@@ -1,0 +1,14 @@
+.tabs-list {
+  .tabs-item {
+    /* 固定标签（isAffix）padding 由类驱动，不随 X 钮隐藏变化 */
+    &.tabs-item-affix {
+      padding: 0 10px;
+    }
+    &.tabs-item-active {
+      color: var(--hooks-colorPrimaryText);
+    }
+    .tabs-item-close-active {
+      color: var(--hooks-colorPrimaryText);
+    }
+  }
+}

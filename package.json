@@ -1,0 +1,123 @@
+{
+  "name": "hooks-admin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "hooks-admin open source management system",
+  "homepage": "https://github.com/HalseySpicy/Hooks-Admin",
+  "bugs": {
+    "url": "https://github.com/HalseySpicy/Hooks-Admin/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Hooks",
+    "email": "848130454@qq.com",
+    "url": "https://github.com/HalseySpicy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:HalseySpicy/Hooks-Admin.git"
+  },
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "vite",
+    "serve": "vite",
+    "build:dev": "tsc && vite build --mode development",
+    "build:test": "tsc && vite build --mode test",
+    "build:pro": "tsc && vite build --mode production",
+    "type:check": "tsc --noEmit --skipLibCheck",
+    "preview": "pnpm build:dev && vite preview",
+    "icons:build": "node scripts/extract-icons.mjs",
+    "lint:eslint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:prettier": "prettier --write \"*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \"{src,build,docs}/**/*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \".{prettier,stylelint}rc.cjs\"",
+    "lint:stylelint": "stylelint --cache --fix \"src/**/*.{less,postcss,css,scss}\" --cache-location node_modules/.cache/stylelint/",
+    "lint:lint-staged": "lint-staged",
+    "prepare": "[ -d .git ] && husky || true",
+    "commit": "git add -A && czg && git push"
+  },
+  "dependencies": {
+    "@ant-design/happy-work-theme": "^2.0.0",
+    "@ant-design/icons": "^6.3.2",
+    "@ant-design/pro-components": "3.1.14-2",
+    "@iconify/react": "^6.0.2",
+    "@tanstack/react-query": "^5.101.0",
+    "ahooks": "^3.9.7",
+    "antd": "^6.5.0",
+    "axios": "^1.18.0",
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.21",
+    "echarts": "^6.1.0",
+    "keepalive-for-react": "^5.0.11",
+    "nprogress": "^0.2.0",
+    "react": "^19.2.7",
+    "react-colorful": "^5.6.1",
+    "react-countup": "^6.5.3",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@eslint/js": "^10.0.1",
+    "@iconify-json/ri": "^1.2.10",
+    "@iconify/utils": "^3.1.4",
+    "@types/node": "^20.14.9",
+    "@types/nprogress": "^0.2.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@unocss/eslint-plugin": "^66.7.2",
+    "@vitejs/plugin-react": "^6.0.2",
+    "autoprefixer": "^10.4.19",
+    "cz-git": "^1.9.3",
+    "czg": "^1.9.3",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
+    "husky": "^9.0.11",
+    "less": "^4.2.0",
+    "lint-staged": "^15.2.7",
+    "postcss": "^8.4.39",
+    "postcss-html": "^1.7.0",
+    "postcss-less": "^6.0.0",
+    "prettier": "^3.8.4",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "stylelint": "^16.6.1",
+    "stylelint-config-recess-order": "^5.0.1",
+    "stylelint-config-standard": "^36.0.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.61.1",
+    "unocss": "^66.7.2",
+    "vite": "^8.0.16",
+    "vite-plugin-checker": "^0.14.4",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-pwa": "^1.3.0",
+    "workbox-build": "^7.4.1",
+    "workbox-window": "^7.4.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "browserslist": {
+    "production": [
+      "> 1%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@10.26.0"
+}

@@ -1,0 +1,33 @@
+.analysis {
+  .analysis-overview {
+    .overview-box {
+      .overview-head {
+        .overview-tabs {
+          .ant-tabs-nav::before {
+            border: none;
+          }
+          .ant-tabs-tab {
+            padding: 12px 0 10px;
+            font-size: 16px;
+          }
+        }
+      }
+      .overview-echarts {
+        .title {
+          font-size: 15px;
+          color: var(--hooks-colorTextSecondary);
+        }
+        .value {
+          font-size: 20px;
+          color: var(--hooks-colorText);
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .overview-title {
+    display: none;
+  }
+}

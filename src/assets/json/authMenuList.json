@@ -1,0 +1,49 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "path": "/home/index",
+      "element": "/home/index",
+      "meta": {
+        "key": "home",
+        "icon": "ri:home-smile-2-line",
+        "title": "首页",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true
+      }
+    },
+    {
+      "path": "/list",
+      "redirect": "/list/useProTable",
+      "meta": {
+        "key": "list",
+        "icon": "ri:table-line",
+        "title": "列表页面",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": false
+      },
+      "children": [
+        {
+          "path": "/list/useProTable",
+          "element": "/list/useProTable/index",
+          "meta": {
+            "key": "useProTable",
+            "icon": "ri:apps-line",
+            "title": "用户列表",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "auths": ["add", "edit", "delete", "batchDelete", "status"],
+            "isKeepAlive": true
+          }
+        }
+      ]
+    }
+  ],
+  "msg": "成功"
+}

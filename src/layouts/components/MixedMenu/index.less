@@ -1,0 +1,51 @@
+.mixed-menu {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: 60px;
+  overflow: hidden;
+  .menu-scroll {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    overflow-x: auto;
+  }
+  .scroll-btn {
+    flex-shrink: 0;
+  }
+  .menu-item {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    gap: 6px;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: var(--hooks-colorText);
+    cursor: pointer;
+    transition: color 0.2s;
+    .anticon {
+      font-size: 18px;
+    }
+    &:hover {
+      color: var(--hooks-colorPrimaryText);
+    }
+  }
+  .menu-item-active {
+    color: var(--hooks-colorPrimaryText);
+
+    /* 混合模式标志性下划线：40×2 主题色，水平居中 */
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      margin: auto;
+      content: '';
+      background-color: var(--hooks-colorPrimary);
+    }
+  }
+}

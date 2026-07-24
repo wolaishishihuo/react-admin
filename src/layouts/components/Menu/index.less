@@ -1,0 +1,49 @@
+/* 侧栏菜单补丁：只放 antd Menu token 表达不了的部分 */
+
+/* 子菜单展开箭头，暗色纯白 */
+.ant-menu .ant-menu-submenu-arrow {
+  color: var(--hooks-colorIconText);
+}
+.dark .ant-menu .ant-menu-submenu-arrow {
+  color: #ffffff;
+}
+
+/* 折叠/悬浮弹出子菜单：容器 8px 内边距；项 40px 高、5px 间距、6px 圆角；选中为灰底而非主题色底
+   （容器选择器需 .ant-menu 提专一度：antd 运行时注入的同权重样式在文档流更靠后） */
+.ant-menu-submenu-popup .ant-menu.ant-menu-vertical {
+  padding: 8px;
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    width: 100%;
+    height: 40px;
+    margin-block: 0 5px;
+    margin-inline: 0;
+    line-height: 40px;
+    border-radius: 6px;
+    &:last-child {
+      margin-block-end: 0;
+    }
+  }
+  .ant-menu-item-selected {
+    color: var(--hooks-colorText);
+    background-color: var(--hooks-colorMenuPopupActiveBg);
+  }
+}
+
+/* dark 档弹出子菜单（仅亮色页面挂 menu-popup-dark；isDark 走上方全局暗色规则）。
+   hex 为主题常量 */
+.ant-menu-submenu-popup.menu-popup-dark .ant-menu.ant-menu-vertical {
+  background-color: #191a23;
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    color: #babbbd;
+  }
+  .ant-menu-item:not(.ant-menu-item-selected):hover,
+  .ant-menu-submenu-title:hover {
+    background-color: #0f1015;
+  }
+  .ant-menu-item-selected {
+    color: #ffffff;
+    background-color: #27282d;
+  }
+}

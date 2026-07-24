@@ -1,0 +1,56 @@
+@import url('./common.less');
+@import url('./proTable.less');
+@import url('./transition.less');
+
+/* global */
+html,
+body,
+#root,
+.ant-app,
+.watermark-content {
+  height: 100%;
+  background-color: var(--hooks-colorBgContainer);
+}
+
+/* antd reset 把裸 svg 置为 display:block（antd 图标有 span.anticon 包裹不受影响）；
+   iconify 裸 svg 回正为行内，文本流场景（Divider/前缀等）才能与文字同行 */
+svg.iconify {
+  display: inline-block;
+}
+
+/* 重置 antd 6 自设 scrollbar-color，与全局滚动条一致 */
+.ant-table {
+  .ant-table-container {
+    .ant-table-body,
+    .ant-table-content {
+      scrollbar-color: auto;
+    }
+  }
+}
+
+/* scroll bar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--hooks-scrollbarThumb);
+  border-radius: 20px;
+}
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+/* nprogress */
+#nprogress .bar {
+  background: var(--hooks-colorPrimary) !important;
+}
+#nprogress .spinner-icon {
+  border-top-color: var(--hooks-colorPrimary) !important;
+  border-left-color: var(--hooks-colorPrimary) !important;
+}
+#nprogress .peg {
+  box-shadow:
+    0 0 10px var(--hooks-colorPrimary),
+    0 0 5px var(--hooks-colorPrimary) !important;
+}

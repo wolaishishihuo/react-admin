@@ -1,0 +1,106 @@
+.theme-drawer {
+  .ant-drawer-body {
+    padding: 25px 24px 10px 26px;
+  }
+  .divider {
+    margin: 10px 0 0 !important;
+    font-size: 15px !important;
+    &:first-child {
+      margin-top: 0 !important;
+    }
+
+    /* antd 图标（span.anticon）与 iconify 裸 svg 双轨：分节图标与标题间距 */
+    .anticon,
+    svg.iconify {
+      margin-right: 10px;
+      vertical-align: -0.125em;
+    }
+  }
+  .ant-divider-with-text::before,
+  .ant-divider-with-text::after {
+    border-top: 1px solid var(--hooks-colorFill) !important;
+  }
+  .theme-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 23.5px 0;
+    span {
+      font-size: 14px;
+      color: var(--hooks-colorText);
+    }
+    .anticon {
+      margin-left: 4px;
+      cursor: pointer;
+    }
+    .primary {
+      width: 19px;
+      height: 19px;
+      cursor: pointer;
+      background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+      border-radius: 50px;
+      box-shadow:
+        var(--hooks-colorBgContainer) 0 0 0 1px,
+        var(--hooks-colorPrimary) 0 0 0 5px;
+    }
+  }
+
+  /* 明暗三档卡片：52px 预览图卡、2px 描边、8px 圆角 */
+  .theme-style-box {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 16px;
+    align-items: center;
+    width: calc(100% + 15px);
+    margin-top: 23.5px;
+    margin-bottom: 10px;
+    .theme-style-item {
+      box-sizing: border-box;
+      width: calc(33.333% - 15px);
+      margin-right: 15px;
+      text-align: center;
+      .box {
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        height: 52px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid var(--hooks-colorBorderSecondary);
+        border-radius: 8px;
+        box-shadow: 0 0 8px 0 rgb(0 0 0 / 10%);
+        transition: box-shadow 0.1s;
+        &.is-active {
+          border: 2px solid var(--hooks-colorPrimary);
+        }
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .name {
+        margin-top: 6px;
+        font-size: 14px;
+        text-align: center;
+      }
+    }
+  }
+
+  /* 菜单风格三卡 isDark 静默禁用：no-drop 光标 + 点击 no-op，选中标记保留 */
+  .menu-style-box .theme-style-item.is-disabled .box {
+    cursor: no-drop;
+  }
+
+  /* 行距节奏由结构驱动（替代 tsx 侧 !margin 压制）：贴邻分组分割线的行底部留 35px */
+  .theme-item:has(+ .divider) {
+    margin-bottom: 35px;
+  }
+}
+
+/* 暗色下预览卡描边透明，选中态保持主题色 */
+.dark .theme-drawer .theme-style-box .theme-style-item .box {
+  border-color: transparent;
+  &.is-active {
+    border-color: var(--hooks-colorPrimary);
+  }
+}
