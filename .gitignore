@@ -26,3 +26,4 @@ db
 *.sw?
 *superpowers
 superpowers
+.pnpm-store

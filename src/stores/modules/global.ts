@@ -37,31 +37,7 @@ export const useGlobalStore = create<GlobalStore>()(
     }),
     {
       name: 'global-state',
-      storage: createJSONStorage(() => localStorage),
-      // persist v5：删旧布局字段与表格专属状态；补 themeMode；layout→menuType
-      version: 5,
-      migrate: persistedState => {
-        const state = persistedState as Record<string, unknown>;
-        delete state?.footer;
-        delete state?.isGrey;
-        delete state?.siderInverted;
-        delete state?.menuSplit;
-        delete state?.tableSize;
-        delete state?.isZebra;
-        delete state?.isBorder;
-        if (!state?.themeMode) state.themeMode = state?.isDark ? 'dark' : 'light';
-        if (state?.layout) {
-          const layoutToMenuType: Record<string, string> = {
-            vertical: 'left',
-            classic: 'top-left',
-            transverse: 'top',
-            columns: 'dual-menu'
-          };
-          state.menuType = layoutToMenuType[state.layout as string] ?? 'left';
-          delete state.layout;
-        }
-        return state as unknown as GlobalStore;
-      }
+      storage: createJSONStorage(() => localStorage)
     }
   )
 );

@@ -16,4 +16,4 @@ pnpm dev        # http://localhost:9527，任意账号密码可登录（本地 m
 ## 说明
 
 - 登录/菜单均为本地 mock：菜单在 `src/assets/json/authMenuList.json`，登录返回本地固定 token。对接真实后端只需替换 `src/api/modules/login.ts` 中注释标注的实现。
-- 完整项目规范见 `CLAUDE.md`；设计系统见 `docs/DESIGN.md`；表格规范见 `docs/PROTABLE.md`。
+- 完整项目规范见 `CLAUDE.md`；设计系统见 `docs/DESIGN.md`；表格规范见 `docs/PROTABLE.md`；Skyroc 基础架构借鉴与改造方案见 `docs/SKYROC_REFERENCE.md`。

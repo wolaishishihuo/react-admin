@@ -20,19 +20,9 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'user-state',
-      version: 1,
       storage: createJSONStorage(() => localStorage),
       // 只持久化数据字段
-      partialize: state => ({ token: state.token, userInfo: state.userInfo, searchHistory: state.searchHistory }),
-      // v<1 重置假 userInfo
-      migrate: (persisted, version) => {
-        const p = (persisted ?? {}) as Partial<UserState>;
-        return {
-          token: p.token ?? '',
-          userInfo: version < 1 ? { name: '' } : (p.userInfo ?? { name: '' }),
-          searchHistory: p.searchHistory ?? []
-        } as unknown as UserStore;
-      }
+      partialize: state => ({ token: state.token, userInfo: state.userInfo, searchHistory: state.searchHistory })
     }
   )
 );
