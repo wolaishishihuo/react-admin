@@ -51,6 +51,18 @@ function navigateIfRemoved(visible: AdminTab[], activeId: string, fallbackId?: s
   void navigateTo(next.fullPath);
 }
 
+function mergeTab(existing: AdminTab, incoming: AdminTab): AdminTab {
+  // 同一地址的路由同步不能覆盖 setTabTitle 写入的运行时标题。
+  const hasRuntimeTitle = existing.title !== existing.oldTitle;
+  const keepRuntimeTitle = existing.fullPath === incoming.fullPath && hasRuntimeTitle;
+
+  return {
+    ...existing,
+    ...incoming,
+    title: keepRuntimeTitle ? existing.title : incoming.title
+  };
+}
+
 export const useTabsStore = create<TabsStore>()(
   persist(
     (set, get) => ({
@@ -59,7 +71,7 @@ export const useTabsStore = create<TabsStore>()(
       contentRevision: {},
       upsertTab: tab => {
         if (tab.fixed && tab.routePath === HOME_TAB.routePath) {
-          set({ homeTab: { ...get().homeTab, ...tab, id: HOME_TAB.id, fixed: true } });
+          set({ homeTab: mergeTab(get().homeTab, { ...tab, id: HOME_TAB.id, fixed: true }) });
           return;
         }
         const oldTabs = get().tabs;
@@ -69,7 +81,7 @@ export const useTabsStore = create<TabsStore>()(
           return;
         }
         // 原位更新已有 Tab，避免路由信息变化导致标签顺序跳动。
-        set({ tabs: oldTabs.map(item => (item.id === tab.id ? { ...item, ...tab } : item)) });
+        set({ tabs: oldTabs.map(item => (item.id === tab.id ? mergeTab(item, tab) : item)) });
       },
       removeTab: (id, activeId) => {
         const visible = getVisibleTabs(get());

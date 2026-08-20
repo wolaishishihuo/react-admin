@@ -70,6 +70,31 @@ describe('tabs store', () => {
     expect(useTabsStore.getState().tabs[0]?.title).toBe('用户列表（新）');
   });
 
+  it('重新激活相同地址时保留运行时标题', () => {
+    useTabsStore.getState().upsertTab(detailTab);
+    useTabsStore.getState().setTabTitle(detailTab.id, '详情 - user_01');
+
+    useTabsStore.getState().upsertTab(detailTab);
+
+    expect(useTabsStore.getState().tabs[0]).toMatchObject({
+      title: '详情 - user_01',
+      oldTitle: '详情'
+    });
+  });
+
+  it('普通 Tab 切换到新地址时恢复路由默认标题', () => {
+    useTabsStore.getState().upsertTab(otherTab);
+    useTabsStore.getState().setTabTitle(otherTab.id, '详情 - user_01');
+
+    useTabsStore.getState().upsertTab({ ...otherTab, fullPath: '/users/2' });
+
+    expect(useTabsStore.getState().tabs[0]).toMatchObject({
+      fullPath: '/users/2',
+      title: '用户资料',
+      oldTitle: '用户资料'
+    });
+  });
+
   it('关闭当前非固定 Tab 导航到邻居', () => {
     useTabsStore.setState({ tabs: [listTab, detailTab] });
     useTabsStore.getState().removeTab(listTab.id, listTab.id);

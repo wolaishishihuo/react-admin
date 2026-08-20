@@ -42,20 +42,23 @@ test('A→B→A 不因 Tab 切换增加列表请求', async ({ page }) => {
   await expect.poll(() => listUrls.length).toBe(afterFirst + 1);
 });
 
-test('两个详情是两个 tab，切回后内容不串', async ({ page }) => {
+test('关闭第二个详情后保留第一个详情的动态标题和内容', async ({ page }) => {
   await login(page);
   await page.goto(appPath('/list/useProTable/detail?id=1'));
   const visiblePane = page.locator('[data-keep-alive-key]:not([aria-hidden="true"])');
   await expect(visiblePane.getByText('user_01')).toBeVisible({ timeout: 15000 });
+  const firstTab = page.locator('.tabs-item', { hasText: '详情 - user_01' });
+  await expect(firstTab).toBeVisible();
+
   await page.goto(appPath('/list/useProTable/detail?id=2'));
-  await expect
-    .poll(async () => {
-      const titles = await page.locator('.tabs-item span').allTextContents();
-      return titles.filter(title => title.includes('详情')).length;
-    })
-    .toBeGreaterThanOrEqual(2);
   await expect(visiblePane.getByText('user_02')).toBeVisible();
-  await page.locator('.tabs-item', { hasText: 'user_01' }).click();
+  const secondTab = page.locator('.tabs-item', { hasText: '详情 - user_02' });
+  await expect(secondTab).toBeVisible();
+
+  await secondTab.locator('.tabs-item-close').click();
+
+  await expect(firstTab).toBeVisible();
+  await expect(page.locator('.tabs-item').getByText('用户详情', { exact: true })).toHaveCount(0);
   await expect(visiblePane.getByText('user_01')).toBeVisible();
   await expect(visiblePane.getByText('user_02')).toHaveCount(0);
 });
