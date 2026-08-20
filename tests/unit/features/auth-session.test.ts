@@ -1,9 +1,15 @@
 import { QueryClient } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { queryClient } from '@/services/query/client';
-import { getToken, isSessionInitialized, setLastLoginUserId, useSessionStore } from '@/stores/modules/session.store';
+import {
+  getRefreshToken,
+  getToken,
+  isSessionInitialized,
+  setLastLoginUserId,
+  useSessionStore
+} from '@/stores/modules/session.store';
 import { HOME_TAB, useTabsStore } from '@/stores/modules/tabs.store';
-import { getUserInfoApi, logoutApi } from '@/features/auth/api';
+import { getUserInfoApi, logoutApi, refreshTokenApi } from '@/features/auth/api';
 import { authUserQueryOptions } from '@/features/auth/queries';
 import {
   applyAuthToken,
@@ -13,13 +19,15 @@ import {
   initializeSession,
   isAuthInitialized,
   logoutSession,
+  refreshCurrentToken,
   revokeSession
 } from '@/features/auth/session';
 import { navigateTo } from '@/router/router-ref';
 
 vi.mock('@/features/auth/api', () => ({
   getUserInfoApi: vi.fn(),
-  logoutApi: vi.fn()
+  logoutApi: vi.fn(),
+  refreshTokenApi: vi.fn()
 }));
 
 vi.mock('@/features/navigation/menu-query', () => ({
@@ -39,6 +47,7 @@ vi.mock('@/router/router-ref', () => ({
 
 const getUserInfoApiMock = vi.mocked(getUserInfoApi);
 const logoutApiMock = vi.mocked(logoutApi);
+const refreshTokenApiMock = vi.mocked(refreshTokenApi);
 const navigateToMock = vi.mocked(navigateTo);
 
 describe('initializeSession', () => {
@@ -46,6 +55,7 @@ describe('initializeSession', () => {
     queryClient.clear();
     useSessionStore.setState({
       token: '',
+      refreshToken: '',
       lastLoginUserId: '',
       sessionEpoch: 0,
       initialized: false
@@ -68,6 +78,7 @@ describe('initializeSession', () => {
     });
     getUserInfoApiMock.mockReset();
     logoutApiMock.mockReset();
+    refreshTokenApiMock.mockReset();
     navigateToMock.mockReset();
   });
 
@@ -139,12 +150,12 @@ describe('initializeSession', () => {
   it('同用户登录保留非固定 Tabs，换用户则清理', async () => {
     setLastLoginUserId('1');
     getUserInfoApiMock.mockResolvedValue({ id: '1', name: 'admin' });
-    await establishSession('token-admin');
+    await establishSession({ token: 'token-admin' });
     expect(useTabsStore.getState().tabs).toHaveLength(1);
     queryClient.setQueryData(['navigation', 'menu', 'token-admin'], { owner: 'admin' });
 
     getUserInfoApiMock.mockResolvedValue({ id: '2', name: 'user' });
-    await establishSession('token-user');
+    await establishSession({ token: 'token-user' });
     expect(useTabsStore.getState().tabs).toEqual([]);
     expect(queryClient.getQueryData(['navigation', 'menu', 'token-admin'])).toBeUndefined();
   });
@@ -166,10 +177,11 @@ describe('initializeSession', () => {
   });
 
   it('HTTP 401 只清本地会话，不再调用登出接口', async () => {
-    applyAuthToken('token-a');
+    useSessionStore.getState().setAuthTokens({ token: 'token-a', refreshToken: 'refresh-a' });
     await expireCurrentSession();
     expect(logoutApiMock).not.toHaveBeenCalled();
     expect(getToken()).toBe('');
+    expect(getRefreshToken()).toBe('');
     expect(navigateToMock).toHaveBeenCalledTimes(1);
     expect(navigateToMock).toHaveBeenCalledWith('/login', { replace: true });
   });
@@ -178,5 +190,45 @@ describe('initializeSession', () => {
     await revokeSession();
     expect(logoutApiMock).not.toHaveBeenCalled();
     expect(navigateToMock).not.toHaveBeenCalled();
+  });
+
+  it('没有 refresh token 时不调用续签接口', async () => {
+    applyAuthToken('token-a');
+
+    await expect(refreshCurrentToken()).resolves.toBe(false);
+
+    expect(refreshTokenApiMock).not.toHaveBeenCalled();
+  });
+
+  it('续签成功后同时保存轮换后的 token', async () => {
+    useSessionStore.getState().setAuthTokens({ token: 'token-a', refreshToken: 'refresh-a' });
+    const sessionEpoch = useSessionStore.getState().sessionEpoch;
+    refreshTokenApiMock.mockResolvedValue({ token: 'token-b', refreshToken: 'refresh-b' });
+
+    await expect(refreshCurrentToken()).resolves.toBe(true);
+
+    expect(refreshTokenApiMock).toHaveBeenCalledWith('refresh-a');
+    expect(getToken()).toBe('token-b');
+    expect(getRefreshToken()).toBe('refresh-b');
+    expect(useSessionStore.getState().sessionEpoch).toBe(sessionEpoch);
+  });
+
+  it('旧会话的迟到续签响应不得覆盖新登录凭据', async () => {
+    let resolveRefresh!: (tokens: { token: string; refreshToken: string }) => void;
+    useSessionStore.getState().setAuthTokens({ token: 'token-a', refreshToken: 'refresh-a' });
+    refreshTokenApiMock.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveRefresh = resolve;
+        })
+    );
+
+    const refresh = refreshCurrentToken();
+    useSessionStore.getState().setAuthTokens({ token: 'token-new-login', refreshToken: 'refresh-new-login' });
+    resolveRefresh({ token: 'token-stale', refreshToken: 'refresh-stale' });
+
+    await expect(refresh).resolves.toBe(true);
+    expect(getToken()).toBe('token-new-login');
+    expect(getRefreshToken()).toBe('refresh-new-login');
   });
 });

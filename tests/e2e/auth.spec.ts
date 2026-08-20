@@ -35,6 +35,73 @@ test('恶意 redirect 登录后回到首页', async ({ page }) => {
   expect(page.url()).not.toContain('evil.example');
 });
 
+test('业务 401 会刷新 token 并重发原请求', async ({ page }) => {
+  let userInfoRequests = 0;
+  let refreshRequests = 0;
+  await page.route('**/api/user/info', async route => {
+    userInfoRequests += 1;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        userInfoRequests === 1
+          ? { code: 401, msg: '令牌已过期', data: null }
+          : { code: 200, msg: '成功', data: { id: '1', name: 'admin' } }
+      )
+    });
+  });
+  await page.route('**/api/refreshToken', async route => {
+    refreshRequests += 1;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 200,
+        msg: '成功',
+        data: { token: 'mock-token-admin-refreshed', refreshToken: 'mock-refresh-admin-refreshed' }
+      })
+    });
+  });
+
+  await login(page);
+
+  expect(userInfoRequests).toBe(2);
+  expect(refreshRequests).toBe(1);
+});
+
+test('登录响应没有 refresh token 时 401 直接终止会话', async ({ page }) => {
+  let userInfoRequests = 0;
+  let refreshRequests = 0;
+  await page.route('**/api/login', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ code: 200, msg: '成功', data: { token: 'access-only-token' } })
+    });
+  });
+  await page.route('**/api/user/info', async route => {
+    userInfoRequests += 1;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ code: 401, msg: '会话已失效', data: null })
+    });
+  });
+  await page.route('**/api/refreshToken', async route => {
+    refreshRequests += 1;
+    await route.abort();
+  });
+
+  await page.goto('/');
+  await page.getByPlaceholder('User：admin / user').fill('admin');
+  await page.getByPlaceholder('Password：123456').fill('123456');
+  await page.getByRole('button', { name: 'Submit' }).click();
+
+  await expect.poll(() => userInfoRequests).toBe(1);
+  await expect(page.getByPlaceholder('User：admin / user')).toBeVisible();
+  expect(refreshRequests).toBe(0);
+});
+
 test('拼错 URL 显示 404', async ({ page }) => {
   await login(page);
   await page.goto(appPath('/this-route-does-not-exist'));

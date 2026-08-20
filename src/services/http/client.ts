@@ -5,7 +5,7 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { getToken } from '@/stores/modules/session.store';
 import type { BaseResponse } from './types';
-import { expireSession } from './unauthorized';
+import { expireSession, refreshToken } from './unauthorized';
 import { getAbortSignal } from './cancel';
 import { HttpError, handleError, showError } from './errors';
 import { ApiStatus } from './status';
@@ -67,11 +67,13 @@ axiosInstance.interceptors.response.use(
 
     const { code, msg } = response.data;
     if (code === ApiStatus.success) return response;
-    if (code === ApiStatus.unauthorized) handleUnauthorizedError(msg);
+    if (code === ApiStatus.unauthorized) return handleUnauthorizedResponse(response.config, msg);
     throw createHttpError(msg || '请求失败', code);
   },
-  error => {
-    if (error.response?.status === ApiStatus.unauthorized) handleUnauthorizedError();
+  async error => {
+    if (error.response?.status === ApiStatus.unauthorized && error.config) {
+      return handleUnauthorizedResponse(error.config, error.response.data?.msg);
+    }
     return Promise.reject(handleError(error));
   }
 );
@@ -84,8 +86,20 @@ export function createHttpError(message: string, code?: number) {
   return new HttpError(message, code ?? ApiStatus.error);
 }
 
-export function handleUnauthorizedError(message?: string): never {
-  void expireSession();
+export async function handleUnauthorizedResponse(
+  config: InternalAxiosRequestConfig,
+  message?: string
+): Promise<AxiosResponse<BaseResponse>> {
+  if (config.isTokenRefresh) throw createHttpError(message || '令牌刷新失败', ApiStatus.unauthorized);
+
+  if (!config.isTokenRefreshRetry && (await refreshToken())) {
+    config.isTokenRefreshRetry = true;
+    const token = getToken();
+    if (token) config.headers.set('x-access-token', token);
+    return axiosInstance.request<BaseResponse>(config);
+  }
+
+  await expireSession();
   const error = createHttpError(message || '未授权访问，请重新登录', ApiStatus.unauthorized);
   showError(error, true);
   throw error;

@@ -106,7 +106,7 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ## 6. 认证
 
-`initializeSession` 冷启动与登录后 single-flight，绑定 token/session epoch：拉 user + 菜单交集。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；明确 401/空用户才清会话。user-info Query `retry: false`。HTTP 401 只调用 `expireSession()`，不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
+`initializeSession` 冷启动与登录后 single-flight，绑定 session epoch：拉 user + 菜单交集。登录/换用户递增 epoch，Token 续签只轮换凭据。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；401 在有 refresh token 时 single-flight 续签并只重发一次，没有或续签失败才清会话。user-info Query `retry: false`。HTTP 不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
 
 ## 7. 质量
 

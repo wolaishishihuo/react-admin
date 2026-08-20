@@ -8,24 +8,27 @@ import { ensureAuthorizedNavigation } from '@/features/navigation/menu-query';
 import { navigateTo, getRouter } from '@/router/router-ref';
 import {
   getLastLoginUserId,
+  getRefreshToken,
   getSessionEpoch,
   getToken,
   isSessionInitialized,
   setLastLoginUserId,
-  setSessionInitialized,
-  setToken
+  setAuthTokens,
+  setRefreshedAuthTokens,
+  setSessionInitialized
 } from '@/stores/modules/session.store';
 import { resetTransientTabs } from '@/stores/modules/tabs.store';
 import { cancelAllRequest } from '@/services/http/cancel';
+import { resetTokenRefresh } from '@/services/http/unauthorized';
 import { authUserQueryOptions } from './queries';
-import { logoutApi } from './api';
-import type { AuthUser } from './types';
+import { logoutApi, refreshTokenApi } from './api';
+import type { AuthTokens, AuthUser } from './types';
 
 let initializeInFlight: Promise<AuthUser | null> | null = null;
 let inFlightKey: string | null = null;
 
 function sessionFlightKey() {
-  return `${getSessionEpoch()}:${getToken()}`;
+  return String(getSessionEpoch());
 }
 
 export function isAuthInitialized() {
@@ -37,19 +40,23 @@ export function isLoggedIn() {
 }
 
 export function applyAuthToken(token: string) {
-  if (getToken() !== token) setSessionInitialized(false);
-  setToken(token);
+  applyAuthTokens({ token });
+}
+
+export function applyAuthTokens(tokens: AuthTokens) {
+  if (getToken() !== tokens.token) setSessionInitialized(false);
+  setAuthTokens(tokens);
 }
 
 function isolateUserChange(previousUserId: string, nextUserId: string) {
   if (previousUserId && previousUserId === nextUserId) return;
-  // 换用户时清理旧页面状态和缓存，但保留当前 token 已加载的 user/menu Query。
+  // 换用户时清理旧页面状态和缓存，但保留当前会话已加载的 user/menu Query。
   resetTransientTabs();
-  const currentToken = getToken();
+  const currentSessionEpoch = getSessionEpoch();
   queryClient.removeQueries({
     predicate: query => {
-      if (query.queryKey[0] === 'navigation' && query.queryKey[2] === currentToken) return false;
-      if (query.queryKey[0] === 'auth' && query.queryKey[2] === currentToken) return false;
+      if (query.queryKey[0] === 'navigation' && query.queryKey[2] === currentSessionEpoch) return false;
+      if (query.queryKey[0] === 'auth' && query.queryKey[2] === currentSessionEpoch) return false;
       return true;
     }
   });
@@ -101,9 +108,10 @@ export async function initializeSession(): Promise<AuthUser | null> {
   return initializeInFlight;
 }
 
-export async function establishSession(token: string): Promise<AuthUser | null> {
+export async function establishSession(tokens: AuthTokens): Promise<AuthUser | null> {
   const previousUserId = getLastLoginUserId();
-  applyAuthToken(token);
+  resetTokenRefresh();
+  applyAuthTokens(tokens);
   const user = await initializeSession();
   if (!user) return null;
   isolateUserChange(previousUserId, user.id);
@@ -111,13 +119,30 @@ export async function establishSession(token: string): Promise<AuthUser | null> 
   return user;
 }
 
+export async function refreshCurrentToken(): Promise<boolean> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+  const key = sessionFlightKey();
+
+  try {
+    const tokens = await refreshTokenApi(refreshToken);
+    if (sessionFlightKey() !== key) return Boolean(getToken());
+    setRefreshedAuthTokens(tokens);
+    return true;
+  } catch {
+    if (sessionFlightKey() !== key) return Boolean(getToken());
+    return false;
+  }
+}
+
 export async function clearLocalSession() {
+  resetTokenRefresh();
   setSessionInitialized(false);
   cancelAllRequest();
   queryClient.clear();
   initializeInFlight = null;
   inFlightKey = null;
-  setToken('');
+  setAuthTokens({ token: '' });
 }
 
 export async function revokeSession() {

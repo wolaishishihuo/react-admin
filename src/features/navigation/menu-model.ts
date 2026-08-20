@@ -11,8 +11,9 @@ const EMPTY_PERMISSION_MAP = new Map<string, string[]>();
 
 export function useAuthorizedNavigation() {
   const token = useSessionStore(state => state.token);
+  const sessionEpoch = useSessionStore(state => state.sessionEpoch);
   const query = useQuery({
-    ...navigationQueryOptions(getRouter(), token),
+    ...navigationQueryOptions(getRouter(), sessionEpoch),
     enabled: Boolean(token)
   });
 

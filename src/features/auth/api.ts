@@ -1,8 +1,17 @@
 import api from '@/services/http';
-import type { AuthUser, ReqLogin, ResLogin } from './types';
+import type { AuthUser, RefreshTokenResponse, ReqLogin, ResLogin } from './types';
 
 export function loginApi(params: ReqLogin) {
   return api.post<ResLogin>({ url: '/login', data: params });
+}
+
+export function refreshTokenApi(refreshToken: string) {
+  return api.post<RefreshTokenResponse>({
+    url: '/refreshToken',
+    data: { refreshToken },
+    isTokenRefresh: true,
+    showErrorMessage: false
+  });
 }
 
 export function getUserInfoApi() {

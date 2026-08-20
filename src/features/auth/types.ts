@@ -9,6 +9,14 @@ export interface AuthUser {
   avatar?: string;
 }
 
-export interface ResLogin {
+export interface AuthTokens {
+  refreshToken?: string;
+  token: string;
+}
+
+export type ResLogin = AuthTokens;
+
+export interface RefreshTokenResponse {
+  refreshToken: string;
   token: string;
 }

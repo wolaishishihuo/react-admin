@@ -26,7 +26,7 @@ export default function LoginForm() {
       message.open({ key, type: 'loading', content: '登录中...' });
 
       const data = await loginApi(values);
-      const user = await establishSession(data.token);
+      const user = await establishSession(data);
       if (!user) return;
 
       const redirect = search.redirect;

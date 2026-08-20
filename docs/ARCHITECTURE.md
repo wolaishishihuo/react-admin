@@ -37,11 +37,11 @@ src/app              AntdBridge + feedback
 
 ## 认证与菜单
 
-- token 在 `session.store.ts`；user/menu 只在 Query。`AuthUser.id` 是换用户判断的稳定 identity，由 session owner 持久化 `lastLoginUserId`。
-- root `beforeLoad` 有 token 则 `initializeSession`（single-flight，绑定 token/session epoch）。旧请求迟到不得重新初始化已登出或已换 token 的 session。
+- token 与可选 refresh token 在 `session.store.ts`；user/menu 只在 Query。登录响应不含 refresh token 时禁用续签，401 保持直接清会话。`AuthUser.id` 是换用户判断的稳定 identity，由 session owner 持久化 `lastLoginUserId`。
+- root `beforeLoad` 有 token 则 `initializeSession`（single-flight，绑定 session epoch）。登录/换用户递增 epoch，续签只轮换凭据；旧请求迟到不得重新初始化已登出或已换用户的 session。
 - user-info Query 显式 `retry: false`。
 - `(admin)/layout` `beforeLoad: guardAdminRoute`：无 token → `/login`（`/home` 不带 redirect）；用户空则 `revokeSession`，由 Guard 唯一负责 redirect；未授权本地路由 → `/403`；未知 URL 由 root 404。动态路由按 `matches.at(-1).fullPath` 授权。
-- 网络/5xx 进 errorComponent，不清 token。401 走 `registerUnauthorizedHandler`，只清本地会话并跳登录，不再请求 logout API。
+- 网络/5xx 进 errorComponent，不清 token。401 在存在 refresh token 时 single-flight 续签并只重发一次；续签请求自身不得递归续签。未启用或续签失败时走 `registerUnauthorizedHandler`，只清本地会话并跳登录，不再请求 logout API。
 - 登录 redirect 只接受站内路径。
 
 ## Tabs 与缓存
@@ -57,7 +57,7 @@ src/app              AntdBridge + feedback
 
 - `import api from '@/services/http'`，返回解包后的 `T`。
 - QueryClient：`refetchOnWindowFocus: false`，`retry: 1`；mutation `retry: false`。
-- 列表 `fetchQuery` 必须 `retry: false`。会话终止才 `queryClient.clear()`；换用户 `removeQueries` 保留当前 token 的 user/menu。
+- 列表 `fetchQuery` 必须 `retry: false`。会话终止才 `queryClient.clear()`；user/menu Query 按 session epoch 隔离，换用户 `removeQueries` 保留当前会话数据。
 
 ## 主题 persist
 
@@ -67,6 +67,6 @@ src/app              AntdBridge + feedback
 | ------------ | ----------------------- | -------------------------------------------------------------- |
 | theme        | `theme-state` v1        | themeMode/primary/isWeak/isHappy/compactAlgorithm/borderRadius |
 | admin-layout | `admin-layout-state` v1 | 菜单/折叠/水印/面包屑/tabs 开关、pageAnimate/pageAnimateMode   |
-| session      | `session-state` v1      | token、lastLoginUserId                                         |
+| session      | `session-state` v1      | token、refreshToken、lastLoginUserId                           |
 
 `isDark` 派生不持久化。`index.html` head 脚本只预刷 `theme-state`。

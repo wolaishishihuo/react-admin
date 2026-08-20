@@ -4,7 +4,7 @@
  */
 import type { QueryClient } from '@tanstack/react-query';
 import type { AnyRouter } from '@tanstack/react-router';
-import { getToken } from '@/stores/modules/session.store';
+import { getSessionEpoch } from '@/stores/modules/session.store';
 import { getAuthMenuListApi } from './api';
 import { normalizeBackendMenu, normalizePath } from './menu-normalize';
 import {
@@ -71,13 +71,13 @@ export function buildAuthorizedNavigation(
   };
 }
 
-export function navigationQueryKey(token: string = getToken()) {
-  return ['navigation', 'menu', token] as const;
+export function navigationQueryKey(sessionEpoch: number = getSessionEpoch()) {
+  return ['navigation', 'menu', sessionEpoch] as const;
 }
 
-export function navigationQueryOptions(router: AnyRouter, token: string = getToken()) {
+export function navigationQueryOptions(router: AnyRouter, sessionEpoch: number = getSessionEpoch()) {
   return {
-    queryKey: navigationQueryKey(token),
+    queryKey: navigationQueryKey(sessionEpoch),
     queryFn: async (): Promise<AuthorizedNavigation> => {
       const backend = await getAuthMenuListApi();
       return buildAuthorizedNavigation(backend, collectRouteCatalog(router));

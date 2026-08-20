@@ -18,7 +18,7 @@ const router = {
 
 describe('navigation query session isolation', () => {
   beforeEach(() => {
-    useSessionStore.setState({ token: '', sessionEpoch: 0, initialized: false, lastLoginUserId: '' });
+    useSessionStore.setState({ token: '', refreshToken: '', sessionEpoch: 0, initialized: false, lastLoginUserId: '' });
     vi.mocked(getAuthMenuListApi).mockReset();
   });
 

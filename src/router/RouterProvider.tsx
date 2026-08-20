@@ -6,10 +6,10 @@ import { RouterProvider as TanStackRouterProvider } from '@tanstack/react-router
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { authUserQueryOptions } from '@/features/auth/queries';
-import { expireCurrentSession, initializeSession, isLoggedIn, revokeSession } from '@/features/auth/session';
+import { expireCurrentSession, initializeSession, isLoggedIn, refreshCurrentToken, revokeSession } from '@/features/auth/session';
 import { ensureAuthorizedNavigation } from '@/features/navigation/menu-query';
 import { queryClient } from '@/services/query/client';
-import { registerUnauthorizedHandler } from '@/services/http/unauthorized';
+import { registerTokenRefreshHandler, registerUnauthorizedHandler } from '@/services/http/unauthorized';
 import { useSessionStore } from '@/stores/modules/session.store';
 import type { AppRouterContext } from './context';
 import { router } from './index';
@@ -17,6 +17,7 @@ import { getRouter } from './router-ref';
 
 // 模块加载时注册一次；并发 401 的 single-flight 由 unauthorized 模块负责。
 registerUnauthorizedHandler(expireCurrentSession);
+registerTokenRefreshHandler(refreshCurrentToken);
 
 export default function RouterProvider() {
   const token = useSessionStore(state => state.token);

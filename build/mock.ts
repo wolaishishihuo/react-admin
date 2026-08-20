@@ -109,7 +109,23 @@ async function mockMiddleware(req: IncomingMessage, res: ServerResponse, next: C
       await sleep(300);
       const body = parseJsonBody(await readBody(req));
       const username = String(body.username ?? '');
-      sendJson(res, envelope({ token: `mock-token-${username}` }));
+      sendJson(res, envelope({ token: `mock-token-${username}`, refreshToken: `mock-refresh-${username}` }));
+      return;
+    }
+
+    if (method === 'POST' && route === '/refreshToken') {
+      const body = parseJsonBody(await readBody(req));
+      const refreshToken = String(body.refreshToken ?? '');
+      const username = refreshToken.replace(/^mock-refresh-/, '');
+      const valid = Boolean(username) && refreshToken === `mock-refresh-${username}`;
+      sendJson(
+        res,
+        envelope(
+          valid ? { token: `mock-token-${username}`, refreshToken: `mock-refresh-${username}` } : null,
+          valid ? 200 : 401,
+          valid ? '成功' : '刷新令牌已失效'
+        )
+      );
       return;
     }
 
