@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 import { defineConfig, loadEnv, type ConfigEnv, type UserConfig } from 'vite';
 import { wrapperEnv } from './build/getEnv';
+import { createMockPlugin } from './build/mock';
 import { createVitePlugins } from './build/plugins';
 import { createProxy } from './build/proxy';
 
@@ -28,7 +29,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       cors: true,
       proxy: createProxy(viteEnv.VITE_PROXY)
     },
-    plugins: createVitePlugins(viteEnv),
+    plugins: [createMockPlugin(), ...createVitePlugins(viteEnv)],
     build: {
       outDir: 'dist',
       sourcemap: false,

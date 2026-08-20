@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import UnoCSS from 'unocss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import type { PluginOption } from 'vite';
@@ -15,6 +16,14 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
   const { VITE_GLOB_APP_TITLE, VITE_REPORT, VITE_PWA } = viteEnv;
 
   return [
+    tanstackRouter({
+      target: 'react',
+      routesDirectory: './src/pages',
+      generatedRouteTree: './src/router/routeTree.gen.ts',
+      routeToken: 'layout',
+      autoCodeSplitting: true,
+      routeFileIgnorePattern: '(?:^|/)(components|modules)(?:/|$)|(?:^|/)(loading|error|not-found)(?:\\.tsx?$|$)'
+    }),
     react(),
     // UnoCSS 原子化 CSS，配置见根目录 uno.config.ts
     UnoCSS(),

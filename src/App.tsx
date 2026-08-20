@@ -2,18 +2,19 @@ import { HappyProvider } from '@ant-design/happy-work-theme';
 import { theme, ConfigProvider, App as AppProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
-import type React from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import RouterProvider from '@/routers';
-import { useGlobalStore } from '@/stores';
+import AntdBridge from '@/app/AntdBridge';
+import ThemeEffects from '@/features/theme/ThemeEffects';
+import RouterProvider from '@/router/RouterProvider';
+import { selectIsDark, useThemeStore } from '@/stores/modules/theme.store';
 import 'dayjs/locale/zh-cn';
 
 dayjs.locale('zh-cn');
 
-const App: React.FC = () => {
-  const { isDark, primary, isHappy, compactAlgorithm, borderRadius } = useGlobalStore(
+export default function App() {
+  const { isDark, primary, isHappy, compactAlgorithm, borderRadius } = useThemeStore(
     useShallow(state => ({
-      isDark: state.isDark,
+      isDark: selectIsDark(state),
       primary: state.primary,
       isHappy: state.isHappy,
       compactAlgorithm: state.compactAlgorithm,
@@ -38,7 +39,6 @@ const App: React.FC = () => {
           ...(isDark ? { colorBgContainer: '#161618', colorBgElevated: '#1e1e20' } : {})
         },
         components: {
-          // 侧栏菜单芯片化样式
           Menu: {
             itemHeight: 42,
             itemBorderRadius: 6,
@@ -57,11 +57,11 @@ const App: React.FC = () => {
     >
       <HappyProvider disabled={!isHappy}>
         <AppProvider>
+          <AntdBridge />
+          <ThemeEffects />
           <RouterProvider />
         </AppProvider>
       </HappyProvider>
     </ConfigProvider>
   );
-};
-
-export default App;
+}

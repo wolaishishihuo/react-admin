@@ -10,10 +10,10 @@ import tseslint from 'typescript-eslint';
 // 代码格式化交给 Prettier（见 .prettierrc.cjs）；eslint-config-prettier 关闭风格类规则避免冲突。
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'public', 'docs', '.husky', 'stats.html', '**/*.d.ts']
+    ignores: ['dist', 'node_modules', 'public', 'docs', '.husky', 'stats.html', '**/*.d.ts', 'src/router/routeTree.gen.ts']
   },
   {
-    files: ['src/**/*.{js,jsx,ts,tsx}'],
+    files: ['src/**/*.{js,jsx,ts,tsx}', 'tests/**/*.{js,jsx,ts,tsx}'],
     // 注：eslint-plugin-react-hooks v7 的预设仍是旧数组格式，无法 spread 进 flat config，
     // 故在下方手动注册 react-hooks 插件并直接开启规则。
     extends: [js.configs.recommended, ...tseslint.configs.recommended, react.configs.flat['jsx-runtime']],

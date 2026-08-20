@@ -1,5 +1,4 @@
-/** 表单校验断言 + asFormRule 胶水 */
-import type { Rule } from 'antd/es/form';
+/** 表单校验断言 */
 
 /** 密码强度级别 */
 export enum PasswordStrength {
@@ -8,14 +7,6 @@ export enum PasswordStrength {
   STRONG = '强'
 }
 
-/** 把断言函数包成 antd Form rule（空值放行） */
-export function asFormRule(validate: (value: string) => boolean, message: string): Rule {
-  return {
-    validator: (_, value: string) => (!value || validate(value) ? Promise.resolve() : Promise.reject(new Error(message)))
-  };
-}
-
-/** 验证手机号码（中国大陆：1 开头，第二位 3-9，共 11 位） */
 export function validatePhone(value: string): boolean {
   if (!value || typeof value !== 'string') return false;
   return /^1[3-9]\d{9}$/.test(value.trim());

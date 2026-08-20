@@ -1,0 +1,70 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "path": "/home",
+      "meta": {
+        "key": "home",
+        "icon": "ri:home-smile-2-line",
+        "title": "首页",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true
+      }
+    },
+    {
+      "path": "/list",
+      "redirect": "/list/useProTable",
+      "meta": {
+        "key": "list",
+        "icon": "ri:table-line",
+        "title": "列表页面",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": false
+      },
+      "children": [
+        {
+          "path": "/list/useProTable",
+          "meta": {
+            "key": "useProTable",
+            "icon": "ri:apps-line",
+            "title": "用户列表",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "auths": ["add", "edit", "delete", "batchDelete", "status"]
+          }
+        },
+        {
+          "path": "/list/useProTable/detail",
+          "meta": {
+            "key": "useProTableDetail",
+            "icon": "ri:file-list-3-line",
+            "title": "用户详情",
+            "isLink": "",
+            "isHide": true,
+            "isFull": false,
+            "isAffix": false
+          }
+        },
+        {
+          "path": "/users/:userId",
+          "meta": {
+            "key": "userProfile",
+            "icon": "ri:user-3-line",
+            "title": "用户资料",
+            "isLink": "",
+            "isHide": true,
+            "isFull": false,
+            "isAffix": false
+          }
+        }
+      ]
+    }
+  ],
+  "msg": "成功"
+}

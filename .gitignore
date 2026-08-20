@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 stats.html
+playwright-report
+test-results
+blob-report
+.playwright
 *.local
 db
 # Editor directories and files

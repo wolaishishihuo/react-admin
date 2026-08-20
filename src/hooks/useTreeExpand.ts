@@ -2,7 +2,7 @@ import type { TableProps } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import type { Key } from 'react';
 
-import treeExpandIcon from '@/components/TreeExpandIcon';
+import treeExpandIcon from '@/components/TableExpandIcon';
 
 export interface TreeExpandOptions<T> {
   /** false 时空转，满足 hooks 无条件调用 */

@@ -1,7 +1,8 @@
 import { Button, Result } from 'antd';
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { HOME_URL } from '@/config';
+import { HOME_PATH } from '@/features/navigation/menu-normalize';
+import { navigateTo } from '@/router/router-ref';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -29,7 +30,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   handleBackHome = () => {
     this.setState({ error: null });
-    window.$navigate?.(HOME_URL);
+    navigateTo(HOME_PATH);
   };
 
   render() {

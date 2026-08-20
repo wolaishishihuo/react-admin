@@ -75,7 +75,7 @@ columns 同时描述展示和搜索：
 
 ## 高度、滚动与样式
 
-`src/styles/proTable.less` 只通过 `.app-pro-table` 和 `.app-pro-table-card` 建立高度链：桌面端搜索区固定、表体内部滚动、分页贴底；`640px` 以下取消固定高度和纵向内滚，滚动交还页面。页面不手工测量高度，不写 `bodyStyle` 或 `cardProps.styles.body` 高度补丁。
+高度链由 `src/pages/(admin)/list/useProTable/index.less` 通过 `.app-pro-table` 和 `.app-pro-table-card` 建立：桌面端搜索区固定、表体内部滚动、分页贴底；`640px` 以下取消固定高度和纵向内滚，滚动交还页面。页面不手工测量高度，不写 `bodyStyle` 或 `cardProps.styles.body` 高度补丁。
 
 AntD Table 的滚动选择器必须按真实 DOM 层级写在页面或项目作用域内：`.ant-table-body` 负责纵向表体，`.ant-table-content` 负责横向内容，虚拟表格使用 `.ant-table-virtual-holder`。不要用全局 `.ant-pro-*` 或 `.ant-pro-card:last-child` 选择器。
 
@@ -86,3 +86,13 @@ AntD Table 的滚动选择器必须按真实 DOM 层级写在页面或项目作�
 - 重复错误提示：request 的 `fetchQuery` 设置 `retry: false`，页面使用 `onRequestError={() => undefined}`，不要在 catch 中再次提示。
 - 分页字段错误：ProTable 的 `current/pageSize` 只能在 request 入口转换为后端 `page/limit`。
 - 样式失效：确认根节点和卡片分别有 `.app-pro-table`、`.app-pro-table-card`，并核对 AntD 6 实际 body/content/virtual-holder 层级。
+
+## 快照缓存列表（keepAlive）
+
+`/list/useProTable` 是 `staticData.keepAlive: true` 的标准缓存列表。约束：
+
+- `request` 必须 `useCallback`，options factory 放页面 `modules/queries.ts`，`fetchQuery` 设 `retry: false`。
+- Tab 切换只改 pane 的 `display` / `aria-hidden`，不得 remount，不得让 `request` 因引用变化再跑一遍。
+- 切回列表时直接展示保留的筛选、分页、选中和滚动，**禁止恢复时 `reload()`**。
+- 用户点击刷新、完成新增/编辑/删除后才按既有规则请求。
+- 高度链在 `src/pages/(admin)/list/useProTable/index.less`（原 `styles/proTable.less`），页面 JSX 禁止手工测高。

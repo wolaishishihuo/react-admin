@@ -1,0 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
+import { getRouter } from '@/router/router-ref';
+import { useSessionStore } from '@/stores/modules/session.store';
+import { navigationQueryOptions } from './menu-query';
+import type { NavigationItem } from './types';
+
+const EMPTY_ITEMS: NavigationItem[] = [];
+const EMPTY_PATH_SET = new Set<string>();
+const EMPTY_PATH_MAP = new Map<string, NavigationItem>();
+const EMPTY_PERMISSION_MAP = new Map<string, string[]>();
+
+export function useAuthorizedNavigation() {
+  const token = useSessionStore(state => state.token);
+  const query = useQuery({
+    ...navigationQueryOptions(getRouter(), token),
+    enabled: Boolean(token)
+  });
+
+  const tree = query.data?.tree ?? EMPTY_ITEMS;
+  const visibleTree = query.data?.visibleTree ?? EMPTY_ITEMS;
+
+  return {
+    ...query,
+    tree,
+    visibleTree,
+    pathSet: query.data?.pathSet ?? EMPTY_PATH_SET,
+    pathMap: query.data?.pathMap ?? EMPTY_PATH_MAP,
+    permissionMap: query.data?.permissionMap ?? EMPTY_PERMISSION_MAP
+  };
+}

@@ -1,45 +1,36 @@
-import { message } from '@/hooks/useMessage';
+export function isHexColor(str: string) {
+  return /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(str);
+}
 
-/** 将 3 位 HEX 颜色码转换为 6 位 */
 export function convertToSixDigitHexColor(str: string) {
   if (str.length > 4) return str.toLocaleUpperCase();
-  else return (str[0] + str[1] + str[1] + str[2] + str[2] + str[3] + str[3]).toLocaleUpperCase();
+  return (str[0] + str[1] + str[1] + str[2] + str[2] + str[3] + str[3]).toLocaleUpperCase();
 }
 
-/** 十六进制颜色转 RGB */
-export function hexToRgb(str: string) {
-  let hexs: any = '';
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(str)) return message.warning('Enter wrong hex color value');
-  str = str.replace('#', '');
-  hexs = str.match(/../g);
-  for (let i = 0; i < 3; i++) hexs[i] = parseInt(hexs[i], 16);
-  return hexs;
+export function hexToRgb(str: string): [number, number, number] | null {
+  if (!/^#?[0-9A-Fa-f]{6}$/.test(str)) return null;
+  const hex = str.replace('#', '');
+  const pairs = hex.match(/../g);
+  if (!pairs) return null;
+  return [parseInt(pairs[0], 16), parseInt(pairs[1], 16), parseInt(pairs[2], 16)];
 }
 
-/** RGB 颜色转十六进制 */
-export function rgbToHex(r: any, g: any, b: any) {
-  let reg = /^\d{1,3}$/;
-  if (!reg.test(r) || !reg.test(g) || !reg.test(b)) return message.warning('Enter wrong rgb color value');
-  let hexs = [r.toString(16), g.toString(16), b.toString(16)];
-  for (let i = 0; i < 3; i++) if (hexs[i].length == 1) hexs[i] = `0${hexs[i]}`;
+export function rgbToHex(r: number, g: number, b: number) {
+  if (![r, g, b].every(value => Number.isInteger(value) && value >= 0 && value <= 255)) return null;
+  const hexs = [r, g, b].map(value => value.toString(16).padStart(2, '0'));
   return `#${hexs.join('')}`;
 }
 
-/** 加深颜色值（level 0-1） */
 export function getDarkColor(color: string, level: number) {
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(color)) return message.warning('Enter wrong hex color value');
-  let rgb = hexToRgb(color);
-  for (let i = 0; i < 3; i++) rgb[i] = Math.round(20.5 * level + rgb[i] * (1 - level));
-  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  const next = rgb.map(value => Math.round(20.5 * level + value * (1 - level))) as [number, number, number];
+  return rgbToHex(...next) ?? color;
 }
 
-/** 变浅颜色值（level 0-1） */
 export function getLightColor(color: string, level: number) {
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(color)) message.warning('Enter wrong hex color value');
-  let rgb = hexToRgb(color);
-  for (let i = 0; i < 3; i++) rgb[i] = Math.round(255 * level + rgb[i] * (1 - level));
-  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  const next = rgb.map(value => Math.round(255 * level + value * (1 - level))) as [number, number, number];
+  return rgbToHex(...next) ?? color;
 }

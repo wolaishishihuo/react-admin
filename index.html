@@ -5,6 +5,31 @@
     <link rel="icon" type="image/svg+xml" href="/react.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%- title %></title>
+    <!-- React 挂载前恢复主题，避免暗色模式和主题色在首屏闪烁。 -->
+    <script>
+      (() => {
+        const readState = key => {
+          try {
+            return JSON.parse(localStorage.getItem(key) || 'null')?.state ?? null;
+          } catch {
+            return null;
+          }
+        };
+
+        const state = readState('theme-state');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const mode = state?.themeMode;
+        const isDark = mode === 'dark' || (mode === 'auto' ? systemDark : mode === 'light' ? false : systemDark);
+        const primary = /^#[0-9a-f]{6}$/i.test(state?.primary ?? '') ? state.primary : '#1677ff';
+        const html = document.documentElement;
+
+        html.classList.toggle('dark', isDark);
+        html.style.colorScheme = isDark ? 'dark' : 'light';
+        html.style.backgroundColor = isDark ? '#141414' : '#ffffff';
+        html.style.filter = state?.isWeak ? 'invert(80%)' : '';
+        html.style.setProperty('--loading-primary', primary);
+      })();
+    </script>
   </head>
   <body>
     <div id="root">
@@ -46,7 +71,7 @@
           display: block;
           width: 14px;
           height: 14px;
-          background-color: #1890ff;
+          background-color: var(--loading-primary, #1677ff);
           border-radius: 100%;
           opacity: 0.3;
           transform: scale(0.75);
@@ -91,20 +116,6 @@
         </div>
       </div>
     </div>
-    <script>
-      // 首屏防闪：React 挂载前读 zustand persist 的 global store，预刷主题色与暗色底
-      const persisted = JSON.parse(window.localStorage.getItem('global-state'));
-      const globalState = persisted && persisted.state;
-      if (globalState) {
-        const dot = document.querySelectorAll('.dot i');
-        const html = document.querySelector('html');
-        if (globalState.primary) dot.forEach(item => (item.style.background = globalState.primary));
-        // auto 档持久化的 isDark 可能过期，以系统当前偏好为准
-        const isDark =
-          globalState.themeMode === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : globalState.isDark;
-        if (isDark) html.style.background = '#141414';
-      }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

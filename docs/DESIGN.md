@@ -55,7 +55,7 @@
 ### 3.2 侧栏菜单（antd Menu token 配置于 App.tsx）
 
 - 项高 **42px**、圆角 6px、两侧内缩 8px、块间距 4px、图标 20px；hover 灰（亮 `#f2f4f5` / 暗 `#17171c`）。
-- Menu theme **恒 light**（antd dark 菜单绕开 light token，刻意不用）；**菜单主题三档配方管线**（design/dark/light，配方常量见 `layouts/components/Sidebar/theme.ts`，经 aside 变量 `--menu-bg/--menu-text/--menu-icon/--menu-name` + 档位类 `menu-theme-*` 生效）：design=白底+tinted 选中芯片（现状默认）、dark=`#191A23` 底+选中白字 `#27282D` 底+hover `#0F1015`（弹出子菜单同档位换肤 `menu-popup-dark`）、light=design+4px 主题色左条；**isDark 强制覆盖**（无视档位）：卡面底暗色配方，选中态同 dark 档。折叠弹出子菜单圆角、design/light 档选中为**灰底**（`colorMenuPopupActiveBg`）；子菜单不另设底色（平铺设计）。
+- Menu theme **恒 light**（antd dark 菜单绕开 light token，刻意不用）；**菜单主题三档配方管线**（design/dark/light，配方常量见 `src/layouts/Sidebar/theme.ts`，经 aside 变量 `--menu-bg/--menu-text/--menu-icon/--menu-name` + 档位类 `menu-theme-*` 生效）：design=白底+tinted 选中芯片（现状默认）、dark=`#191A23` 底+选中白字 `#27282D` 底+hover `#0F1015`（弹出子菜单同档位换肤 `menu-popup-dark`）、light=design+4px 主题色左条；**isDark 强制覆盖**（无视档位）：卡面底暗色配方，选中态同 dark 档。折叠弹出子菜单圆角、design/light 档选中为**灰底**（`colorMenuPopupActiveBg`）；子菜单不另设底色（平铺设计）。
 - 横向/混合菜单（top / top-left）选中态：**文字变主题色，无实心主色底**（top-left 另有 40×2 主题色下划线）。
 - **dual-menu（双列）对齐 art**：第一列轨道 **80px** 宽（纯图标态 64px），项 `margin:8px`/圆角 token/**图标 20px**、文字 12px，选中态浅主题底（`colorPrimaryBg`）+ 主题色文字；第二列顶部系统名**左对齐**（`padding-left:25px`）+ **常规字重**（非居中加粗），rail logo 仍居中；第二列右缘 **11×50 悬浮折叠钮**（aside 悬停浮现）。
 
@@ -66,7 +66,7 @@
 
 ### 3.4 图表（echarts）
 
-- tooltip 必须随主题：暗 `rgba(0,0,0,0.8)` 黑底白字 / 亮 `rgba(255,255,255,0.9)`——用 `@/components/Echarts/config` 的 `getTooltipStyle(isDark)`，禁用 echarts 默认恒白底。
+- tooltip 必须随主题：暗 `rgba(0,0,0,0.8)` 黑底白字 / 亮 `rgba(255,255,255,0.9)`——用 `@/components/ECharts/config` 的 `getTooltipStyle(isDark)`，禁用 echarts 默认恒白底。
 
 ### 3.5 头栏部件
 
@@ -84,7 +84,7 @@
 ## 4. 交互行为规则（原扒自 art，现以此文档为准）
 
 - **标签栏**：纵向滚轮映射横向滚动（取 `deltaX/deltaY` 绝对值大者加到 `scrollLeft`，原生 wheel 监听 + preventDefault）；激活标签自动入视区（首次挂载瞬时、路由切换 `behavior:'smooth'`）；**一套菜单双入口**——标签右键 + more 按钮（作用于激活标签）：刷新（仅激活标签可用）/最大化（恒可用）/关闭左侧/右侧/其它/所有（`isAffix` 固定标签参与禁用判定；关闭范围吞掉激活标签时先跳转菜单目标标签，关闭所有回首页）；无「关闭当前」项（标签 X 钮覆盖）。
-- **主题**：`themeMode` 三档 light/dark/auto——auto 由 `matchMedia('(prefers-color-scheme)')` 实时跟随系统；用户选择持久化，实际生效读 `isDark`；`index.html` 内联脚本读 `global-state` 做首屏防闪（含 auto 档）。
+- 主题：`themeMode` 三档 light/dark/auto——auto 由 `matchMedia('(prefers-color-scheme)')` 实时跟随系统；用户选择持久化，实际生效读 `isDark`；`index.html` 内联脚本读 `theme-state` 做首屏防闪（含 auto 档）。
 - **列表搜索**：标准分页表由 ProTable columns 描述搜索字段；看板使用页内 AntD Form，查询只在提交后更新应用条件，重置恢复业务默认值。
 - **表格全屏**：CSS class 方案（非 Fullscreen API，保证弹窗可用），ESC 退出；手动点击刷新才转圈（自动请求不转）。
 - **移动端**：≤800px 侧栏（aside 整体）转 fixed 抽屉 + 收起态 `translateX` 离场；进入移动视口/菜单导航后自动收起；top/top-left 的顶部菜单窄屏不可用，回退全菜单树抽屉（dual-menu 保持 rail+第二列整体抽屉）。

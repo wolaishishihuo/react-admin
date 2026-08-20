@@ -4,7 +4,7 @@ import type { TableProps } from 'antd';
 import { useState } from 'react';
 import type { Key } from 'react';
 
-import { message } from '@/hooks/useMessage';
+import { message } from '@/app/feedback';
 
 type OperateType = 'add' | 'edit';
 type Refresh = () => void | Promise<void>;

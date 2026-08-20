@@ -8,10 +8,10 @@ interface DownloadOptions<T = string> {
 
 const DEFAULT_FILENAME = 'downloaded_file';
 
-/** 在新窗口中打开 URL（默认带 noopener,noreferrer 安全策略） */
-export function openWindow(url: string, options: { secure?: boolean; target?: string } = {}): void {
-  const { secure = true, target = '_blank' } = options;
-  window.open(url, target, secure ? 'noopener,noreferrer' : undefined);
+/** 在新窗口中打开 URL（始终带 noopener,noreferrer） */
+export function openWindow(url: string, options: { target?: string } = {}): void {
+  const { target = '_blank' } = options;
+  window.open(url, target, 'noopener,noreferrer');
 }
 
 /** 创建 a 标签触发下载 */

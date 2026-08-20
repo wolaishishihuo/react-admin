@@ -10,3 +10,6 @@
 /public/*
 stats.html
 pnpm-lock.yaml
+src/router/routeTree.gen.ts
+playwright-report
+test-results
