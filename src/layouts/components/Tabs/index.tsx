@@ -1,4 +1,3 @@
-import { useUpdateEffect } from 'ahooks';
 import clsx from 'clsx';
 import { Icon as SvgIcon } from '@iconify/react/offline';
 import type React from 'react';
@@ -6,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import { type MetaProps } from '@/routers/interface';
 import { useGlobalStore, useTabsStore, useAuthStore, addTab, removeTab } from '@/stores';
+import { getTabId } from '@/utils';
 import TabContextMenu from './components/TabContextMenu';
 import './index.less';
 
@@ -14,7 +14,7 @@ const LayoutTabs: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const path = location.pathname + location.search;
+  const path = getTabId(location.pathname + location.search);
 
   const tabs = useGlobalStore(state => state.tabs);
   const tabsList = useTabsStore(state => state.tabsList);
@@ -62,17 +62,15 @@ const LayoutTabs: React.FC = () => {
     });
   };
 
-  // 路由切换追加标签
-  useUpdateEffect(() => {
+  // 追加当前标签；含首挂——登录后可能直接落在 redirect 目标页，那一页也要有标签
+  useEffect(() => {
     const meta = matches[matches.length - 1].loaderData as MetaProps & { redirect: boolean };
-    if (!meta?.redirect) {
-      const tabValue = {
-        title: meta.title!,
-        path: path,
-        closable: !meta.isAffix
-      };
-      addTab(tabValue);
-    }
+    if (meta?.redirect) return;
+    addTab({
+      title: meta.title!,
+      path: path,
+      closable: !meta.isAffix
+    });
   }, [matches]);
 
   const closeTab = (event: React.MouseEvent, targetPath: string) => {

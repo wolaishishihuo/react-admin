@@ -5,6 +5,7 @@ import { useEffect, useMemo } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { setGlobalState, useGlobalStore, useAuthStore } from '@/stores';
+import { getTabId } from '@/utils';
 import { setKeepAliveRef } from '@/utils/keepAlive';
 import Maximize from './components/Maximize';
 
@@ -13,8 +14,8 @@ const LayoutMain: React.FC = () => {
   const location = useLocation();
   const aliveRef = useKeepAliveRef();
 
-  // 缓存 key 与 Tabs 标签 key 一致（pathname + search）
-  const cacheKey = location.pathname + location.search;
+  // 缓存 key 与 Tabs 标签 key 同源，禁止各算一份
+  const cacheKey = getTabId(location.pathname + location.search);
 
   const maximize = useGlobalStore(state => state.maximize);
   const isCollapse = useGlobalStore(state => state.isCollapse);

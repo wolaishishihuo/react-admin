@@ -1,22 +1,19 @@
 /** 函数式 api 封装：解包 Promise<T>，含拦截/401/消息/loading */
 import axios, { type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { showFullScreenLoading, tryHideFullScreenLoading } from '@/components/Loading/fullScreen';
-import { LOGIN_URL } from '@/config';
-import { setToken, setAuthMenuList, useUserStore } from '@/stores';
+import { useUserStore } from '@/stores';
 import { type BaseResponse } from '@/types';
+import { clearAuth } from '@/utils/auth';
+import { getAbortSignal } from './cancel';
 import { HttpError, handleError, showError, showSuccess } from './error';
 import { ApiStatus } from './status';
+import { transformResponse } from './transform';
 
 /** 请求配置常量 */
 const REQUEST_TIMEOUT = 30000;
-const LOGOUT_DELAY = 500;
-const MAX_RETRIES = 0;
-const RETRY_DELAY = 1000;
-const UNAUTHORIZED_DEBOUNCE_TIME = 3000;
 
-/** 401 防抖状态 */
-let isUnauthorizedErrorShown = false;
-let unauthorizedTimer: ReturnType<typeof setTimeout> | null = null;
+/** 只登出一次：并发 401 不重复触发清理（提示的去重由 showError 负责） */
+let logoutInFlight: Promise<void> | null = null;
 
 /** 扩展 AxiosRequestConfig：每请求级消息开关 + 全屏 loading */
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
@@ -60,6 +57,9 @@ axiosInstance.interceptors.request.use(
       request.data = JSON.stringify(request.data);
     }
 
+    // 调用方自带 signal 就由它自己管生命周期，不纳入 cancelAllRequest
+    if (!request.signal) request.signal = getAbortSignal();
+
     return request;
   },
   error => {
@@ -70,7 +70,12 @@ axiosInstance.interceptors.request.use(
 
 /** 响应拦截器 */
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse<BaseResponse>) => {
+  async (response: AxiosResponse<BaseResponse>) => {
+    await transformResponse(response);
+
+    // 非 json 响应（blob/arraybuffer 下载）不参与信封解包
+    if (!isJsonResponse(response.config)) return response;
+
     const { code, msg } = response.data;
     if (code === ApiStatus.success) return response;
     if (code === ApiStatus.unauthorized) handleUnauthorizedError(msg);
@@ -82,71 +87,25 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-/** 统一创建 HttpError */
-function createHttpError(message: string, code: number) {
-  return new HttpError(message, code);
+/** 响应体是否走业务信封（默认 json） */
+function isJsonResponse(config?: AxiosRequestConfig) {
+  return (config?.responseType || 'json') === 'json';
 }
 
-/** 处理 401 错误（带防抖） */
+/** 统一创建 HttpError；缺业务码时归到通用错误 */
+function createHttpError(message: string, code?: number) {
+  return new HttpError(message, code ?? ApiStatus.error);
+}
+
+/** 处理 401：登出只做一次，提示按消息去重 */
 function handleUnauthorizedError(message?: string): never {
+  logoutInFlight ??= clearAuth().finally(() => {
+    logoutInFlight = null;
+  });
+
   const error = createHttpError(message || '未授权访问，请重新登录', ApiStatus.unauthorized);
-
-  if (!isUnauthorizedErrorShown) {
-    isUnauthorizedErrorShown = true;
-    logOut();
-
-    unauthorizedTimer = setTimeout(resetUnauthorizedError, UNAUTHORIZED_DEBOUNCE_TIME);
-
-    showError(error, true);
-    throw error;
-  }
-
+  showError(error, true);
   throw error;
-}
-
-/** 重置 401 防抖状态 */
-function resetUnauthorizedError() {
-  isUnauthorizedErrorShown = false;
-  if (unauthorizedTimer) clearTimeout(unauthorizedTimer);
-  unauthorizedTimer = null;
-}
-
-/** 退出登录：清 token + 清菜单 + 跳登录页 */
-function logOut() {
-  setTimeout(() => {
-    setToken('');
-    setAuthMenuList([]);
-    window.$navigate(LOGIN_URL);
-  }, LOGOUT_DELAY);
-}
-
-/** 是否需要重试 */
-function shouldRetry(statusCode: number) {
-  return [
-    ApiStatus.requestTimeout,
-    ApiStatus.internalServerError,
-    ApiStatus.badGateway,
-    ApiStatus.serviceUnavailable,
-    ApiStatus.gatewayTimeout
-  ].includes(statusCode);
-}
-
-/** 请求重试逻辑 */
-async function retryRequest<T>(config: ExtendedAxiosRequestConfig, retries: number = MAX_RETRIES): Promise<T> {
-  try {
-    return await request<T>(config);
-  } catch (error) {
-    if (retries > 0 && error instanceof HttpError && shouldRetry(error.code)) {
-      await delay(RETRY_DELAY);
-      return retryRequest<T>(config, retries - 1);
-    }
-    throw error;
-  }
-}
-
-/** 延迟函数 */
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /** 请求函数 */
@@ -162,6 +121,10 @@ async function request<T = any>(config: ExtendedAxiosRequestConfig): Promise<T> 
 
   try {
     const res = await axiosInstance.request<BaseResponse<T>>(config);
+
+    // 非 json 响应交原始数据给调用方（配合 utils/download 的 blob 下载）
+    if (!isJsonResponse(config)) return res.data as unknown as T;
+
     const body = res.data;
     if (config.showSuccessMessage && body.msg) {
       showSuccess(body.msg);
@@ -179,23 +142,21 @@ async function request<T = any>(config: ExtendedAxiosRequestConfig): Promise<T> 
   }
 }
 
-/** API 方法集合：单 config 入参，返回解包后的 Promise<T> */
+/** API 方法集合：单 config 入参，返回解包后的 Promise<T>；HTTP 层不重试，由页面按幂等性决定 */
 const api = {
   get<T>(config: ExtendedAxiosRequestConfig) {
-    return retryRequest<T>({ ...config, method: 'GET' });
+    return request<T>({ ...config, method: 'GET' });
   },
   post<T>(config: ExtendedAxiosRequestConfig) {
-    return retryRequest<T>({ ...config, method: 'POST' });
+    return request<T>({ ...config, method: 'POST' });
   },
   put<T>(config: ExtendedAxiosRequestConfig) {
-    return retryRequest<T>({ ...config, method: 'PUT' });
+    return request<T>({ ...config, method: 'PUT' });
   },
   del<T>(config: ExtendedAxiosRequestConfig) {
-    return retryRequest<T>({ ...config, method: 'DELETE' });
+    return request<T>({ ...config, method: 'DELETE' });
   },
-  request<T>(config: ExtendedAxiosRequestConfig) {
-    return retryRequest<T>(config);
-  }
+  request
 };
 
 export default api;

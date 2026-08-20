@@ -83,6 +83,11 @@ export function isNullOrUnDef(val: unknown): val is null | undefined {
   return isUnDef(val) || isNull(val);
 }
 
+/** 是否为安全的站内跳转地址（挡掉 //evil.com 这类协议相对外链） */
+export function isSafeRedirect(val?: string | null): val is string {
+  return !!val && val.startsWith('/') && !val.startsWith('//');
+}
+
 /** 是否为十六进制颜色值 */
 export const isHexColor = (str: string) => {
   return /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(str);

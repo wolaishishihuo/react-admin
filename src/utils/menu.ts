@@ -34,16 +34,27 @@ export function getFirstLevelMenuList(menuList: RouteObjectType[]) {
   });
 }
 
-/** 根据 path 获取菜单对象（支持动态路由正则匹配），未找到返回空对象 */
+/** 根据 path 获取菜单对象（剥查询串后匹配，支持动态路由正则），未找到返回空对象 */
 export function getMenuByPath(
   menulist: RouteObjectType[] = useAuthStore.getState().flatMenuList,
   path: string = getUrlWithParams()
 ) {
+  const pathname = path.split('?')[0];
   const menuItem = menulist.find(menu => {
     const regex = new RegExp(`^${menu.path?.replace(/:.[^/]*/, '.*')}$`);
-    return regex.test(path);
+    return regex.test(pathname);
   });
   return menuItem || {};
+}
+
+/**
+ * 标签与缓存的统一身份：默认只认 pathname，menu.meta.multiTab 才带上查询串
+ *
+ * 详情、编辑这类需要并行开多份的页面才开 multiTab；列表页换查询参数不该多出标签和缓存实例。
+ */
+export function getTabId(fullPath: string = getUrlWithParams()) {
+  const pathname = fullPath.split('?')[0];
+  return getMenuByPath(useAuthStore.getState().flatMenuList, pathname).meta?.multiTab ? fullPath : pathname;
 }
 
 /** 递归生成面包屑 map：{ [menuKey]: 祖先链（含自身） } */

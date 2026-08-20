@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { getUrlWithParams } from '@/utils';
+import { getMenuByPath, getTabId } from '@/utils';
 import { destroyKeepAlive } from '@/utils/keepAlive';
 import { type TabsState, type TabsListProp } from '../interface';
+import { useAuthStore } from './auth';
 
 export interface TabsStore extends TabsState {
   setTabsList: (tabsList: TabsListProp[]) => void;
@@ -10,7 +11,7 @@ export interface TabsStore extends TabsState {
   removeTab: (payload: { path: string; isCurrent: boolean }) => void;
   closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
   closeMultipleTab: (payload: { path?: string }) => void;
-  validateTabs: (validPaths: string[]) => void;
+  validateTabs: () => void;
   setTabTitle: (title: string) => void;
 }
 
@@ -63,12 +64,13 @@ export const useTabsStore = create<TabsStore>()(
         set({ tabsList: nextTabsList });
         destroyKeepAlive(removed);
       },
-      validateTabs: validPaths => {
+      validateTabs: () => {
         const { tabsList } = get();
+        const { flatMenuList } = useAuthStore.getState();
         const removed: string[] = [];
         const nextTabsList = tabsList.filter(item => {
-          // 固定标签恒保留；其余按菜单校验滤悬空标签
-          const keep = !item.closable || validPaths.includes(item.path);
+          // 固定标签恒保留；其余反查菜单滤悬空标签（标签 path 带 query，getMenuByPath 会剥掉）
+          const keep = !item.closable || Boolean(getMenuByPath(flatMenuList, item.path).path);
           if (!keep) removed.push(item.path);
           return keep;
         });
@@ -78,8 +80,9 @@ export const useTabsStore = create<TabsStore>()(
         }
       },
       setTabTitle: title => {
+        const activeId = getTabId();
         set(state => ({
-          tabsList: state.tabsList.map(item => (item.path === getUrlWithParams() ? { ...item, title } : item))
+          tabsList: state.tabsList.map(item => (item.path === activeId ? { ...item, title } : item))
         }));
       }
     }),
@@ -96,5 +99,5 @@ export const removeTab = (payload: { path: string; isCurrent: boolean }) => useT
 export const closeTabsOnSide = (payload: { path: string; type: 'left' | 'right' }) =>
   useTabsStore.getState().closeTabsOnSide(payload);
 export const closeMultipleTab = (payload: { path?: string }) => useTabsStore.getState().closeMultipleTab(payload);
-export const validateTabs = (validPaths: string[]) => useTabsStore.getState().validateTabs(validPaths);
+export const validateTabs = () => useTabsStore.getState().validateTabs();
 export const setTabTitle = (title: string) => useTabsStore.getState().setTabTitle(title);

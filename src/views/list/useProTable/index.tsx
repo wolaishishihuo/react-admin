@@ -3,6 +3,7 @@ import { ProTable, type ActionType, type ProColumns, type ProTableProps } from '
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Form, Input, Modal, Popconfirm, Radio, Row, Space, Switch } from 'antd';
 import { useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Icon } from '@/components/Icon';
 import IconSelect from '@/components/IconSelect';
 import { PRO_TABLE_PAGINATION } from '@/config/proTable';
@@ -29,6 +30,7 @@ type UserSearch = Omit<ReqUserList, 'page' | 'limit'>;
 
 const UseProTable = () => {
   const { BUTTONS } = useAuthButton();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const actionRef = useRef<ActionType>(undefined);
 
@@ -136,12 +138,15 @@ const UseProTable = () => {
     {
       key: 'option',
       title: '操作',
-      width: 140,
+      width: 190,
       align: 'center',
       fixed: 'right',
       search: false,
       render: (_, record) => (
         <Space size={0}>
+          <Button size='small' type='link' onClick={() => navigate(`/list/useProTable/detail?id=${record.id}`)}>
+            详情
+          </Button>
           {BUTTONS.edit && (
             <Button size='small' type='link' onClick={() => handleEdit(record)}>
               编辑

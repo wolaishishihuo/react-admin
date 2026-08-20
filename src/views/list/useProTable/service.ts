@@ -31,6 +31,12 @@ export async function fetchUserList({ page = 1, limit = 10, username, gender, st
   return { list: filtered.slice((page - 1) * limit, page * limit), total: filtered.length };
 }
 
+/** 按 id 查详情，未命中返回 null */
+export async function fetchUserDetail(id: string): Promise<UserItem | null> {
+  await sleep(300);
+  return mockUsers.find(item => item.id === id) ?? null;
+}
+
 export async function createUser(data: Omit<UserItem, 'id' | 'createTime'>) {
   await sleep(200);
   mockUsers = [{ ...data, id: String(nextId++), createTime: dayjs().format('YYYY-MM-DD HH:mm:ss') }, ...mockUsers];

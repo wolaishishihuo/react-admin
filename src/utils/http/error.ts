@@ -105,10 +105,36 @@ export function handleError(error: AxiosError<ErrorResponse>): never {
   });
 }
 
+/**
+ * 单条消息占着去重位的上限
+ *
+ * `onClose` 不保证被回调，没有兜底那条消息会永远留在栈里、此后再也弹不出来——
+ * 一条错误提示被静默吞掉比重复弹一次糟得多。
+ */
+const MSG_MAX_LIFETIME = 5000;
+const errMsgStack = new Set<string>();
+
+/** 按消息内容去重：同一文案在展示期间只弹一次 */
+function showErrorOnce(msg: string): void {
+  if (errMsgStack.has(msg)) return;
+  errMsgStack.add(msg);
+
+  // 只摘掉自己这一条；清空整个栈会连带抹掉期间进来的其他消息，让它们绕过去重再弹一次
+  const timer = setTimeout(() => errMsgStack.delete(msg), MSG_MAX_LIFETIME);
+
+  message.error({
+    content: msg,
+    onClose: () => {
+      clearTimeout(timer);
+      errMsgStack.delete(msg);
+    }
+  });
+}
+
 /** 显示错误消息并记录日志 */
 export function showError(error: HttpError, showMessage: boolean = true): void {
   if (showMessage) {
-    message.error(error.message);
+    showErrorOnce(error.message);
   }
   console.error('[HTTP Error]', error.toLogData());
 }

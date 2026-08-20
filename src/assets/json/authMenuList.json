@@ -41,6 +41,22 @@
             "auths": ["add", "edit", "delete", "batchDelete", "status"],
             "isKeepAlive": true
           }
+        },
+        {
+          "path": "/list/useProTable/detail",
+          "element": "/list/useProTable/detail/index",
+          "meta": {
+            "key": "useProTableDetail",
+            "icon": "ri:file-list-3-line",
+            "title": "用户详情",
+            "isLink": "",
+            "isHide": true,
+            "isFull": false,
+            "isAffix": false,
+            "activeMenu": "/list/useProTable",
+            "isKeepAlive": true,
+            "multiTab": true
+          }
         }
       ]
     }

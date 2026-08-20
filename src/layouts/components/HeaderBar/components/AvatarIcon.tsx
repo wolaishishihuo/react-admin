@@ -2,11 +2,11 @@ import { Icon as SvgIcon } from '@iconify/react/offline';
 import { type MenuProps, Dropdown, Avatar } from 'antd';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logoutApi } from '@/api/modules/login';
 import avatar from '@/assets/images/avatar.png';
-import { HOME_URL, LOGIN_URL } from '@/config';
+import { HOME_URL } from '@/config';
 import { modal, message } from '@/hooks/useMessage';
-import { setToken, setAuthMenuList, useUserStore } from '@/stores';
+import { useUserStore } from '@/stores';
+import { clearAuth } from '@/utils/auth';
 import InfoModal, { type InfoModalRef } from './InfoModal';
 import PasswordModal, { type PasswordModalRef } from './PasswordModal';
 
@@ -27,15 +27,9 @@ const AvatarIcon: React.FC = () => {
       cancelText: '取消',
       mask: { closable: true },
       onOk: async () => {
-        // 登出：接口失败也清本地态并跳登录
-        try {
-          await logoutApi();
-        } finally {
-          setToken('');
-          setAuthMenuList([]);
-          navigate(LOGIN_URL, { replace: true });
-          message.success('退出登录成功！');
-        }
+        // 清理走统一入口，跳登录页由 RouterGuard 随 token 变化完成
+        await clearAuth();
+        message.success('退出登录成功！');
       }
     });
   };
