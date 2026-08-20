@@ -6,7 +6,7 @@ import { setPrimary, useThemeStore } from '@/stores/modules/theme.store';
 import './index.less';
 
 const presetColors = [
-  '#1677FF',
+  '#B40006',
   '#00B96B',
   '#E0282E',
   '#DAA96E',

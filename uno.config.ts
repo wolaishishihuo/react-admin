@@ -53,7 +53,7 @@ export default defineConfig({
     },
     colors: {
       // 复用 useTheme 注入的 antd token 与项目自定义 CSS 变量，避免在 JSX 中反复写任意值。
-      primary: 'var(--hooks-colorPrimary, #1677ff)',
+      primary: 'var(--hooks-colorPrimary, #B40006)',
       'primary-text': 'var(--hooks-colorPrimaryText)',
       'primary-bg': 'var(--hooks-colorPrimaryBg)',
       'primary-border': 'var(--hooks-colorPrimaryBorder)',

@@ -27,10 +27,10 @@ interface ThemeStore extends ThemeState {
   setSystemDark: (systemDark: boolean) => void;
 }
 
-export const DEFAULT_PRIMARY = '#1677ff';
+export const DEFAULT_PRIMARY = '#B40006';
 
 const initialThemeState: ThemePersistedState = {
-  themeMode: 'auto',
+  themeMode: 'light',
   primary: DEFAULT_PRIMARY,
   isWeak: false,
   isHappy: true,

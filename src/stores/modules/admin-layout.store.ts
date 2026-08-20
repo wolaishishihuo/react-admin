@@ -37,7 +37,7 @@ const initialPersisted: AdminLayoutPersistedState = {
   dualMenuShowText: true,
   isCollapse: false,
   accordion: true,
-  watermark: true,
+  watermark: false,
   breadcrumb: true,
   breadcrumbIcon: false,
   tabs: true,

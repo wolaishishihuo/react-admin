@@ -18,9 +18,9 @@
 
         const state = readState('theme-state');
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const mode = state?.themeMode;
-        const isDark = mode === 'dark' || (mode === 'auto' ? systemDark : mode === 'light' ? false : systemDark);
-        const primary = /^#[0-9a-f]{6}$/i.test(state?.primary ?? '') ? state.primary : '#1677ff';
+        const mode = state?.themeMode ?? 'light';
+        const isDark = mode === 'dark' || (mode === 'auto' && systemDark);
+        const primary = /^#[0-9a-f]{6}$/i.test(state?.primary ?? '') ? state.primary : '#B40006';
         const html = document.documentElement;
 
         html.classList.toggle('dark', isDark);
@@ -71,7 +71,7 @@
           display: block;
           width: 14px;
           height: 14px;
-          background-color: var(--loading-primary, #1677ff);
+          background-color: var(--loading-primary, #b40006);
           border-radius: 100%;
           opacity: 0.3;
           transform: scale(0.75);

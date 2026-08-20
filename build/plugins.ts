@@ -6,14 +6,13 @@ import type { PluginOption } from 'vite';
 import checker from 'vite-plugin-checker';
 import viteCompression from 'vite-plugin-compression';
 import { createHtmlPlugin } from 'vite-plugin-html';
-import { VitePWA } from 'vite-plugin-pwa';
 
 /**
  * 创建 Vite 插件
  * @param viteEnv
  */
 export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOption[])[] => {
-  const { VITE_GLOB_APP_TITLE, VITE_REPORT, VITE_PWA } = viteEnv;
+  const { VITE_GLOB_APP_TITLE, VITE_REPORT } = viteEnv;
 
   return [
     tanstackRouter({
@@ -38,8 +37,6 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
         data: { title: VITE_GLOB_APP_TITLE }
       }
     }),
-    // Vite PWA
-    VITE_PWA && createVitePwa(viteEnv),
     // 是否生成打包预览，分析依赖包体积以优化
     VITE_REPORT && (visualizer({ filename: 'stats.html', gzipSize: true, brotliSize: true }) as PluginOption)
   ];
@@ -72,38 +69,4 @@ const createCompression = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
     );
   }
   return plugins;
-};
-
-/**
- * @description Vite PWA 配置
- * @param viteEnv
- */
-const createVitePwa = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
-  const { VITE_GLOB_APP_TITLE } = viteEnv;
-  return VitePWA({
-    registerType: 'autoUpdate',
-    manifest: {
-      name: VITE_GLOB_APP_TITLE,
-      short_name: VITE_GLOB_APP_TITLE,
-      theme_color: '#ffffff',
-      icons: [
-        {
-          src: '/logo.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: '/logo.png',
-          sizes: '512x512',
-          type: 'image/png'
-        },
-        {
-          src: '/logo.png',
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable'
-        }
-      ]
-    }
-  });
 };
