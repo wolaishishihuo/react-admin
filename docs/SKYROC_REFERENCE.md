@@ -39,24 +39,46 @@
 
 axios 层的借鉴深度已定档为**逻辑级**：只搬 3.1、3.2、3.3 三个纯逻辑点并删掉重试死代码，**现有拦截器结构不动**，不抽选项式钩子（理由见 3.8）。
 
-### 1.1 做完之后与 Skyroc 还差什么
+### 1.1 落地后与 Skyroc 的差距清单
 
-本文全部落地后，得到的是"**规则一致、机制自有、模型更简**"，不是实现对齐。按能力逐块说明：
+**状态：本文全部落地并逐条冒烟验证。** 得到的是"**规则一致、机制自有、模型更简**"，不是实现对齐。按能力逐块说明：
 
-| 能力     | 会与 Skyroc 一致                                                                      | 仍然不同                                                                                                                        |
-| -------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 登录认证 | 单一清理入口、`queryClient.clear()`、用户切换判定、登出请求先于清本地、冷启动会话校验 | 无 refreshToken 与单飞续签；无 `logout` / `modalLogout` 业务码分岔；用户信息落在持久化 zustand，不是 React Query 管的服务端状态 |
-| 路由权限 | 守卫执行顺序、redirect 白名单、首页不带 redirect、三种权限的边界划分                  | 只有 dynamic 一种模式；无 `roles` / `permissions` / 超级角色；判定在渲染期同步完成而不是加载前 `await`；无外链路由处理          |
-| 路由缓存 | Tab 与缓存共用同一身份函数、`multiTab` 语义、隐藏页副作用随 active 暂停               | 缓存由 `keepalive-for-react` 实现，没有 router state 快照；隐藏页 Location 不隔离（见 6.7）                                     |
-| HTTP     | 二进制响应解信封、取消在途请求、错误按消息去重、默认不重试                            | 无 adapter、无 flat 风格、无选项式钩子、无请求加密、无 `X-Request-Id`                                                           |
+| 能力     | 会与 Skyroc 一致                                                                                             | 仍然不同                                                                                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 登录认证 | 单一清理入口、`queryClient.clear()`、用户切换判定（含换人不走 redirect）、登出请求先于清本地、冷启动会话校验 | 无 refreshToken 与单飞续签；无 `logout` / `modalLogout` 业务码分岔；用户信息落在持久化 zustand，不是 React Query 管的服务端状态（冷启动会刷新，但页面存活期间不会） |
+| 路由权限 | 守卫执行顺序、redirect 白名单、首页不带 redirect、三种权限的边界划分                                         | 只有 dynamic 一种模式；无 `roles` / `permissions` / 超级角色；判定在渲染期同步完成而不是加载前 `await`；无外链路由处理                                              |
+| 路由缓存 | Tab 与缓存共用同一身份函数、`multiTab` 语义、隐藏页副作用随 active 暂停                                      | 缓存由 `keepalive-for-react` 实现，没有 router state 快照；隐藏页 Location 不隔离（见 6.7）                                                                         |
+| HTTP     | 二进制响应解信封、取消在途请求、错误按消息去重、默认不重试                                                   | 无 adapter、无 flat 风格、无选项式钩子、无请求加密、无 `X-Request-Id`                                                                                               |
 
 要让实现真正对齐，代价是换掉 TanStack Router 和 Jotai——那是迁移，不是借鉴，不在本文范围内。
 
-## 2. 两个潜伏的 bug
+#### 未对齐项逐条备案
 
-这两个是核对代码时发现的既有缺陷，不属于"架构增强"。
+上表右列是概括，这里把每一条摊开：为什么不做、什么时候该回来做。**这些都是明确决定，不是遗漏。**
 
-**两者当前都不可观测**：`src/utils/download.ts` 在 `src` 内零消费者，全项目没有一处 `responseType: 'blob'`；也没有任何页面带查询参数导航（ProTable 把搜索条件留在组件状态里，不写 URL）。所以它们不是"线上故障"，而是**给模板使用者埋的坑**——第一次加导出按钮、第一次加 `/detail?id=` 详情页就会踩到。修复成本很低，建议先做，但不必当成救火。
+| #   | 未对齐项                                     | 不做的理由                                                                                                                                                                                                               | 触发条件（满足则重新立项）                                    |
+| --- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| 1   | **refreshToken 单飞续签**                    | 后端没有 Refresh Token 契约，假续签比不续签更危险                                                                                                                                                                        | 后端定义了 refresh 接口与轮换策略；规则已写好在 3.7，照做即可 |
+| 2   | **`logout` / `modalLogout` 业务码分岔**      | 要等后端定义业务码体系（哪个码静默登出、哪个码弹窗确认）                                                                                                                                                                 | 后端给出业务码表                                              |
+| 3   | **userInfo 不是服务端状态**                  | 落在持久化 zustand，冷启动会刷新，但页面存活期间不会。改成 React Query 管理要动 store 模型                                                                                                                               | 出现"管理员改权限后需要当场生效"的需求                        |
+| 4   | **只有 dynamic 一种路由模式**                | 本项目路由表由菜单生成（见 5.2），static 模式需要一份全量本地路由清单                                                                                                                                                    | 要求前端离线可用、或需要"存在但无权"的语义                    |
+| 5   | **无 `roles` / `permissions` / 超级角色**    | 当前权限模型是"菜单决定路由 + `meta.auths` 决定按钮"，够用                                                                                                                                                               | 出现同一菜单对不同角色显示不同内容的需求                      |
+| 6   | **无权 URL 报 404 而不是 403**               | 前端只有授权菜单一份数据，**分不清"存在但无权"和"根本不存在"**。原方案的判定条件在 `*` 里恒为真，照做会把所有拼错的 URL 变成 403（详见 5.4）                                                                             | 与第 4 条绑定：有了全量路由清单才谈得上区分                   |
+| 7   | **守卫在渲染期判定，不是加载前 `await`**     | 这是刻意选择，不是妥协：`loader` / `middleware` 只在导航时运行，而我们要求 token 被动变化（401）时也立刻生效。Skyroc 的 `beforeLoad` 同样做不到，它靠 http adapter 主动 `navigate('/login-out')` 补（见 5.2.1 上方对比） | 无。除非 RR 出现"路由级响应式守卫"                            |
+| 8   | **外链只在点击菜单时处理**                   | `Menu` 里 `meta.isLink` 会 `window.open`，但手输 URL 不触发，守卫层没有对应逻辑                                                                                                                                          | 菜单里真的配置了外链项                                        |
+| 9   | **隐藏页 Location 不隔离**                   | 活跃门已覆盖绝大部分症状，剩下的边角要用 `UNSAFE_` API 换，且与 `multiTab` 耦合（详见 6.7）                                                                                                                              | 加完活跃门仍观察到隐藏页读错 URL                              |
+| 10  | **无 router state 快照缓存**                 | 深度依赖 TanStack Router 内部（`__store`、`latestLocation`），RR 没有对应物（见 6.1）                                                                                                                                    | 无。不要尝试等价实现                                          |
+| 11  | **HTTP 无 adapter / flat 风格 / 选项式钩子** | 单一 Web 消费者，接缝不值当（见 3.5、3.8）                                                                                                                                                                               | 出现第二个请求实例，或要跨端复用                              |
+| 12  | **无请求加密、无 `X-Request-Id`**            | 前者与模板目标无关，后者要后端配合才有意义                                                                                                                                                                               | 后端要求链路追踪                                              |
+| 13  | **无测试基建**                               | 引入 vitest + testing-library 是独立的重大决策，不夹带在本轮里（见第 8 节）                                                                                                                                              | 单独立项                                                      |
+
+另有一条**新增的遗留提醒**（本文原方案没料到）：`api/modules/login.ts` 首行 `import api from '@/utils/http'` 现在是注释掉的，**接真实后端启用它就会成环**（`api/modules/login` → `utils/http/index` → `utils/auth` → `api/modules/login`）。三处引用都在函数体内，ESM 下能跑，性质同既有那条惰性环；要彻底断开就把 `clearAuth` 里的 `logoutApi` 调用改成动态 `import()`。详见施工细节 1。
+
+## 2. 三个潜伏的 bug
+
+**状态：均已修复（第 1 批）。** 这些是核对代码时发现的既有缺陷，不属于"架构增强"。
+
+原本判断"两者当前都不可观测"，落地时加了 `/list/useProTable/detail?id=` 示例页后立刻显形，并牵出**第三个同源 bug**（2.3）：凡是拿 `pathname + search` 去和菜单 path 比对的地方都会错。三处的根因是同一个，修在 `getMenuByPath` 一处即可。
 
 ### 2.1 blob 下载走 `api` 必然失败
 
@@ -73,7 +95,7 @@ if (code === ApiStatus.success) return response;
 
 ### 2.2 `validateTabs` 会误删带 query 的标签
 
-标签的 `path` 是 `pathname + search`（`getUrlWithParams()`），而 `src/hooks/usePermissions.ts` 传入的 `validPaths` 是菜单原始 path（不含 search）：
+标签的 `path` 是 `pathname + search`（`getUrlWithParams()`），而权限初始化处传入的 `validPaths` 是菜单原始 path（不含 search）：
 
 ```ts
 const keep = !item.closable || validPaths.includes(item.path);
@@ -91,6 +113,14 @@ export function extractTabsByAllRoutes(routeIds: string[], tabs: App.Global.Tab[
 ```
 
 `App.Global.Tab` 里 `id` 是缓存/标签身份（可能带 query），`routePath` 是菜单路由路径。修法见 6.3。
+
+### 2.3 `useAuthButton` 在带 query 的页面丢光按钮权限（落地时新发现）
+
+`src/hooks/useAuthButton.ts` 调 `getMenuByPath()`，默认参数是 `getUrlWithParams()`——**含查询串**。而 `getMenuByPath` 内部用 `^menu.path$` 全匹配，于是 `/list/useProTable?foo=1` 匹配不到任何菜单，`meta.key` 取不到，`BUTTONS` 变成空对象。
+
+浏览器实测：`/list/useProTable` 工具栏是 `['新增', '批量删除']`，`/list/useProTable?foo=1` 是 `[]`。
+
+与 2.2 同源，所以**统一修在 `getMenuByPath` 内部剥掉查询串**，2.2 与 2.3 一并解决，调用方都不必各自 `split('?')`。
 
 另外 `retryRequest` / `shouldRetry` / `RETRY_DELAY` / `delay` 是死代码：`MAX_RETRIES = 0` 让重试分支永远进不去。按极简原则直接删。
 
@@ -131,6 +161,8 @@ axiosInstance.interceptors.response.use(async response => {
 ```
 
 `request<T>` 里同样要分流，非 json 直接返回 `res.data`，不要走 `body.data`。
+
+**只改成功分支，错误拦截器不动。** Skyroc 在错误拦截器里也调了一次 `transformResponse`（拿真实 HTTP 状态码表达失败的后端），但本项目的 `handleError` 是 `statusCode ? getErrorMessage(statusCode) : ...`——**状态码优先于后端 msg**，把信封解出来也不会显示，只会多一个不产生任何效果的 async 分支。所以非 2xx 的下载失败仍显示按状态码的统一中文文案，这是既有设计，不在本轮改动范围。
 
 ### 3.2 取消在途请求（照抄思路）
 
@@ -317,27 +349,35 @@ export async function clearAuth() {
 }
 ```
 
-`AvatarIcon.logout`、http 层 401、以及 `usePermissions` 里"无任何菜单权限"三处全部改调 `clearAuth`。
+`AvatarIcon.logout`、http 层 401、以及权限初始化里"无任何菜单权限"三处全部改调 `clearAuth`。
 
 1. `LoginForm` 用登录身份替换无条件清空。mock 的 `ResLogin` 只有 `userInfo.name`，模板阶段就用它当身份；接真实后端时换成 `userId`：
 
 ```ts
-const lastLoginUser = localStorage.getItem('lastLoginUser');
-if (lastLoginUser !== data.userInfo.name) {
+// 同一账号：留标签、走 redirect；换人：清标签、强制回首页
+const isSameUser = localStorage.getItem('lastLoginUser') === data.userInfo.name;
+if (!isSameUser) {
   setTabsList([]);
   localStorage.setItem('lastLoginUser', data.userInfo.name);
 }
+
+const redirect = searchParams.get('redirect');
+navigate(isSameUser && isSafeRedirect(redirect) ? redirect : HOME_URL);
 ```
 
-`initAuth` 不新建：`usePermissions().initPermissions` 已经是这个角色（拉菜单、派生权限、校验标签），只需要把它内部的 `setToken('')` 换成 `clearAuth`。
+**换人时必须连 redirect 一起放弃，这两件事是一体的**（Skyroc `use-login.ts` 里就是 `needRedirect = false` 和 `remove('globalTabs')` 写在同一个分支）。只清标签不改跳转，换账号后会被 redirect 送回上一个账号停留的页面，而 Tabs 首挂又会给那一页重建标签——表现就是"标签根本没清"。落地时正是先漏了这半条才发现的。
+
+`initAuth` 不新建：`initPermissions` 已经是这个角色（拉菜单、派生权限、校验标签），只需要把它内部的 `setToken('')` 换成 `clearAuth`。
+
+**落地时它从 `src/hooks/usePermissions.ts` 搬到了 `src/utils/auth.ts`**：那个 hook 零个 React API，纯粹是个壳；把"建立会话"和"清除会话"放在同一个模块里，两端才对称，组件外也能直接调。
 
 ### 4.3 Token 存储不是安全边界
 
 本项目和 Skyroc 都把 token 放本地存储。它适合通用模板，但要明确：页面一旦 XSS，本地 token 可被读取。更高要求下需要后端提供 `HttpOnly + Secure + SameSite` Cookie 并同时设计 CSRF 防护，前端模板不能单方面决定。
 
-### 4.4 冷启动会话校验（方案记录，可选后置）
+### 4.4 冷启动会话校验（已落地）
 
-这是本项目与 Skyroc 在认证上最本质的差异，前面几节的清理规则都覆盖不到它。但它依赖一个当前不存在的接口，**模板阶段不急做，本节只把方案记清楚**。
+这是本项目与 Skyroc 在认证上最本质的差异，前面几节的清理规则都覆盖不到它。原计划后置，实际在四批之后补上了。
 
 Skyroc 的 `initAuth()` 第一步是向后端要用户信息：
 
@@ -359,14 +399,22 @@ async function initAuth() {
 
 返回 `null` 时守卫会 `await context.logout()` 再跳登录。也就是说**每次冷启动都是一次真实的会话校验**："这个 token 还有效吗、我是谁"由后端回答。
 
-本项目的 `initPermissions(token)` 只拉菜单，`userInfo` 是登录时写进持久化 zustand 的，刷新浏览器不再向后端确认。后果：token 已经失效时前端仍然渲染完整后台，要等下一次业务请求撞 401 才发现。
+改造前的 `initPermissions(token)` 只拉菜单，`userInfo` 是登录时写进持久化 zustand 的，刷新浏览器不再向后端确认。
 
-这不是移植难度问题，而是缺接口——mock 里没有 `getUserInfo`。补法很小：
+**收益要说准**：原先这里写的"token 失效时要等下一次业务请求撞 401 才发现"不成立——接真实后端后 `getAuthMenuListApi` 走的就是 `api.get`，请求拦截器会带上 token，菜单请求本身就会 401。真正的收益是另外两条：
 
-1. `src/api/modules/login.ts` 增加 `getUserInfoApi`（同现有 mock 风格：延迟 + 可开关失败），接真实后端时替换实现。
-2. `initPermissions` 改成先取 userInfo、写入 user store，再拉菜单；userInfo 取不到走 `clearAuth`。
+1. **userInfo 的新鲜度**。改造前它是"上次登录那一刻"的快照，管理员改了姓名/角色/头像，用户不退出重登就一直看到旧值；改造后每次冷启动都刷新。
+2. **把会话校验变成显式契约**，而不是依赖"菜单接口恰好也鉴权"这个副作用。
 
-**必须保持两类失败的区分**：菜单/用户接口的网络失败要继续走 `MenuLoadError` 重试视图，只有明确的会话失效（401 或后端说 token 无效）才 `clearAuth`。现在那个重试视图存在的意义正是防止把网络抖动误判成登出，加了 userInfo 校验后不能把两者合并成一条路径。
+落地方式：
+
+1. `src/api/modules/login.ts` 增加 `getUserInfoApi(token)`（同现有 mock 风格：延迟 + 两个 DevTools 开关，`mockUserInfoFail=1` 模拟请求失败、`mockSessionExpired=1` 模拟会话失效）。mock 从 `mock-token-<name>` 反解身份，模拟"后端按 token 回答我是谁"；接真实后端时换成注释行，token 由请求头带，入参可去掉。
+2. `initPermissions` 先取 userInfo 写 user store，再拉菜单。
+3. **`LoginForm` 不再写 userInfo**，只落 token——userInfo 收口成 `initPermissions` 这一个写入点，避免登录响应和用户信息接口给出两份不同快照。
+
+**两类失败的区分靠现成机制天然成立**：`routers/index.tsx` 的 `.catch` 判的是"token 还在不在"。请求失败（网络/服务端故障）异常向上抛，token 没动 → 走 `MenuLoadError` 重试视图；会话失效（mock 返回 null，真实后端是 401 由 http 层 `clearAuth`）token 已清空 → 守卫直接把人送到登录页。两条路都实测过。
+
+`MenuLoadError` 的文案相应改成"无法获取用户信息或菜单权限数据"，因为它现在兜的是两个接口。
 
 仍然不做的：refreshToken 单飞续签（见 3.7），以及 Skyroc 的 `logout` / `modalLogout` 业务码分岔（弹窗确认后登出、`beforeunload` 兜底）——后者要等后端定义业务码体系。
 
@@ -411,7 +459,20 @@ function getLoginRedirectSearch(location: ParsedLocation, context: Router.Router
 
 ### 5.2 不迁 React Router loader
 
-Skyroc 用 TanStack Router 的 `beforeLoad`，天然在渲染前执行。**本项目不能照搬，因为路由表本身是从菜单数据生成的**：
+**根因是路由与菜单的数据流向相反，不只是 router 库不同。** Skyroc 的路由树来自编译期扫描 `pages/` 生成的 `routeTree.gen.ts`，后端菜单进来后被拿去和这棵树求交集，对不上本地页面的菜单项直接丢掉：
+
+```ts
+// packages/web/admin-layouts/src/features/menus/dynamic-routes.ts
+function toBackendRoute(route: Api.Route.BackendRoutePayload): Api.Route.BackendRoute | null {
+  const path = toRoutePath(route.path);
+  if (!availableRoutePaths.has(path)) return null;
+  ...
+}
+```
+
+菜单只贡献侧栏展示、权限、tab 元信息（`keepAlive`、`multi`），**一条路由都不产生**——`initMenus` 全程只 `setMenusState`。所以它的 `router` 能在模块顶层 `createRouter()` 建一次就不再变，认证态经 `context` 流入，`beforeLoad`、loader、`defaultPreload: 'intent'` 才全都成立。
+
+本项目相反，路由表是从菜单生成的：
 
 ```ts
 // src/routers/index.tsx
@@ -426,6 +487,45 @@ const router = useMemo(() => createBrowserRouter([{ HydrateFallback: Loading, ch
 菜单必须在 router **创建之前**到位，而 loader 活在 router **内部**——把 `initAuth` 放进 loader 是鸡生蛋。真要做得先把路由表改成"稳定根路由 + `unstable_patchRoutesOnNavigation` 动态挂载"，否则菜单一变 `createBrowserRouter` 就整体重建、loader 重跑。这个前置改造的成本远大于收益，本轮不做。
 
 而且"未登录先渲染一帧"这个问题，现有的 `ready` 门加 `<Loading />` 已经挡掉大部分。
+
+同理不引入的：`/login-out` 那条"用 URL 表达一次登出"的路由（我们的 `clearAuth()` 本就是任何地方可调的普通函数，http 层 401 直接调它）；`validateSearch` 的 zod schema（要新增依赖，RR7 也没有对应机制，"在参数入口处校验"的意图已由 `isSafeRedirect` 在唯一消费点满足）。
+
+### 5.2.1 值得抄的一条：认证初始化要防重入
+
+Skyroc 根路由的守卫带一个初始化标记：
+
+```ts
+// apps/admin/src/pages/__root.tsx
+beforeLoad: async ({ context }) => {
+  if (!context.isAuthInitialized && context.isLoggedIn) {
+    await context.initAuth();
+  }
+};
+```
+
+本项目原先没有等价物，实测出真 bug：**一次登录会跑两遍 `initPermissions`**（冷启动是 1 次）。因为 `LoginForm` 显式 `await initPermissions(token)` 的同时，`setToken` 又让 `RouterProvider` 的 effect（条件 `token && !authMenuList.length`）也发起一次，两次并发。mock 下只是浪费，接真实后端后每次登录发双倍请求，且两次菜单响应的到达顺序不确定，后到的会覆盖先到的。
+
+修法沿用项目里已有的 `logoutInFlight` 同款模式，给 `initPermissions` 加模块级 in-flight promise，两个调用方 await 同一个：
+
+```ts
+let initInFlight: Promise<void> | null = null;
+
+const initPermissions = (token: string) => {
+  if (!token) return Promise.resolve();
+  initInFlight ??= loadPermissions(token).finally(() => {
+    initInFlight = null;
+  });
+  return initInFlight;
+};
+```
+
+`.finally` 保证失败后也复位，`MenuLoadError` 的重试按钮不会被卡住（已实测：失败 → 重试仍失败 → 清掉开关再重试即恢复）。
+
+### 5.2.2 Loading 防闪烁
+
+Skyroc router 配了 `defaultPendingMs: 10` + `defaultPendingMinMs: 1000`：加载超过 10ms 才显示 loading，一旦显示至少停留 1 秒。本项目的 `ready` 门原先是"只要没就绪就显示"，mock 有 900ms 延迟看不出问题，快后端下会闪一下。
+
+落地为 `src/hooks/useDelayedVisible.ts`（延迟 10ms、最短 500ms），`RouterProvider` 用它包住 `<Loading />`。**两段必须配套**：只加最短时长会把 30ms 的加载硬拖成 500ms，只加延迟则挡不住"闪一下就消失"。
 
 ### 5.3 改法：`RouterGuard` 同步化
 
@@ -487,7 +587,11 @@ export function hasAuthorizedRoutePath(path: string, userInfo?: Api.Auth.UserInf
 
 它需要这个判定，是因为它的路由树来自本地文件（所有页面都注册着），菜单才来自后端，两者存在差集。
 
-**本项目的路由表是从菜单生成的**（`ConvertRouter` 只为菜单项建路由），无权路径压根不存在于路由表里，会落到 `*`。路由权限已经由构造保证，不需要再建一套路径索引。唯一缺口是语义：无权 URL 现在报 404 而不是 403。如果要对齐，在 `*` 兜底里判断"有 token 且路径不在 `flatMenuList` 中"渲染 403 即可，属于可选项。
+**本项目的路由表是从菜单生成的**（`ConvertRouter` 只为菜单项建路由），无权路径压根不存在于路由表里，会落到 `*`。路由权限已经由构造保证，不需要再建一套路径索引。唯一缺口是语义：无权 URL 现在报 404 而不是 403。
+
+**原本写的补法（在 `*` 兜底里判断"有 token 且路径不在 `flatMenuList` 中"渲染 403）是错的，已放弃。** 能落到 `*` 就说明没有任何路由匹配上，而路由是照着菜单建的——所以"路径不在 `flatMenuList` 中"在 `*` 里恒为真，照做会把所有 404（含纯拼错的 URL）一律变成 403，反而更糟。
+
+根本原因是：前端只有"授权菜单"这一份数据，**分不清"存在但无权"和"根本不存在"**。Skyroc 能分是因为它的路由树来自本地文件、注册了全部页面，跟菜单做差集才有意义。本项目要对齐就得同时维护一份全量路由清单，代价远大于"把 404 显示成 403"的收益。**结论：保持 404，不做。**
 
 三种权限的边界照旧：菜单权限管侧栏展示，路由权限管手输 URL 能否进页面，按钮权限管操作是否展示，**三者都不是安全边界**。真正的边界在后端，每个敏感接口都必须再校验一次。按钮权限继续用 `useAuthButton`，不新造组件。
 
@@ -530,7 +634,22 @@ export function getTabIdByRoute(pathname: string, multiTab: boolean, fullPath: s
 改法只有两步：
 
 - `MetaProps` 增加 `multiTab?: boolean`，默认 `false`；只有详情、编辑等确实需要并行的页面显式开启。
-- 新增 `getTabId(pathname, fullPath, multiTab)`（放 `src/utils/menu.ts`，与既有菜单助手同层），`Main` 的 cacheKey 和 Tabs 的 `path` 都从它取值，禁止各算一份。
+- 新增 `getTabId`（放 `src/utils/menu.ts`，与既有菜单助手同层），`Main` 的 cacheKey、Tabs 的 `path`、`setTabTitle` 的匹配都从它取值，禁止各算一份。
+
+**落地签名是 `getTabId(fullPath?)`，`multiTab` 由函数自己反查菜单，不由调用方传入**：
+
+```ts
+export function getTabId(fullPath: string = getUrlWithParams()) {
+  const pathname = fullPath.split('?')[0];
+  return getMenuByPath(useAuthStore.getState().flatMenuList, pathname).meta?.multiTab ? fullPath : pathname;
+}
+```
+
+三个理由：
+
+1. 传参版让每个调用方各自去拿 `multiTab`，那正是"各算一份"换了个位置——`Main` 还得为此多引一个 `useMatches`。
+2. Skyroc 的数据流本来就是从菜单取的（`getTabByMenuInfo` 读 `menuInfo.tab?.multi` 再传给 `getTabIdByRoute`），本项目把这一步收进函数里，语义一致。
+3. `setTabTitle` 原本用 `getUrlWithParams()`（恒带查询串）匹配标签，multiTab 落地后非 multiTab 页会匹配不上；改用 `getTabId()` 的默认参数后自动对齐。
 
 Skyroc 另有一个 `contentKey`（multi 时 `fullPath`，否则 `pathname`）用于"身份不变但要重新挂载"。**这一层不需要移植**：`keepalive-for-react` 内部已经用 `renderCount` 实现了同一件事——每个缓存项存一个 `renderCount`，React key 是 `${cacheKey}-${renderCount}`，`aliveRef.current.refresh(cacheKey)` 只把它 +1。身份与重挂载已经是分开的两个维度，项目侧只需要决定 cacheKey 怎么算。
 
@@ -538,17 +657,24 @@ Skyroc 另有一个 `contentKey`（multi 时 `fullPath`，否则 `pathname`）�
 
 Skyroc 在 Tab 上存了两个字段（`id` 是身份、`routePath` 是路由路径），校验用后者。本项目**不照抄这个结构**：`TabsListProp` 走的是 `tabs-state` 持久化，加字段就要处理存量数据，而项目已经决定不再使用 `version` + `migrate`（见 7 的施工细节 3）。
 
-更简单的等价做法是校验时反查菜单，`src/utils/menu.ts` 里现成的 `getMenuByPath()` 已经处理了动态参数（内部把 `:param` 换成 `.*` 做正则匹配），只需要先剥掉查询串：
+更简单的等价做法是校验时反查菜单，`src/utils/menu.ts` 里现成的 `getMenuByPath()` 已经处理了动态参数（内部把 `:param` 换成 `.*` 做正则匹配）。
+
+**落地实现与原方案有一处偏差**：查询串不在调用方 `split('?')`，而是**剥在 `getMenuByPath` 内部**。理由是 2.3 暴露了 `useAuthButton` 有同样的病，修在函数内部一次覆盖全部调用方，也不给未来的调用方留同一个坑；菜单 path 本就不含 `?`，剥查询串对这个函数恒成立。
 
 ```ts
+// utils/menu.ts —— getMenuByPath 内部
+const pathname = path.split('?')[0];
+const menuItem = menulist.find(menu => new RegExp(`^${menu.path?.replace(/:.[^/]*/, '.*')}$`).test(pathname));
+
+// stores/modules/tabs.ts —— 调用方不再自己处理查询串
 validateTabs: () => {
   const { flatMenuList } = useAuthStore.getState();
-  const keep = !item.closable || Boolean(getMenuByPath(flatMenuList, item.path.split('?')[0]).path);
+  const keep = !item.closable || Boolean(getMenuByPath(flatMenuList, item.path).path);
   ...
 }
 ```
 
-这样 2.2 的 bug 修掉了，`TabsListProp` 不变、`tabs-state` 结构不变、不需要迁移。附带好处是 `validateTabs` 不再需要调用方传 `validPaths`，`usePermissions` 里那段拼 `validPaths` 的代码可以一起删。
+这样 2.2 / 2.3 一并修掉，`TabsListProp` 不变、`tabs-state` 结构不变、不需要迁移。附带好处是 `validateTabs` 不再需要调用方传 `validPaths`，权限初始化里那段拼 `validPaths` 的代码已一起删。
 
 Skyroc 那个 `findTabByRoutePath`（`tab.id === routePath || tab.id.startsWith(routePath + '?')`）在需要按路由反查标签时可以借用同一个思路，本项目当前没有这个消费点，不提前加。
 
@@ -653,7 +779,7 @@ if (active) snapshot.current = live;
 
 ## 7. 实施顺序
 
-**当前状态：本文为方案定稿，四批改动均未落地，代码保持原样。** 动手前先读本节末尾的"施工细节"，其中一条会改变批次顺序（批次 3 先于批次 2）。
+**当前状态：四批全部落地，实际执行顺序 1 → 3 → 2 → 4（按施工细节的要求，批次 3 先于批次 2）。** 与本文原方案的偏差已就地标注在 2.3、6.2、6.3、5.4 和施工细节 1、7。
 
 无测试运行器，每批的验收方式统一为：`pnpm type:check` + `pnpm lint:eslint` + dev 运行时冒烟。文件改名或移动后必须重启 dev server 再验。
 
@@ -670,7 +796,7 @@ if (active) snapshot.current = live;
 
 1. **建立缓存页数据获取的项目约定：`enabled: active` 与 `useEffectOnActive`（6.4）**，并在模板里放一个可切换的详情页示例，让这条约定有地方看。
 2. blob / arraybuffer 响应分流（3.1），顺带修 `HttpError.code` 收 `undefined`。
-3. `validateTabs` 改为反查菜单（2.2、6.3），顺带删掉 `usePermissions` 里拼 `validPaths` 的那段。
+3. `validateTabs` 改为反查菜单（2.2、6.3），顺带删掉权限初始化里拼 `validPaths` 的那段。
 4. 删重试死代码（3.6）。
 
 冒烟：开两个详情页互相切换，隐藏那个不再发请求，网络面板里不出现对方 id 的请求；blob 下载成功、下载失败能看到后端 JSON 错误文案；带 query 的标签刷新后仍在。
@@ -705,6 +831,10 @@ if (active) snapshot.current = live;
 
 **1. `cancelAllRequest` 必须独立成文件，否则出现循环依赖。** `utils/auth.ts` 要用 `cancelAllRequest`（在 http 里），而 http 的 401 分支要用 `clearAuth`（在 auth 里）。虽然本项目已有类似的惰性循环（`stores/modules/tabs.ts` → `@/utils` → `@/stores`）且能跑，但不该再加一条。落法：把 abortController 和 `cancelAllRequest` 放 `src/utils/http/cancel.ts`，它不 import 任何业务模块；`http/index.ts` 和 `utils/auth.ts` 都只依赖它，环就断了。
 
+已用全量 import 图核对：落地后 `src` 内仍然只有那一条既有的惰性环，本轮没新增。
+
+**遗留提醒（本文原先没料到）**：`clearAuth` 要调 `logoutApi`，而 `logoutApi` 住在 `src/api/modules/login.ts`——那个文件的首行 `import api from '@/utils/http'` 现在是注释掉的，**一旦对接真实后端把它启用，就会成环**：`api/modules/login` → `utils/http/index` → `utils/auth` → `api/modules/login`。三处引用都发生在函数体内（不是模块求值期），ESM 下能正常跑，但它和既有那条一样属于"能跑的惰性环"。真接后端时若想彻底断开，把 `logoutApi` 的调用改成动态 `import()` 即可。
+
 **2. `clearAuth` 不负责跳转**（前提是批次 3 已完成），也不需要现在那个 `LOGOUT_DELAY = 500`。延迟原本是为了让 401 提示先露出来再跳，而 antd 的 `message` 挂在 `App` context 上、位置高于 router，跳转不会打断它。
 
 **3. 不给 Tab 加字段，也不引入 persist 迁移。** 项目已移除 `global-state` 与 `user-state` 的 `version` + `migrate`（历史包袱清理），后续也不走这条路。因此 `validateTabs` 的修法改成校验时反查菜单，`TabsListProp` 与 `tabs-state` 结构保持不变，见 6.3。
@@ -713,7 +843,11 @@ if (active) snapshot.current = live;
 
 **5. `LoginForm` 消费 redirect 时不能动现有跳转顺序。** 那里的 `navigate(HOME_URL)` 必须留在 `initPermissions` 之前（文件里有注释说明：晚了 `LoginForm` 会先被卸载，动态 router 首挂会落在 `/login` 闪一帧）。加 redirect 只是把目标换成 `isSafeRedirect(redirect) ? redirect : HOME_URL`，位置不动。
 
-**6. 错误去重替换 401 布尔时，"只登出一次"要单独保住。** 现在那个 `isUnauthorizedErrorShown` 同时干两件事：压重复提示、保证只登出一次。按消息去重只覆盖第一件，第二件需要独立的 in-flight 标记，否则并发 401 会触发多次 `clearAuth`。
+**6. 错误去重替换 401 布尔时，"只登出一次"要单独保住。** 现在那个 `isUnauthorizedErrorShown` 同时干两件事：压重复提示、保证只登出一次。按消息去重只覆盖第一件，第二件需要独立的 in-flight 标记，否则并发 401 会触发多次 `clearAuth`。落地用的是 `logoutInFlight ??= clearAuth().finally(() => (logoutInFlight = null))`。
+
+**7. 加 redirect 之后必须让 Tabs 在首挂也追加当前标签（落地时发现）。** `LayoutTabs` 原来用 `useUpdateEffect` 追加标签，**跳过首挂**；`initTabs` 只补 `isAffix` 的固定标签。以前登录后恒落在首页（首页是固定标签）所以看不出问题，加了 redirect 之后会直接落在任意业务页——那一页没有标签。浏览器实测：换账号登录后停在 `/list/useProTable`，标签栏只有"首页"。
+
+改法是把那个 `useUpdateEffect` 换成 `useEffect`（依赖不变，仍是 `[matches]`）。`initTabs` 声明在前先执行，首页仍排第一位；`addTab` 本身按 path 去重，不会重复追加。
 
 ### 不在任何批次里的已知缺口
 
@@ -765,20 +899,27 @@ packages/web/admin-layouts/src/state/tabs/use-admin-tab.ts     标签生命周�
 ### 本项目对应位置
 
 ```text
-src/utils/http/index.ts                        拦截器、401、重试死代码
-src/utils/http/error.ts                        HttpError、提示、断网跳 500
+src/utils/auth.ts                              会话建立(initPermissions)与清除(clearAuth)
+src/utils/queryClient.ts                       QueryClient 单例
+src/utils/http/index.ts                        拦截器、401 收口
+src/utils/http/cancel.ts                       共用 AbortController、cancelAllRequest
+src/utils/http/transform.ts                    二进制响应解 JSON 信封
+src/utils/http/error.ts                        HttpError、消息去重、断网跳 500
 src/utils/download.ts                          blob 下载消费端
-src/routers/index.tsx                          路由表生成、菜单门
-src/routers/helper/RouterGuard.tsx             守卫
+src/routers/index.tsx                          路由表生成、菜单门、loading 防闪
+src/routers/helper/RouterGuard.tsx             守卫（渲染期判定）
 src/routers/helper/ConvertRouter.tsx           菜单转路由
-src/routers/interface/index.ts                 MetaProps
-src/hooks/usePermissions.ts                    菜单/权限初始化
+src/routers/interface/index.ts                 MetaProps（含 multiTab）
+src/hooks/useDelayedVisible.ts                 加载指示器防闪烁
 src/stores/modules/{user,auth,tabs}.ts         登录态、菜单、标签
 src/layouts/components/Main/index.tsx          KeepAlive 接线
 src/layouts/components/Tabs/index.tsx          标签追加
+src/utils/menu.ts                              getMenuByPath、getTabId
 src/utils/keepAlive.ts                         缓存命令式操作
-src/views/login/components/LoginForm.tsx       登录流程
-src/main.tsx                                   queryClient
+src/views/list/useProTable/detail/             缓存页活跃门示例
+src/views/login/components/LoginForm.tsx       登录流程、用户切换判定
+src/api/modules/login.ts                       登录/用户信息/菜单 mock 与失败开关
+src/main.tsx                                   QueryClientProvider 接线
 ```
 
 ## 10. 许可

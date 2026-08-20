@@ -12,24 +12,26 @@
 
 ## 1. 技术栈与核心依赖
 
-| 类别       | 选型                                                                                                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------- |
-| 框架       | React 19 + TypeScript 5.9 + Vite 8(Rolldown)                                                              |
-| UI         | Ant Design 6(`@ant-design/happy-work-theme` 快乐主题可选)                                                 |
-| 高级表格   | `@ant-design/pro-components@3.1.14-2`(仅用 ProTable,见 §5.1)                                             |
-| 样式       | UnoCSS(presetWind4,工具类为主) + Less(antd 深覆盖/伪元素等留守场景),**无 CSS Modules**                |
-| 客户端状态 | Zustand 5(persist 持久化)                                                                                 |
-| 服务端状态 | @tanstack/react-query 5(ProTable request 走 `fetchQuery`;页面独立数据用 `useQuery`)                      |
-| 路由       | React Router 7(库模式,`VITE_ROUTER_MODE` 决定 hash/history)                                              |
-| 请求       | axios 二次封装于 `@/utils/http`(**禁止直接用 axios/fetch**)                                               |
-| 工具库     | ahooks(优先用现成 hook)、dayjs(zh-cn 已设)、clsx                                                        |
-| 图表       | echarts 6(经 `@/components/Echarts` 封装)                                                                |
-| 交互       | nprogress、react-countup、react-colorful、keepalive-for-react                                               |
+| 类别       | 选型                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| 框架       | React 19 + TypeScript 5.9 + Vite 8(Rolldown)                                                           |
+| UI         | Ant Design 6(`@ant-design/happy-work-theme` 快乐主题可选)                                              |
+| 高级表格   | `@ant-design/pro-components@3.1.14-2`(仅用 ProTable,见 §5.1)                                           |
+| 样式       | UnoCSS(presetWind4,工具类为主) + Less(antd 深覆盖/伪元素等留守场景),**无 CSS Modules**                 |
+| 客户端状态 | Zustand 5(persist 持久化)                                                                              |
+| 服务端状态 | @tanstack/react-query 5(ProTable request 走 `fetchQuery`;页面独立数据用 `useQuery`)                    |
+| 路由       | React Router 7(库模式,`VITE_ROUTER_MODE` 决定 hash/history)                                            |
+| 请求       | axios 二次封装于 `@/utils/http`(**禁止直接用 axios/fetch**)                                            |
+| 工具库     | ahooks(优先用现成 hook)、dayjs(zh-cn 已设)、clsx                                                       |
+| 图表       | echarts 6(经 `@/components/Echarts` 封装)                                                              |
+| 交互       | nprogress、react-countup、react-colorful、keepalive-for-react                                          |
 | 图标       | `@iconify/react/offline`(ri 本地子集,清单 `src/assets/icons/ri-manifest.json`,改后 `pnpm icons:build`) |
 
 包管理器**仅允许 pnpm**(preinstall only-allow 强制),Node `^20.19.0 || >=22.12.0`。
 
-**登录/菜单为纯前端 mock**:登录返回本地固定 token(带模拟延迟);菜单读 `src/assets/json/authMenuList.json`(600ms 延迟 + DevTools 设 `localStorage.mockMenuFail=1` 模拟失败)。对接真实后端只需替换 `src/api/modules/login.ts` 中注释标注的两处实现。
+**登录/用户信息/菜单为纯前端 mock**:登录返回本地固定 token(带模拟延迟);冷启动由 `getUserInfoApi(token)` 反解身份并刷新 userInfo;菜单读 `src/assets/json/authMenuList.json`。三个 DevTools 失败开关:`localStorage.mockMenuFail=1`(菜单失败)、`mockUserInfoFail=1`(用户信息失败,二者均走 `MenuLoadError` 重试视图)、`mockSessionExpired=1`(会话失效,走 `clearAuth` 回登录页)。对接真实后端只需替换 `src/api/modules/login.ts` 中注释标注的实现。
+
+**userInfo 只有一个写入点**:`@/utils/auth` 的 `initPermissions`(登录后与每次冷启动都会跑),`LoginForm` 只落 token——避免登录响应与用户信息接口给出两份不同快照。
 
 ### 常用命令
 
@@ -175,16 +177,16 @@ const requestRows = useCallback<NonNullable<ProTableProps<Row, SearchParams>['re
 
 ### 5.2 其他公共组件
 
-| 组件                                    | 用法                                                                                                                                                       |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ECharts**(`@/components/Echarts`)   | `<ECharts option={option} height={300} />`,option 类型 `ECOption`;布局变化自动 resize、卸载自动 dispose;**暗色 tooltip 必须用 `getTooltipStyle(isDark)`** |
-| **Icon**(`@/components/Icon`)         | 按名字符串渲染 iconify 图标:`<Icon name='ri:home-3-line' />`(菜单等动态场景)                                                                            |
-| **IconSelect**                          | 表单用可视化图标单选器(受控 value/onChange,值为 ri 名字符串)                                                                                            |
-| **StatCardGrid**                        | 统计卡片栅格,number 值自动数字滚动动画                                                                                                                     |
-| **TreeExpandIcon** + `useTreeExpand`    | 树表展开图标与展开状态管理                                                                                                                                 |
-| **Error 三件套**(403/404/500)         | + `ComponentError`(视图缺失兜底)+ `MenuLoadError`(菜单请求失败重试)                                                                                    |
-| **Loading** / **Lazy** / **SwitchDark** | 加载态 / 懒加载包装 / 明暗切换                                                                                                                             |
-| **ErrorBoundary**                       | Main 已全局接线(key=cacheKey 包每个路由页),无需手动包                                                                                                    |
+| 组件                                    | 用法                                                                                                                                                      |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ECharts**(`@/components/Echarts`)     | `<ECharts option={option} height={300} />`,option 类型 `ECOption`;布局变化自动 resize、卸载自动 dispose;**暗色 tooltip 必须用 `getTooltipStyle(isDark)`** |
+| **Icon**(`@/components/Icon`)           | 按名字符串渲染 iconify 图标:`<Icon name='ri:home-3-line' />`(菜单等动态场景)                                                                              |
+| **IconSelect**                          | 表单用可视化图标单选器(受控 value/onChange,值为 ri 名字符串)                                                                                              |
+| **StatCardGrid**                        | 统计卡片栅格,number 值自动数字滚动动画                                                                                                                    |
+| **TreeExpandIcon** + `useTreeExpand`    | 树表展开图标与展开状态管理                                                                                                                                |
+| **Error 三件套**(403/404/500)           | + `ComponentError`(视图缺失兜底)+ `MenuLoadError`(菜单请求失败重试)                                                                                       |
+| **Loading** / **Lazy** / **SwitchDark** | 加载态 / 懒加载包装 / 明暗切换                                                                                                                            |
+| **ErrorBoundary**                       | Main 已全局接线(key=cacheKey 包每个路由页),无需手动包                                                                                                     |
 
 页内静态图标直接 `import { Icon as SvgIcon } from '@iconify/react/offline'`(**禁裸 `@iconify/react`**,eslint 强制);图标 100% 离线,新增图标名先入 `ri-manifest.json` 再 `pnpm icons:build`。
 
@@ -194,12 +196,16 @@ const requestRows = useCallback<NonNullable<ProTableProps<Row, SearchParams>['re
 
 ```tsx
 const { BUTTONS } = useAuthButton();
-{BUTTONS.add && <Button type='primary'>新增</Button>}
+{
+  BUTTONS.add && <Button type='primary'>新增</Button>;
+}
 ```
 
 ### 5.4 Hooks 与 utils 工具箱(先查这里,别重复造)
 
-**src/hooks/**:`useMessage`(**组件外/统一提示出口**:`import { message, notification, modal } from '@/hooks/useMessage'`,禁止从 antd 直接 import message 静态方法)、`useAuthButton`、`usePermissions`(菜单/权限初始化)、`useTheme`、`useIsMobile`、`useClipboard`、`useTableOperate`、`useTreeExpand`。通用 hook 需求先查 **ahooks**,没有再自研。
+**src/hooks/**:`useMessage`(**组件外/统一提示出口**:`import { message, notification, modal } from '@/hooks/useMessage'`,禁止从 antd 直接 import message 静态方法)、`useAuthButton`、`useTheme`、`useIsMobile`、`useClipboard`、`useTableOperate`、`useTreeExpand`、`useDelayedVisible`(加载指示器防闪烁)。通用 hook 需求先查 **ahooks**,没有再自研。
+
+**会话生命周期不在 hooks 里**:建立(`initPermissions`)与清除(`clearAuth`)同住 `@/utils/auth`,二者都是普通函数,组件外也能调。
 
 **src/utils/**(`@/utils` barrel):`validate.ts`(表单校验断言 + `asFormRule` 胶水:`rules={[asFormRule(validatePhone, '手机号格式不正确')]}`)、`download.ts`(blob/url 文件下载)、`date.ts`(RangePicker 日期范围预设)、`menu.ts`(菜单树助手:扁平化/过滤/面包屑)、`is.ts`(类型守卫)、`common.ts`。直接路径模块:`@/utils/http`、`@/utils/color`、`@/utils/keepAlive`、`@/utils/themeAnimation`。
 
@@ -231,7 +237,7 @@ api.get<ResPage<UserList>>({ url: '/user/list', params, showErrorMessage: false,
 
 路由**运行时根据菜单数据生成**(当前来源为 mock JSON),不是静态定义。流程(`src/routers/index.tsx`):
 
-1. 挂载时若 `auth.authMenuList` 为空,`usePermissions().initPermissions(token)` 拉菜单入 auth store;菜单请求失败(有 token)渲染 `MenuLoadError` 重试视图。
+1. 挂载时若 `auth.authMenuList` 为空,`initPermissions(token)`(`@/utils/auth`)先校验会话取 userInfo、再拉菜单入 auth store;请求失败(token 仍在)渲染 `MenuLoadError` 重试视图,会话失效(token 已清)由守卫跳登录。
 2. `ConvertRouter.tsx` 扁平化菜单树,用 `import.meta.glob('@/views/**/*.tsx')` 把菜单项 `element` 字符串(如 `/home/index`)映射为懒加载组件;指向不存在视图时渲染 `ComponentError` 兜底不白屏。
 3. 最终路由 = 静态路由(登录、403/404/500,`modules/staticRouter.tsx`)+ 动态路由(挂 `<LayoutIndex />` 下;`meta.isFull` 全屏页平级)。
 4. `RouterGuard`:设 `document.title`;无 token 重定向 `LOGIN_URL`;已登录访问 /login 被 replace;设置 `window.$navigate` 供非组件代码跳转。
@@ -239,6 +245,15 @@ api.get<ResPage<UserList>>({ url: '/user/list', params, showErrorMessage: false,
 **添加页面 = 建 `src/views/...` + 同步 `src/assets/json/authMenuList.json` 的 `path`/`element`**(element = 视图文件路径,如 `/list/useProTable/index`)。
 
 页面缓存:keepalive-for-react,工具在 `@/utils/keepAlive`(`setKeepAliveRef`/`refreshKeepAlive`/`destroyKeepAlive`),Main 已接线。
+
+**缓存页副作用必须挂活跃门**(`meta.isKeepAlive: true` 的页面一律适用):隐藏不等于卸载,隐藏页的 effect、query、定时器全都还活着,且从全局 location 读到的是当前页的 URL。
+
+- 请求:`useQuery({ ..., enabled: active && ... })`,`active` 取自 `useKeepAliveContext()`。
+- 副作用:`useEffect` 换 `useEffectOnActive(cb, deps, skipMount?)`,一次性初始化用 `useEffectOnCreate`。
+- 写全局状态(如 `setTabTitle` 按当前 URL 匹配标签)必须走活跃门,否则会改到别人的标签上。
+- 边界:`enabled: false` 不取消已在飞的请求;ProTable 的 `request` 是命令式的、不吃 `enabled`,需要时在 `actionRef.reload()` 调用处判断 `active`。
+
+示例见 `src/views/list/useProTable/detail`;完整推导见 `docs/SKYROC_REFERENCE.md` §6.4。
 
 ## 9. 代码质量与提交规范
 

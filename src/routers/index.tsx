@@ -34,7 +34,7 @@ const RouterProvider: React.FC = () => {
   // 已登录无菜单时拉权限
   useEffect(() => {
     if (token && !authMenuList.length) runInit();
-  }, [authMenuList, token]);
+  }, [authMenuList.length, token]);
 
   // 路由表仅随 authMenuList 变，token 续期不重建
   const routerList = useMemo<RouteObjectType[]>(() => {
