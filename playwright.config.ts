@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = 9528;
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 9528);
 const baseURL = `http://127.0.0.1:${port}`;
+const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER !== 'false' && !process.env.CI;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -17,7 +18,7 @@ export default defineConfig({
   webServer: {
     command: `pnpm exec vite --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer,
     env: {
       VITE_OPEN: 'false',
       VITE_ROUTER_MODE: process.env.VITE_ROUTER_MODE || 'hash'

@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-本文件是 **hooks-admin** 的 AI 编码全局指令与项目规范手册。生成的一切代码必须符合本文件；与本文件冲突的通用习惯一律以本文件为准。落地契约见 `docs/ARCHITECTURE.md`，表格见 `docs/PROTABLE.md`，视觉见 `docs/DESIGN.md`。
+本文件是 **hooks-admin** 的 AI 编码全局指令与项目规范手册。生成的一切代码必须符合本文件；与本文件冲突的通用习惯一律以本文件为准。Agent 执行入口见 `AGENTS.md`，落地契约见 `docs/ARCHITECTURE.md`，表格见 `docs/PROTABLE.md`，视觉见 `docs/DESIGN.md`。
 
 ## 0. 项目定位
 
 **React 技术栈的极简 admin 模板**，纯前端 mock 闭环、开箱即跑。
 
-- **模板极简原则**：删减/合并/复用优先于新增抽象；新抽象需 ≥2 个真实消费者才立项。
+- **模板极简原则**：删减/合并/复用优先于新增抽象；新抽象原则上需 ≥2 个真实消费者。单消费者 Query 只有在承担非默认 session/cache/retry 契约时才允许单独提取。
 - **明确不引入**：国际化（文案直接写中文）、CSS Modules、Footer、灰色模式、Jotai、MSW、Activity/RouteActivity、keepalive-for-react、React Router。
 - **页面动画**：非缓存页使用 `motion@12.34.3` 七种 mode；缓存 pane `initial={false}`，首次创建/切回/刷新均不播放进入动画。不使用 AnimatePresence。
 - **视觉基准**：`docs/DESIGN.md`。禁止近似发挥。
@@ -18,7 +18,7 @@
 | 框架       | React 19 + TypeScript 5.9 + Vite 8                                      |
 | UI         | Ant Design 6 + ProTable (`@ant-design/pro-components@3.1.14-2`)         |
 | 样式       | UnoCSS (presetWind4) + Less，无 CSS Modules                             |
-| 客户端状态 | Zustand 5（仅 token/主题/Admin UI/Tabs）                                |
+| 客户端状态 | Zustand 5（session/主题/Admin UI/Tabs/搜索历史）                        |
 | 服务端状态 | TanStack Query 5                                                        |
 | 路由       | TanStack Router **1.162.8**（与 plugin 精确锁版，禁止 `^`/`~`）         |
 | 请求       | axios，封装于 `@/services/http`（禁止直接 axios/fetch）                 |
@@ -26,6 +26,8 @@
 | 图表       | echarts 6，经 `@/components/ECharts`                                    |
 | 页面动画   | `motion@12.34.3`                                                        |
 | 图标       | `@iconify/react/offline`（改 `ri-manifest.json` 后 `pnpm icons:build`） |
+
+依赖版本以 `package.json` 和 `pnpm-lock.yaml` 为唯一事实来源；文档只保留架构边界与必须精确锁版的依赖。
 
 登录/用户/菜单走同源 Vite mock（`build/mock.ts`，必须在 proxy 之前）。失败开关：`localStorage.mockMenuFail=1`、`mockUserInfoFail=1`、`mockSessionExpired=1`。对接真实后端替换 `src/features/auth/api.ts` 与 `src/features/navigation/api.ts`。
 
@@ -41,9 +43,11 @@ pnpm lint:check
 pnpm format:check
 pnpm test
 pnpm test:e2e
-pnpm build:dev|test|pro
+pnpm build:dev
+pnpm build:test
+pnpm build:pro
+pnpm verify
 pnpm icons:build
-pnpm commit
 ```
 
 ## 2. 目录
@@ -69,7 +73,7 @@ src/app/             AntdBridge + feedback
 - 新代码不用 `React.FC` 强制，与所在模块风格一致。
 - 禁止裸 `any`（通用封装既有默认参除外）；`import type` 内联式。
 - 导入：React/三方 → `@/` → 相对 → 样式。
-- 注释只写「是什么」。文案直接中文。时间用 dayjs。
+- 注释不复述代码；只记录非显然意图、约束和必要原因。文案直接中文。时间用 dayjs。
 
 ## 4. 样式
 
@@ -77,9 +81,15 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ## 5. 组件与数据
 
+### Query
+
+`api.ts` 只定义 HTTP 输入输出；Query options 绑定 `queryKey`、`queryFn` 和缓存策略。满足以下任一条件才提取 `queries.ts`：同一 options 有 ≥2 个真实调用方；同一缓存同时由组件和 Guard/loader/prefetch 等命令式入口访问；或单消费者必须集中维护非默认 session 隔离、retry、staleTime 策略。其他一次性查询直接写在调用处。禁止为了目录整齐创建 Query hooks、key factory 或 CRUD DSL。
+
+提取后的 options 必须供 `useQuery`、`ensureQueryData`、`fetchQuery` 等入口共享同一缓存契约。`queryKey` 包含影响结果的全部最终参数；user/menu 按 session epoch 隔离。
+
 ### ProTable
 
-直接使用 ProTable，禁止二次封装。`request` 用 `useCallback` + `queryClient.fetchQuery(userListOptions(query))`，`retry: false`。失败抛原异常，`onRequestError={() => undefined}`。keepAlive 列表 Tab 切换不请求、恢复不 `reload`。详见 `docs/PROTABLE.md`。
+直接使用 ProTable，禁止二次封装。`/list/useProTable` 是模板中的标准缓存列表示例，明确保留页面 `modules/queries.ts` 以展示 options 契约；普通业务页仍按上一节条件判断。`request` 用 `useCallback` + `queryClient.fetchQuery(userListOptions(query))`，`retry: false`。失败抛原异常，`onRequestError={() => undefined}`。keepAlive 列表 Tab 切换不请求、恢复不 `reload`。详见 `docs/PROTABLE.md`。
 
 ### 其他
 
@@ -110,4 +120,9 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ## 7. 质量
 
-ESLint 10 flat + Prettier + Stylelint。提交 Conventional Commits（`pnpm commit`）。改动后跑 `pnpm type:check` 与 lint。不自动 commit。
+ESLint 10 flat + Prettier + Stylelint。提交使用 Conventional Commits；仅在用户明确要求时才执行 commit，禁止自动 push。
+
+- 纯文档改动：`pnpm exec prettier --check AGENTS.md CLAUDE.md README.md docs/*.md` 与 `git diff --check`。
+- 普通代码改动：至少运行 `pnpm type:check`、`pnpm lint:check`、`pnpm format:check` 与相关单测。
+- 路由、认证、HTTP、Tabs、缓存或发布前验证：运行 `pnpm verify`，覆盖 route tree、类型、lint、格式、单测、hash/history E2E 和生产/开发构建。
+- 交付前检查 `git status --short` 与最终 diff，确认没有无关改动或生成物漂移。

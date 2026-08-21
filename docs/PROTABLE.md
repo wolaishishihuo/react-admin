@@ -1,13 +1,10 @@
 # ProTable 开发规范
 
-本项目标准列表页使用 React 19、Ant Design 6 和 ProComponents。
+本项目标准列表页使用 React 19、Ant Design 6、ProComponents 3 和 TanStack Query 5。
 
 ## 版本与边界
 
-- React：`19.2.7`
-- AntD：`6.5.0`
-- `@ant-design/pro-components`：`3.1.14-2`
-- TanStack React Query：`5.101.0`
+具体版本以 `package.json` 和 `pnpm-lock.yaml` 为准；`@ant-design/pro-components` 按 `package.json` 精确锁版。
 
 普通分页、搜索和 CRUD 列表直接使用 `ProTable`。树表、双表、复杂汇总表、全量树接口和报表组合页不适合 ProTable request/search 模型时，直接使用原生 AntD `Table`。不创建 `AppProTable`、`useProTablePage`、请求工厂或 CRUD DSL。
 
@@ -33,7 +30,7 @@ const requestRows = useCallback<NonNullable<ProTableProps<Row, Search>['request'
 
 `retry: false` 防止 HTTP 层为一次失败重复提示。request 不捕获后伪装成成功空数据；异常继续抛出，并在 ProTable 上设置 `onRequestError={() => undefined}`，让 HTTP 层保留唯一错误提示。
 
-分页页面可使用 `toProTableResponse(result)`，它把 `{ list, total }` 转成 `{ data, total, success: true }`。标准分页配置使用 `PRO_TABLE_PAGINATION`：默认第 1 页、默认 10 条、10/15/20/25/30 条选项和中文总数文案。
+分页页面直接把 `{ list, total }` 转成 `{ data: list, total, success: true }`，不为这一行映射创建 helper。标准分页配置使用 `PRO_TABLE_PAGINATION`：默认第 1 页、默认 10 条、10/15/20/25/30 条选项和中文总数文案。
 
 ## columns 与搜索
 
@@ -54,12 +51,12 @@ columns 同时描述展示和搜索：
 - `actionRef.current?.reloadAndRest?.()`：清选中状态并回到第一页。
 - `actionRef.current?.reset()`：清空搜索、排序、筛选并重置页码。
 - `formRef.current?.getFieldsValue()`：读取导出或写操作使用的当前筛选条件。
-- `formRef.current?.setFieldsValue(...)`：写入异步基地、日期等默认条件。
+- `formRef.current?.setFieldsValue(...)`：写入异步加载的选项、日期等默认条件。
 - `formRef.current?.submit()`：提交写入的默认条件，触发一次业务查询。
 
 异步默认值页面应使用 `manualRequest`，并用一次性 ref 守卫：默认值准备完成后先将守卫置为 `true`，再 `setFieldsValue`，最后 `submit()`，避免空条件查询和重复初始化。查询和重置都应只更新一次提交条件。
 
-导出从 `formRef` 读取当前表单值，复用与列表相同的日期转换和基地参数，不维护第二份搜索状态。
+导出从 `formRef` 读取当前表单值，复用与列表相同的参数转换，不维护第二份搜索状态。
 
 ## 删除后的空页自愈
 
@@ -71,7 +68,7 @@ columns 同时描述展示和搜索：
 
 ## 树表与特殊报表
 
-树表需要受控展开、异步重新播种、汇总行或多个派生表格时，直接使用 AntD `Table`，配合 `useTreeExpand` 和 `TreeExpandIcon`。资金日报、资金月报等报表保留独立 board/home/chart 查询、Tab 派生数据和图表，继续使用 `app-main` 整页滚动，不把图表塞进 ProTable 卡片。
+树表需要受控展开、异步重新播种、汇总行或多个派生表格时，直接使用 AntD `Table`，配合 `useTreeExpand` 和 `TableExpandIcon`。报表组合页保留独立查询、派生数据和图表，使用 `app-main` 整页滚动，不把图表塞进 ProTable 卡片。
 
 ## 高度、滚动与样式
 
@@ -91,7 +88,7 @@ AntD Table 的滚动选择器必须按真实 DOM 层级写在页面或项目作�
 
 `/list/useProTable` 是 `staticData.keepAlive: true` 的标准缓存列表。约束：
 
-- `request` 必须 `useCallback`，options factory 放页面 `modules/queries.ts`，`fetchQuery` 设 `retry: false`。
+- `request` 必须 `useCallback`。本页作为模板示例，明确保留 `modules/queries.ts` 展示 options 契约；其他页面按 CLAUDE.md §5 的提取条件判断。`fetchQuery` 设 `retry: false`。
 - Tab 切换只改 pane 的 `display` / `aria-hidden`，不得 remount，不得让 `request` 因引用变化再跑一遍。
 - 切回列表时直接展示保留的筛选、分页、选中和滚动，**禁止恢复时 `reload()`**。
 - 用户点击刷新、完成新增/编辑/删除后才按既有规则请求。

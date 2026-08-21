@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "hooks-admin open source management system",
-  "homepage": "https://github.com/HalseySpicy/Hooks-Admin",
+  "homepage": "https://github.com/wolaishishihuo/react-admin",
   "bugs": {
-    "url": "https://github.com/HalseySpicy/Hooks-Admin/issues"
+    "url": "https://github.com/wolaishishihuo/react-admin/issues"
   },
   "license": "MIT",
   "author": {
-    "name": "Hooks",
-    "email": "848130454@qq.com",
-    "url": "https://github.com/HalseySpicy"
+    "name": "wolaishishihuo",
+    "email": "2430250298@qq.com",
+    "url": "https://github.com/wolaishishihuo"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:HalseySpicy/Hooks-Admin.git"
+    "url": "https://github.com/wolaishishihuo/react-admin.git"
   },
   "type": "module",
   "scripts": {
@@ -35,13 +35,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "verify:migration": "pnpm routes:check && pnpm type:check && pnpm lint:check && pnpm format:check && pnpm test && pnpm test:e2e && VITE_ROUTER_MODE=history pnpm test:e2e && pnpm build:pro && VITE_ROUTER_MODE=history pnpm build:dev",
+    "verify": "pnpm routes:check && pnpm type:check && pnpm lint:check && pnpm format:check && pnpm test && PLAYWRIGHT_PORT=19528 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && VITE_ROUTER_MODE=history PLAYWRIGHT_PORT=19529 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && pnpm build:pro && VITE_ROUTER_MODE=history pnpm build:dev",
     "lint:eslint": "eslint --fix \"{src,tests}/**/*.{js,jsx,ts,tsx}\"",
     "lint:prettier": "prettier --write \"*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \"{src,build,docs,tests}/**/*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \".{prettier,stylelint}rc.cjs\" \".github/workflows/*.{yml,yaml}\"",
     "lint:stylelint": "stylelint --cache --fix \"src/**/*.{less,postcss,css,scss}\" --cache-location node_modules/.cache/stylelint/",
     "lint:lint-staged": "lint-staged",
     "prepare": "[ -d .git ] && husky || true",
-    "commit": "git add -A && czg && git push"
+    "commit": "czg"
   },
   "dependencies": {
     "@ant-design/happy-work-theme": "^2.0.0",

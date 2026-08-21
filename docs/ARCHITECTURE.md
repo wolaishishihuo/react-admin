@@ -1,6 +1,6 @@
 # 架构契约
 
-本文只描述已经落地的实现，不记录迁移过程。核对 Skyroc 行为时读取仓库 commit `67ae76c1`。
+本文只描述已经落地的契约，不记录迁移过程。任务明确改变行为时同步更新实现、测试和本文档；其他不一致按 `AGENTS.md` 的裁决流程处理。
 
 ## 目录与依赖方向
 
@@ -16,7 +16,7 @@ src/services/query   QueryClient 单例
 src/stores/modules   仅客户端状态：session/theme/admin-layout/tabs/search-history
 src/components       模板公共 UI
 src/hooks            跨页面 React/Ant Design 行为
-src/utils            纯函数：date/download/tree/validate/color
+src/utils            纯函数：date/download/tree/validate/color/form-rule/url
 src/app              AntdBridge + feedback
 ```
 
@@ -58,15 +58,18 @@ src/app              AntdBridge + feedback
 - `import api from '@/services/http'`，返回解包后的 `T`。
 - QueryClient：`refetchOnWindowFocus: false`，`retry: 1`；mutation `retry: false`。
 - 列表 `fetchQuery` 必须 `retry: false`。会话终止才 `queryClient.clear()`；user/menu Query 按 session epoch 隔离，换用户 `removeQueries` 保留当前会话数据。
+- `api.ts` 只负责 HTTP 输入输出；Query options 负责缓存身份、获取函数与缓存策略，提取条件以 CLAUDE.md §5 为准。
 
-## 主题 persist
+## 状态持久化
 
 这是新模板架构，不提供旧 React Router 模板 localStorage 原地升级。JSON 不存在或损坏时回退当前默认值。
 
-| Store        | key                     | 持久化                                                         |
-| ------------ | ----------------------- | -------------------------------------------------------------- |
-| theme        | `theme-state` v1        | themeMode/primary/isWeak/isHappy/compactAlgorithm/borderRadius |
-| admin-layout | `admin-layout-state` v1 | 菜单/折叠/水印/面包屑/tabs 开关、pageAnimate/pageAnimateMode   |
-| session      | `session-state` v1      | token、refreshToken、lastLoginUserId                           |
+| Store        | key                       | 持久化                                                         |
+| ------------ | ------------------------- | -------------------------------------------------------------- |
+| theme        | `theme-state` v1          | themeMode/primary/isWeak/isHappy/compactAlgorithm/borderRadius |
+| admin-layout | `admin-layout-state` v1   | 菜单/折叠/水印/面包屑/tabs 开关、pageAnimate/pageAnimateMode   |
+| session      | `session-state` v1        | token、refreshToken、lastLoginUserId                           |
+| tabs         | `tabs-state` v1           | homeTab、tabs；contentRevision 不持久化                        |
+| search       | `search-history-state` v1 | 最近 10 条菜单搜索 path                                        |
 
 `isDark` 派生不持久化。`index.html` head 脚本只预刷 `theme-state`。

@@ -1,6 +1,6 @@
 # DESIGN.md — 视觉与交互设计规范
 
-本项目**自包含**的设计规范：所有数值提炼自当前代码（原始视觉来源为 art-design-pro，已完成像素级对齐；无需本地持有 art 源码）。改样式以本文档 + 代码现状为准；本文档与代码不一致时，以代码为准并回来修文档。
+本项目**自包含**的目标视觉规范：所有数值提炼自当前代码（原始视觉来源为 art-design-pro，已完成像素级对齐；无需本地持有 art 源码）。代码是实现证据，不天然高于规范；二者不一致时按 `AGENTS.md` 的裁决流程判断，禁止静默把视觉回归写回本文档。
 
 ## 1. 设计原语（Design Tokens）
 
@@ -62,7 +62,7 @@
 ### 3.3 卡片与表格
 
 - 卡片 = `app-card`（bg-surface + line-secondary 边框 + rd-lg，**不含 padding**）；统计横幅用单卡分栏 + 竖分割线，勿拆多张小卡。
-- 标准分页表使用 ProTable 的列设置、分页和项目作用域高度链；树表、双表、复杂汇总表按真实业务需要使用原生 AntD Table。表格高度机制见 CLAUDE.md §6 和 `docs/PROTABLE.md`。
+- 标准分页表使用 ProTable 的列设置、分页和项目作用域高度链；树表、双表、复杂汇总表按真实业务需要使用原生 AntD Table。表格高度机制见 CLAUDE.md §5 和 `docs/PROTABLE.md`。
 
 ### 3.4 图表（echarts）
 
@@ -91,7 +91,7 @@
 
 ## 5. 修改样式的工作规则
 
-1. 分工三原则（CLAUDE.md §5）：一次性 → utility；≥3 处复用 → shortcut；antd 深覆盖/伪元素/keyframes → less。
+1. 分工三原则（CLAUDE.md §4）：一次性 → utility；≥3 处复用 → shortcut；antd 深覆盖/伪元素/keyframes → less。
 2. 颜色/圆角引用 §1 token；新增语义色先加 `--hooks-*` 变量 + uno theme 映射，再在 JSX 用语义类。
 3. 视觉调整须亮/暗两档 + 四 menuType 核对（历史教训：暗色硬编码、模式间数值漂移是常见回归源）。
-4. art-design-pro 是历史视觉来源；本文档已提炼其全部落地规则，**不要求本地持有 art 源码**。若需考古某规则出处，TODO.md 阶段三/七各条目录有原始 commit 与扒取位置。
+4. art-design-pro 是历史视觉来源；本文档已提炼其全部落地规则，**不要求本地持有 art 源码**。历史来源只通过当前仓库 Git 记录追溯；规范与实现冲突时按文首流程处理。
