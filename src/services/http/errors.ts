@@ -76,7 +76,7 @@ const getErrorMessage = (status: number): string => {
 
 export function handleError(error: AxiosError<ErrorResponse>): never {
   if (error.code === 'ERR_CANCELED') {
-    throw new HttpError('请求已取消', ApiStatus.error);
+    throw error;
   }
 
   const statusCode = error.response?.status;

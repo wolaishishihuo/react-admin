@@ -100,7 +100,6 @@ export async function handleUnauthorizedResponse(
   }
 
   await expireSession();
-  const error = createHttpError(message || '未授权访问，请重新登录', ApiStatus.unauthorized);
-  showError(error, true);
-  throw error;
+  // 过期码不按请求提示：刷新失败已统一清认证并跳登录，避免并发 401 重复 toast。
+  throw createHttpError(message || '未授权访问，请重新登录', ApiStatus.unauthorized);
 }

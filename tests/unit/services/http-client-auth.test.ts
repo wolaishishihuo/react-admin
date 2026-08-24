@@ -1,5 +1,6 @@
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { message } from '@/app/feedback';
 import { axiosInstance, handleUnauthorizedResponse } from '@/services/http/client';
 import { HttpError } from '@/services/http/errors';
 import { registerTokenRefreshHandler, registerUnauthorizedHandler, resetTokenRefresh } from '@/services/http/unauthorized';
@@ -38,6 +39,7 @@ describe('handleUnauthorizedResponse', () => {
       lastLoginUserId: ''
     });
     resetTokenRefresh();
+    vi.mocked(message.error).mockClear();
   });
 
   afterEach(() => {
@@ -125,6 +127,16 @@ describe('handleUnauthorizedResponse', () => {
 
     expect(refreshHandler).not.toHaveBeenCalled();
     expect(unauthorizedHandler).not.toHaveBeenCalled();
+  });
+
+  it('刷新失败后清会话且不按请求提示', async () => {
+    const unauthorizedHandler = vi.fn().mockResolvedValue(undefined);
+    registerUnauthorizedHandler(unauthorizedHandler);
+
+    await expect(handleUnauthorizedResponse(createConfig(), '令牌已过期')).rejects.toBeInstanceOf(HttpError);
+
+    expect(unauthorizedHandler).toHaveBeenCalledOnce();
+    expect(message.error).not.toHaveBeenCalled();
   });
 
   it('已经续签重发过的请求再次 401 时不再刷新', async () => {
