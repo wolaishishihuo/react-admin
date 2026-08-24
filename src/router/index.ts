@@ -36,7 +36,7 @@ export const router = createRouter({
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
   defaultPendingMs: 10,
-  defaultPendingMinMs: 500,
+  defaultPendingMinMs: 1000,
   defaultStructuralSharing: true,
   notFoundMode: 'root',
   scrollRestoration: true,
