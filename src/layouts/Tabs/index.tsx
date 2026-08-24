@@ -76,7 +76,7 @@ export default function LayoutTabs() {
       <div className='tabs-list flex flex-1 gap-6px items-center overflow-x-auto scrollbar-hide' ref={listRef}>
         {tabsList.map(item => (
           <TabContextMenu key={item.id} path={item.id} activePath={activeId}>
-            <div>
+            <div className='shrink-0'>
               <button
                 type='button'
                 className={clsx(
@@ -89,7 +89,7 @@ export default function LayoutTabs() {
                   void navigateTo(item.fullPath);
                 }}
               >
-                <span>{item.title}</span>
+                <span className='whitespace-nowrap'>{item.title}</span>
                 {!item.fixed && tabsList.length > 1 && (
                   <span
                     className={clsx(
