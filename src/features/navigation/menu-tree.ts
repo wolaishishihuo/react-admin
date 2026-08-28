@@ -1,3 +1,4 @@
+/** 菜单树查询：可见性、pathMap、面包屑、父级 path。隐藏项仍留在 tree 里给授权用。 */
 import type { NavigationItem } from './types';
 import { normalizePath } from './menu-normalize';
 

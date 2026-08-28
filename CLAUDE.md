@@ -112,9 +112,9 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ### 文件路由与缓存
 
-添加页面步骤见 `docs/ROUTING.md`。在 `src/pages/(admin)/...` 建文件路由并写 `staticData`。`dynamic` 还要同步 `src/features/navigation/mock/menu.json` 的 path（不使用 `element`）。
+添加页面步骤见 `docs/ROUTING.md`。`VITE_AUTH_ROUTE_MODE` 同一时间只生效一种，默认 `static`。在 `src/pages/(admin)/...` 建文件路由并写 `staticData`（`title`、`keepAlive`、`menu.icon` / `menu.hide` / `menu.order` / `menu.activeMenu`、`tab.multi` / `tab.fixed`、`buttons`）。不请求菜单，侧边栏从本地 route tree 生成（没有 `staticData` 的节点不会把子路由提到上一级），Guard 只校验本地文件树；keepAlive / multi / activeMenu / 按钮码都读 `staticData`。
 
-`staticData` 字段：`title`、`keepAlive`、`menu.icon` / `menu.hide` / `menu.order` / `menu.activeMenu`、`tab.multi` / `tab.fixed`。本模板额外允许 `buttons` 作为页面按钮码（static 不打菜单接口时使用）。`VITE_AUTH_ROUTE_MODE=static` 不请求菜单，侧边栏从本地 route tree 生成（没有 `staticData` 的节点不会把子路由提到上一级），Guard 只校验本地文件树。`dynamic` 登录后拉当前账号菜单，本地没有的 path 整节点丢掉，用这份树做侧边栏和 403；`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`（`meta` 等价）。Tab 的 keepAlive 以菜单项为准；停在当前页时缓存 pane 仍可用 `staticData.keepAlive`。`element` 忽略。`redirect` 不进入授权集合。
+若改为 `dynamic`：还要同步 `src/features/navigation/mock/menu.json` 的 path。登录后拉当前账号菜单，本地没有的 path 整节点丢掉，用这份树做侧边栏和 403；`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`（`meta` 等价）。Tab 的 keepAlive 以菜单项为准；停在当前页时缓存 pane 仍可用 `staticData.keepAlive`。`element` 忽略。`redirect` 不进入授权集合。
 
 缓存：活动页把 `router.state` 做成只读快照，pane 用 `display:none` 挂着。活动 entry 每次写入最新 `router.state`。Tab 的 keepAlive 来自当前模式菜单项。缓存 pane 无进入动画。内部字段只允许 `src/layouts/cache/snapshot-router.ts` 访问。非 keepAlive 走活 Outlet。守卫、按钮权限、菜单选中、面包屑、Tabs、cache 和刷新统一使用最后一个 match 的 `fullPath` 作为 `originPath`。
 
@@ -126,7 +126,7 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ## 6. 认证
 
-`initializeSession` 冷启动与登录后 single-flight，绑定 session epoch：拉 user；dynamic 再拉当前账号菜单，本地文件树没有的 path 整节点丢掉。登录/换用户递增 epoch，Token 续签只轮换凭据。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；401 在有 refresh token 时 single-flight 续签并只重发一次，没有或续签失败才清会话。user-info Query `retry: false`。HTTP 不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
+`initializeSession` 冷启动与登录后 single-flight，绑定 session epoch：拉 user。若改为 dynamic，再拉当前账号菜单，本地文件树没有的 path 整节点丢掉。登录/换用户递增 epoch，Token 续签只轮换凭据。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；401 在有 refresh token 时 single-flight 续签并只重发一次，没有或续签失败才清会话。user-info Query `retry: false`。HTTP 不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
 
 ## 7. 质量
 

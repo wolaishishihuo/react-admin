@@ -19,6 +19,17 @@ pnpm dev        # http://localhost:9527，任意账号密码可登录（本地 m
 
 `pnpm preview` 是 `build:dev` + `vite preview`，preview 仍挂同源 mock。
 
+## 加一个后台页面
+
+默认 `VITE_AUTH_ROUTE_MODE=static`：同一时间只跑这一种。没有 `src/pages` 里的文件就没有页面。
+
+1. 在 `src/pages/(admin)/` 建文件，导出 `Route`，写 `component` 和 `staticData`。分组要有带 `title` 的 `layout.tsx`。
+2. 跑一次 `pnpm dev` 或 `pnpm routes:check`，把更新后的 `src/router/routeTree.gen.ts` 一并提交。
+
+侧边栏、进页、keepAlive 都读这份 `staticData`。字段和守卫见 [`docs/ROUTING.md`](docs/ROUTING.md)。
+
+只有把开关改成 `dynamic` 时，才还要在 `src/features/navigation/mock/menu.json`（或真实菜单接口）补同一条 path；那时侧边栏和 403 跟当前账号菜单走。改菜单/授权代码从 `src/features/navigation/` 进，每个文件头有一句职责。
+
 ## 环境变量
 
 Vite 按 `--mode` 叠加根目录 `.env` 与 `.env.[mode]`：
@@ -76,5 +87,5 @@ E2E 会复用已在目标端口上的 Vite；`CI=1` 或 `PLAYWRIGHT_REUSE_SERVER
 
 ## 说明
 
-- `VITE_AUTH_ROUTE_MODE=static` 时不请求菜单接口，侧边栏和 keepAlive 来自本地 `staticData`。设为 `dynamic` 时登录后请求当前账号菜单，用这份树做侧边栏和 403；`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`。页面组件始终由本地文件路由决定，不使用后端 `element`。
+- 默认 `VITE_AUTH_ROUTE_MODE=static`：不请求菜单接口，侧边栏和 keepAlive 来自本地 `staticData`。若改为 `dynamic`：登录后拉当前账号菜单做侧边栏和 403，`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`。页面组件始终由本地文件路由决定，不使用后端 `element`。
 - Agent 执行入口见 `AGENTS.md`；完整项目规范见 `CLAUDE.md`；架构契约见 `docs/ARCHITECTURE.md`；**路由生成与使用见 `docs/ROUTING.md`**；设计系统见 `docs/DESIGN.md`；表格规范见 `docs/PROTABLE.md`。

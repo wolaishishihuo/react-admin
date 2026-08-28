@@ -1,4 +1,4 @@
-/** 后端 handle 与 meta 等价。buttons 是本模板扩展：static 不打菜单接口时用来挂按钮码。 */
+/** 后端菜单 DTO 与运行时 `NavigationItem`。handle 与 meta 等价；buttons 是 static 无菜单接口时的按钮码。 */
 export interface BackendRouteHandle {
   title?: string | null;
   icon?: string | null;

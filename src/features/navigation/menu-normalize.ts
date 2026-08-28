@@ -1,3 +1,4 @@
+/** path 规范化，以及后端 `:param` 转成本地 `$param`。 */
 import type { BackendRoutePayload, BackendRouteResponse } from './types';
 
 export const HOME_PATH = '/home';

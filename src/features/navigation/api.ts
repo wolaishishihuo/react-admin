@@ -1,3 +1,4 @@
+/** 菜单 HTTP。对接真实后端时替换本文件。 */
 import api from '@/services/http';
 import type { BackendRouteResponse } from './types';
 

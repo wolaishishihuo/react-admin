@@ -1,3 +1,4 @@
+/** 当前页按钮码：`const { BUTTONS } = useAuthButton()`。 */
 import { useRoute } from '@/router/use-route';
 import { useAuthorizedNavigation, useMenuSelectPath } from './menu-model';
 

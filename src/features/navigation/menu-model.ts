@@ -1,3 +1,4 @@
+/** 组件入口：读授权导航树，以及侧边栏当前选中 path。 */
 import { useQuery } from '@tanstack/react-query';
 import { getRouter } from '@/router/router-ref';
 import { getMenuSelectPath, useRoute } from '@/router/use-route';
