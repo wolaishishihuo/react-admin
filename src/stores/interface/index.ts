@@ -62,7 +62,7 @@ export interface TabsAction {
   closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
   closeMultipleTab: (payload: { path?: string }) => void;
   validateTabs: () => void;
-  setTabTitle: (title: string) => void;
+  setTabTitle: (title: string, path?: string) => void;
 }
 
 /* UserState */
@@ -76,6 +76,8 @@ export interface UserAction {
   setToken: (token: UserState['token']) => void;
   setUserInfo: (token: UserState['userInfo']) => void;
   setSearchHistory: (searchHistory: string[]) => void;
+  addSearchHistory: (path: string) => void;
+  removeSearchHistory: (path: string) => void;
 }
 
 /* AuthState */

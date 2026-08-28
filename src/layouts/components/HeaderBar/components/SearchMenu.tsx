@@ -1,12 +1,13 @@
+import { Icon as SvgIcon } from '@iconify/react/offline';
 import { useDebounce } from 'ahooks';
 import { Empty, Input, type InputRef, Modal } from 'antd';
 import clsx from 'clsx';
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Icon as SvgIcon } from '@iconify/react/offline';
+
 import { Icon } from '@/components/Icon';
 import { type RouteObjectType } from '@/routers/interface';
-import { addSearchHistory, removeSearchHistory, useAuthStore, useUserStore } from '@/stores';
+import { useAuthStore, useUserStore } from '@/stores';
 
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
@@ -15,6 +16,8 @@ const SearchMenu: React.FC = () => {
 
   const flatMenuList = useAuthStore(state => state.flatMenuList);
   const searchHistory = useUserStore(state => state.searchHistory);
+  const addSearchHistory = useUserStore(state => state.addSearchHistory);
+  const removeSearchHistory = useUserStore(state => state.removeSearchHistory);
 
   const inputRef = useRef<InputRef>(null);
   const menuListRef = useRef<HTMLDivElement>(null);

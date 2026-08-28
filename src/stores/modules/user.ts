@@ -24,6 +24,14 @@ export const useUserStore = create<UserStoreState>()(
         setSearchHistory: searchHistory =>
           set((state: UserState) => {
             state.searchHistory = searchHistory;
+          }),
+        addSearchHistory: path =>
+          set((state: UserState) => {
+            state.searchHistory = [path, ...state.searchHistory.filter(item => item !== path)].slice(0, 10);
+          }),
+        removeSearchHistory: path =>
+          set((state: UserState) => {
+            state.searchHistory = state.searchHistory.filter(item => item !== path);
           })
       }),
       {
@@ -33,13 +41,3 @@ export const useUserStore = create<UserStoreState>()(
     )
   )
 );
-
-export const addSearchHistory = (path: string) => {
-  const { searchHistory, setSearchHistory } = useUserStore.getState();
-  setSearchHistory([path, ...searchHistory.filter(item => item !== path)].slice(0, 10));
-};
-
-export const removeSearchHistory = (path: string) => {
-  const { searchHistory, setSearchHistory } = useUserStore.getState();
-  setSearchHistory(searchHistory.filter(item => item !== path));
-};

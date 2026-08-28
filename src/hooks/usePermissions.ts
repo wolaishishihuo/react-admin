@@ -1,6 +1,6 @@
 import { getAuthButtonListApi, getAuthMenuListApi } from '@/apis/modules/login';
 import { notification } from '@/hooks/useMessage';
-import { useAuthStore, useUserStore } from '@/stores';
+import { useAuthStore, useTabsStore, useUserStore } from '@/stores';
 
 let inFlight: { token: string; promise: Promise<void> } | null = null;
 
@@ -11,6 +11,7 @@ const usePermissions = () => {
   const setToken = useUserStore(state => state.setToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
   const setAuthButtonList = useAuthStore(state => state.setAuthButtonList);
+  const validateTabs = useTabsStore(state => state.validateTabs);
 
   const initPermissions = (token: string) => {
     if (!token) return Promise.resolve();
@@ -32,6 +33,8 @@ const usePermissions = () => {
           setToken('');
           return Promise.reject('No permission');
         }
+
+        validateTabs();
       } catch (error) {
         setToken('');
         return Promise.reject(error);

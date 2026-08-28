@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { HOME_URL } from '@/config';
 import { RefreshContext } from '@/context/Refresh';
-import { closeMultipleTab, closeTabsOnSide, useGlobalStore, useTabsStore } from '@/stores';
+import { useGlobalStore, useTabsStore } from '@/stores';
 
 interface TabContextMenuProps {
   /** 菜单作用目标标签路径 */
@@ -23,6 +23,8 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({ path, activePath, trigg
   const navigate = useNavigate();
   const { refresh } = useContext(RefreshContext);
   const tabsList = useTabsStore(state => state.tabsList);
+  const closeTabsOnSide = useTabsStore(state => state.closeTabsOnSide);
+  const closeMultipleTab = useTabsStore(state => state.closeMultipleTab);
   const setGlobalState = useGlobalStore(state => state.setGlobalState);
 
   const clickedIndex = tabsList.findIndex(item => item.path === path);

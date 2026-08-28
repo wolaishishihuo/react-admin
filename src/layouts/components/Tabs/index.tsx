@@ -1,13 +1,16 @@
-import clsx from 'clsx';
+import './index.less';
+
 import { Icon as SvgIcon } from '@iconify/react/offline';
+import clsx from 'clsx';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
+
 import { type MetaProps } from '@/routers/interface';
-import { useGlobalStore, useTabsStore, useAuthStore, addTab, removeTab } from '@/stores';
+import { useAuthStore, useGlobalStore, useTabsStore } from '@/stores';
 import { getTabId } from '@/utils';
+
 import TabContextMenu from './components/TabContextMenu';
-import './index.less';
 
 const LayoutTabs: React.FC = () => {
   const matches = useMatches();
@@ -18,6 +21,8 @@ const LayoutTabs: React.FC = () => {
 
   const tabs = useGlobalStore(state => state.tabs);
   const tabsList = useTabsStore(state => state.tabsList);
+  const addTab = useTabsStore(state => state.addTab);
+  const removeTab = useTabsStore(state => state.removeTab);
   const flatMenuList = useAuthStore(state => state.flatMenuList);
 
   const listRef = useRef<HTMLDivElement>(null);

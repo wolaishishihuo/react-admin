@@ -1,20 +1,14 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { type TabsAction, type TabsState } from '@/stores/interface';
 import { getMenuByPath, getTabId } from '@/utils';
-import { type TabsState, type TabsListProp } from '../interface';
+
 import { useAuthStore } from './auth';
 
-export interface TabsStore extends TabsState {
-  setTabsList: (tabsList: TabsListProp[]) => void;
-  addTab: (tab: TabsListProp) => void;
-  removeTab: (payload: { path: string; isCurrent: boolean }) => void;
-  closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
-  closeMultipleTab: (payload: { path?: string }) => void;
-  validateTabs: () => void;
-  setTabTitle: (title: string, path?: string) => void;
-}
+export type TabsStoreState = TabsState & TabsAction;
 
-export const useTabsStore = create<TabsStore>()(
+export const useTabsStore = create<TabsStoreState>()(
   persist(
     (set, get) => ({
       tabsList: [],
@@ -74,12 +68,3 @@ export const useTabsStore = create<TabsStore>()(
     }
   )
 );
-
-export const setTabsList = (tabsList: TabsListProp[]) => useTabsStore.getState().setTabsList(tabsList);
-export const addTab = (tab: TabsListProp) => useTabsStore.getState().addTab(tab);
-export const removeTab = (payload: { path: string; isCurrent: boolean }) => useTabsStore.getState().removeTab(payload);
-export const closeTabsOnSide = (payload: { path: string; type: 'left' | 'right' }) =>
-  useTabsStore.getState().closeTabsOnSide(payload);
-export const closeMultipleTab = (payload: { path?: string }) => useTabsStore.getState().closeMultipleTab(payload);
-export const validateTabs = () => useTabsStore.getState().validateTabs();
-export const setTabTitle = (title: string, path?: string) => useTabsStore.getState().setTabTitle(title, path);
