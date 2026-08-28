@@ -50,6 +50,8 @@ const LoginForm: React.FC = () => {
 
       // navigate to home
       navigate(HOME_URL);
+    } catch (error) {
+      message.error((error as { msg?: string })?.msg || '登录失败');
     } finally {
       setLoading(false);
       message.destroy(key);
@@ -79,16 +81,23 @@ const LoginForm: React.FC = () => {
     <div className='login-form-content'>
       <Form name='login' size='large' autoComplete='off' ref={formRef} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         <Form.Item name='username' rules={[{ required: true, message: 'Please input your username!' }]}>
-          <Input prefix={<UserOutlined />} placeholder='User：admin / user' />
+          <Input prefix={<UserOutlined />} placeholder='User：admin / user' data-testid='login-username' />
         </Form.Item>
         <Form.Item name='password' rules={[{ required: true, message: 'Please input your password!' }]}>
-          <Input.Password prefix={<LockOutlined />} placeholder='Password：123456' />
+          <Input.Password prefix={<LockOutlined />} placeholder='Password：123456' data-testid='login-password' />
         </Form.Item>
         <Form.Item className='login-form-button'>
           <Button shape='round' icon={<CloseCircleOutlined />} onClick={onReset}>
             Reset
           </Button>
-          <Button type='primary' shape='round' icon={<UserOutlined />} loading={loading} htmlType='submit'>
+          <Button
+            type='primary'
+            shape='round'
+            icon={<UserOutlined />}
+            loading={loading}
+            htmlType='submit'
+            data-testid='login-submit'
+          >
             Submit
           </Button>
         </Form.Item>

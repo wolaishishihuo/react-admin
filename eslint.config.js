@@ -24,7 +24,11 @@ export default defineConfig(
       '.vscode/**',
       '.idea/**',
       '.husky/**',
-      '.local/**'
+      '.local/**',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+      'blob-report/**'
     ]
   },
   js.configs.recommended,
