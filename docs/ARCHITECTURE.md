@@ -63,7 +63,7 @@ tests                Vitest unit + Playwright e2e
 
 ## HTTP / Query
 
-- `import api from '@/services/http'`，返回解包后的 `T`。信封 `{ code, msg, data }`，成功码 `200`；鉴权头 `x-access-token`。
+- `import api from '@/services/http'`，返回解包后的 `T`。信封 `{ code, msg, data }`，成功码 `200`；鉴权头 `x-access-token`。与后端对齐的字段表见 `docs/BACKEND.md`。
 - QueryClient：`refetchOnWindowFocus: false`，`retry: 1`；mutation `retry: false`。
 - 登出与会话失效调用 `cancelAllRequest()`，中止未自带 `signal` 的在途请求并立刻换新 Controller。取消保持 axios `ERR_CANCELED`，不包装成业务错误、不 toast。
 - 401 刷新全局单飞；失败后只清会话并跳登录，过期码不按请求重复提示。

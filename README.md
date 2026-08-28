@@ -63,12 +63,11 @@ Vite 按 `--mode` 叠加根目录 `.env` 与 `.env.[mode]`：
 
 `build:test` / `build:pro` **不含 mock**，请求打到对应 `.env` 的 `VITE_API_URL`（模板默认仍是 Apifox）。
 
-对接真实后端：
+对接真实后端前先用 [`docs/BACKEND.md`](docs/BACKEND.md) 和后端对齐信封、登录、菜单字段和分页。然后：
 
 1. 关掉或加开关移除 `vite.config.ts` 里的 `createMockPlugin()`，否则本地 `/api` 永远进 mock。
 2. 按环境改 `VITE_API_URL`；需要绕 CORS 时再配 `VITE_PROXY`。
-3. 替换 `src/features/auth/api.ts` 与 `src/features/navigation/api.ts`。
-4. 接口信封为 `{ code, msg, data }`，成功码 `200`；鉴权头 `x-access-token`。
+3. 若 URL 或字段与默认不一致，改 `src/features/auth/api.ts` 与 `src/features/navigation/api.ts`（以及 `src/services/http`）。
 
 ## 验证
 
@@ -89,4 +88,4 @@ E2E 会复用已在目标端口上的 Vite；`CI=1` 或 `PLAYWRIGHT_REUSE_SERVER
 ## 说明
 
 - `VITE_AUTH_ROUTE_MODE` 一次只生效一种，不并存。默认 `static`：不请求菜单，侧边栏和 keepAlive 来自 `staticData`。`dynamic`：登录后拉当前账号菜单做侧边栏和 403，`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`。页面始终由本地文件路由决定，不使用后端 `element`。钉死一种或为改开关预留两份元数据，见 [`docs/ROUTING.md`](docs/ROUTING.md)。
-- Agent 执行入口见 `AGENTS.md`；完整项目规范见 `CLAUDE.md`；架构契约见 `docs/ARCHITECTURE.md`；**路由生成与使用见 `docs/ROUTING.md`**；设计系统见 `docs/DESIGN.md`；表格规范见 `docs/PROTABLE.md`。
+- Agent 执行入口见 `AGENTS.md`；完整项目规范见 `CLAUDE.md`；架构契约见 `docs/ARCHITECTURE.md`；与后端对齐见 [`docs/BACKEND.md`](docs/BACKEND.md)；**路由生成与使用见 `docs/ROUTING.md`**；设计系统见 `docs/DESIGN.md`；表格规范见 `docs/PROTABLE.md`。
