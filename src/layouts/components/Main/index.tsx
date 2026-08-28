@@ -1,7 +1,6 @@
 import "./index.less";
 
 import { useDebounceFn } from "ahooks";
-import { Layout } from "antd";
 import React, { useEffect } from "react";
 
 import KeepAliveOutlet from "@/components/KeepAlive";
@@ -11,16 +10,17 @@ import { useGlobalStore } from "@/stores";
 
 import Maximize from "./components/Maximize";
 
-const { Content } = Layout;
+interface LayoutMainProps {
+  header?: React.ReactNode;
+}
 
-const LayoutMain: React.FC = () => {
+const LayoutMain: React.FC<LayoutMainProps> = ({ header }) => {
   const { maximize, isCollapse, setGlobalState } = useGlobalStore(state => ({
     maximize: state.maximize,
     isCollapse: state.isCollapse,
     setGlobalState: state.setGlobalState
   }));
 
-  // Monitor window changes, collapse menu
   const { run } = useDebounceFn(
     () => {
       const screenWidth = document.body.clientWidth;
@@ -34,21 +34,23 @@ const LayoutMain: React.FC = () => {
     return () => window.removeEventListener("resize", run);
   }, []);
 
-  // Monitor whether the current page is maximized, dynamically add class
   useEffect(() => {
     const root = document.getElementById("root") as HTMLElement;
     root.classList.toggle("main-maximize", maximize);
   }, [maximize]);
 
   return (
-    <React.Fragment>
+    <main className="app-main">
+      <header className="app-header">
+        {header && <div className="app-header-bar">{header}</div>}
+        <LayoutTabs />
+      </header>
       <Maximize />
-      <LayoutTabs />
-      <Content>
+      <div className="app-content">
         <KeepAliveOutlet />
-      </Content>
+      </div>
       <LayoutFooter />
-    </React.Fragment>
+    </main>
   );
 };
 

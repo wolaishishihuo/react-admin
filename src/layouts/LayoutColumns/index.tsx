@@ -6,14 +6,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import logo from "@/assets/images/logo.svg";
 import { Icon } from "@/components/Icon";
-import LayoutMenu from "@/layouts/components//Menu";
 import ToolBarLeft from "@/layouts/components/Header/ToolBarLeft";
 import ToolBarRight from "@/layouts/components/Header/ToolBarRight";
 import LayoutMain from "@/layouts/components/Main";
+import LayoutMenu from "@/layouts/components/Menu";
+import { LAYOUT_SIDER_COLLAPSED_WIDTH, LAYOUT_SIDER_WIDTH } from "@/layouts/constants";
 import { RouteObjectType } from "@/routers/interface";
 import { useAuthStore, useGlobalStore } from "@/stores";
 
-const { Header, Sider } = Layout;
+const { Sider } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
@@ -70,7 +71,12 @@ const LayoutColumns: React.FC = () => {
           })}
         </div>
       </div>
-      <Sider width={210} collapsed={isCollapse} className={`${!subMenuList.length && "not-sider"}`}>
+      <Sider
+        width={LAYOUT_SIDER_WIDTH}
+        collapsedWidth={LAYOUT_SIDER_COLLAPSED_WIDTH}
+        collapsed={isCollapse}
+        className={`${!subMenuList.length && "not-sider"}`}
+      >
         {subMenuList.length ? (
           <React.Fragment>
             <div className="logo">
@@ -80,13 +86,14 @@ const LayoutColumns: React.FC = () => {
           </React.Fragment>
         ) : null}
       </Sider>
-      <Layout>
-        <Header>
-          <ToolBarLeft />
-          <ToolBarRight />
-        </Header>
-        <LayoutMain />
-      </Layout>
+      <LayoutMain
+        header={
+          <React.Fragment>
+            <ToolBarLeft />
+            <ToolBarRight />
+          </React.Fragment>
+        }
+      />
     </section>
   );
 };

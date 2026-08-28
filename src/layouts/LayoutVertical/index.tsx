@@ -4,13 +4,14 @@ import { Layout } from "antd";
 import React from "react";
 
 import logo from "@/assets/images/logo.svg";
-import LayoutMenu from "@/layouts/components//Menu";
 import ToolBarLeft from "@/layouts/components/Header/ToolBarLeft";
 import ToolBarRight from "@/layouts/components/Header/ToolBarRight";
 import LayoutMain from "@/layouts/components/Main";
+import LayoutMenu from "@/layouts/components/Menu";
+import { LAYOUT_SIDER_COLLAPSED_WIDTH, LAYOUT_SIDER_WIDTH } from "@/layouts/constants";
 import { useGlobalStore } from "@/stores";
 
-const { Header, Sider } = Layout;
+const { Sider } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
@@ -19,20 +20,21 @@ const LayoutVertical: React.FC = () => {
 
   return (
     <section className="layout-vertical">
-      <Sider width={210} collapsed={isCollapse}>
+      <Sider width={LAYOUT_SIDER_WIDTH} collapsedWidth={LAYOUT_SIDER_COLLAPSED_WIDTH} collapsed={isCollapse}>
         <div className="logo">
           <img src={logo} alt="logo" className="logo-img" />
           {!isCollapse && <h2 className="logo-text">{APP_TITLE}</h2>}
         </div>
         <LayoutMenu mode="inline" />
       </Sider>
-      <Layout>
-        <Header>
-          <ToolBarLeft />
-          <ToolBarRight />
-        </Header>
-        <LayoutMain />
-      </Layout>
+      <LayoutMain
+        header={
+          <React.Fragment>
+            <ToolBarLeft />
+            <ToolBarRight />
+          </React.Fragment>
+        }
+      />
     </section>
   );
 };

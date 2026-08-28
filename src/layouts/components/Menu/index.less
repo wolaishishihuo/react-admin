@@ -4,3 +4,40 @@
     background-color: var(--hooks-colorBgSubMenuSider) !important;
   }
 }
+.ant-menu-inline,
+.ant-menu-vertical {
+  color: var(--hooks-colorTextSider);
+  background: transparent !important;
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    width: calc(100% - 16px) !important;
+    margin-block: 4px !important;
+    margin-inline: 8px !important;
+    border-radius: 6px !important;
+  }
+  .ant-menu-item-selected {
+    color: var(--hooks-colorPrimary) !important;
+    background-color: var(--hooks-colorPrimaryBg) !important;
+  }
+  .ant-menu-item:not(.ant-menu-item-selected):hover,
+  .ant-menu-submenu-title:hover {
+    background-color: var(--hooks-colorLayoutHover, var(--hooks-colorFillTertiary)) !important;
+  }
+  .ant-menu-item::after {
+    display: none !important;
+  }
+}
+.ant-menu-horizontal {
+  .ant-menu-item-selected,
+  .ant-menu-submenu-selected {
+    color: var(--hooks-colorPrimary) !important;
+    background-color: var(--hooks-colorPrimaryBg) !important;
+    .ant-menu-submenu-title {
+      color: var(--hooks-colorPrimary) !important;
+    }
+  }
+  .ant-menu-item:not(.ant-menu-item-selected):hover,
+  .ant-menu-submenu:not(.ant-menu-submenu-selected):hover .ant-menu-submenu-title {
+    background-color: var(--hooks-colorLayoutHover, var(--hooks-colorFillTertiary)) !important;
+  }
+}

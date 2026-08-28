@@ -4,7 +4,11 @@
 const globalTheme = {
   light: {
     // Customize global CSS variables
-    "--hooks-colorBgContent": "#f5f5f5",
+    "--hooks-colorBgContent": "#fafbfc",
+    "--hooks-colorBgBox": "#ffffff",
+    "--hooks-colorCardBorder": "rgba(0, 0, 0, 0.08)",
+    "--hooks-colorLayoutHover": "#edeff0",
+    "--hooks-colorTabText": "#7987a1",
     "--hooks-colorLogoText": "#475768",
     "--hooks-colorTextRegular": "#606266",
     "--hooks-boxShadowAnalysis": "0 5px 20px 0 rgb(50 50 50 / 54%)",
@@ -17,7 +21,11 @@ const globalTheme = {
   },
   dark: {
     // Customize global CSS variables
-    "--hooks-colorBgContent": "#0d0d0d",
+    "--hooks-colorBgContent": "#070707",
+    "--hooks-colorBgBox": "#161618",
+    "--hooks-colorCardBorder": "rgba(255, 255, 255, 0.08)",
+    "--hooks-colorLayoutHover": "#252530",
+    "--hooks-colorTabText": "#8f8fa3",
     "--hooks-colorLogoText": "#f1f1f1",
     "--hooks-colorTextRegular": "#CFD3DC",
     "--hooks-boxShadowAnalysis": "0 3px 20px 0 rgb(255 255 255 / 35%)",

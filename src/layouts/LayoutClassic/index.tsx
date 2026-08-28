@@ -5,15 +5,15 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import logo from "@/assets/images/logo.svg";
-import LayoutMenu from "@/layouts/components//Menu";
+import CollapseIcon from "@/layouts/components/Header/components/CollapseIcon";
 import ToolBarLeft from "@/layouts/components/Header/ToolBarLeft";
 import ToolBarRight from "@/layouts/components/Header/ToolBarRight";
 import LayoutMain from "@/layouts/components/Main";
+import LayoutMenu from "@/layouts/components/Menu";
+import { LAYOUT_SIDER_COLLAPSED_WIDTH, LAYOUT_SIDER_WIDTH } from "@/layouts/constants";
 import { RouteObjectType } from "@/routers/interface";
 import { useAuthStore, useGlobalStore } from "@/stores";
 import { getFirstLevelMenuList } from "@/utils";
-
-import CollapseIcon from "../components/Header/components/CollapseIcon";
 
 const { Header, Sider } = Layout;
 
@@ -57,7 +57,12 @@ const LayoutClassic: React.FC = () => {
         </div>
       </Header>
       <div className="classic-content">
-        <Sider width={210} collapsed={isCollapse} className={`${!subMenuList.length && menuSplit ? "not-sider" : ""}`}>
+        <Sider
+          width={LAYOUT_SIDER_WIDTH}
+          collapsedWidth={LAYOUT_SIDER_COLLAPSED_WIDTH}
+          collapsed={isCollapse}
+          className={`${!subMenuList.length && menuSplit ? "not-sider" : ""}`}
+        >
           {menuSplit ? (
             <React.Fragment>
               {subMenuList.length ? (

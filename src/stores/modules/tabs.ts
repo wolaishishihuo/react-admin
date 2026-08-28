@@ -19,9 +19,17 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
           }),
         addTab: tabs =>
           set((draft: TabsState) => {
-            if (draft.tabsList.every(item => item.path !== tabs.path)) {
+            const existIndex = draft.tabsList.findIndex(item => item.path === tabs.path);
+            if (existIndex === -1) {
               draft.tabsList.push(tabs);
+              return;
             }
+            const existing = draft.tabsList[existIndex];
+            draft.tabsList[existIndex] = {
+              ...existing,
+              icon: tabs.icon || existing.icon,
+              closable: tabs.closable
+            };
           }),
         removeTab: (path, isCurrent) =>
           set((draft: TabsState) => {

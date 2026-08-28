@@ -5,13 +5,22 @@
   padding-right: 50px;
   overflow: hidden;
   .collapsed {
-    margin-right: 20px;
-    font-size: calc((var(--hooks-fontSizeLG) + 2) * 1px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-right: 8px;
+    font-size: 18px;
     color: var(--hooks-colorTextHeader);
     cursor: pointer;
-    transition: color 0.3s;
+    border-radius: 8px;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
     &:hover {
       color: var(--hooks-colorPrimaryText);
+      background-color: var(--hooks-colorLayoutHover, var(--hooks-colorTextHoverHeader));
     }
   }
   .ant-breadcrumb {
@@ -50,17 +59,32 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
-  height: 55px;
-  line-height: 55px;
+  height: 60px;
+  line-height: 60px;
   .header-icon {
+    display: flex;
+    align-items: center;
+    overflow: visible;
     & > * {
-      margin-left: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      margin-left: 4px;
+      overflow: visible;
       color: var(--hooks-colorTextHeader);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+      &:hover {
+        background-color: var(--hooks-colorLayoutHover, var(--hooks-colorTextHoverHeader));
+      }
     }
   }
   .username {
-    margin: 0 20px;
-    font-size: 15px;
+    margin: 0 12px 0 16px;
+    font-size: 14px;
     color: var(--hooks-colorTextHeader);
   }
   .avatar {

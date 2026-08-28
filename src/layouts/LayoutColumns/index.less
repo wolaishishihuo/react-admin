@@ -1,21 +1,22 @@
 .layout-columns {
   display: flex;
   height: 100%;
+  background-color: var(--hooks-colorBgContent);
   .logo {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    height: 55px;
+    height: 60px;
     overflow: hidden;
     .logo-img {
       width: 34px;
       height: 34px;
     }
     .logo-text {
-      font-size: 26px;
-      font-weight: bold;
-      line-height: 26px;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 18px;
       color: var(--hooks-colorTextSider);
       letter-spacing: 0.5px;
       white-space: nowrap;
@@ -32,9 +33,6 @@
     .menu-list {
       flex: 1;
       overflow: auto;
-      // &::-webkit-scrollbar {
-      //   display: none;
-      // }
       .menu-item {
         box-sizing: border-box;
         display: flex;
@@ -42,11 +40,11 @@
         align-items: center;
         justify-content: center;
         padding: 0 4px;
-        margin: 5px 6px 10px;
+        margin: 8px 6px;
         color: var(--hooks-colorTextSecondarySider);
         cursor: pointer;
-        border-radius: calc(var(--hooks-borderRadius) * 1px);
-        transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+        border-radius: 6px;
+        transition: all 0.2s ease;
         .anticon {
           margin: 13px 0 4px;
           font-size: 16px;
@@ -61,8 +59,8 @@
         }
       }
       .menu-active {
-        color: #ffffff;
-        background-color: var(--hooks-colorPrimary);
+        color: var(--hooks-colorPrimary);
+        background-color: var(--hooks-colorPrimaryBg);
       }
     }
   }
@@ -73,7 +71,7 @@
   }
   .ant-layout-sider {
     background-color: var(--hooks-colorBgSider);
-    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+    transition: all 0.25s ease;
     .ant-layout-sider-children {
       display: flex;
       flex-direction: column;
@@ -86,25 +84,6 @@
         background-color: var(--hooks-colorBgSider);
         border-right: none;
       }
-    }
-  }
-  .ant-layout {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-width: 0;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    .ant-layout-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 55px;
-      padding: 0 40px 0 20px;
-      line-height: 55px;
-      background-color: var(--hooks-colorBgHeader);
-      border-bottom: 1px solid var(--hooks-colorBorderHeader);
     }
   }
 }

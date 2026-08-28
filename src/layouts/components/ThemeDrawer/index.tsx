@@ -26,7 +26,6 @@ const ThemeDrawer: React.FC = () => {
     breadcrumbIcon,
     tabs,
     tabsIcon,
-    tabsDrag,
     footer,
     themeDrawerVisible,
     setGlobalState
@@ -48,7 +47,6 @@ const ThemeDrawer: React.FC = () => {
     breadcrumbIcon: state.breadcrumbIcon,
     tabs: state.tabs,
     tabsIcon: state.tabsIcon,
-    tabsDrag: state.tabsDrag,
     footer: state.footer,
     themeDrawerVisible: state.themeDrawerVisible,
     setGlobalState: state.setGlobalState
@@ -243,10 +241,6 @@ const ThemeDrawer: React.FC = () => {
       <div className="theme-item">
         <span>标签栏图标</span>
         <Switch checked={tabsIcon} onChange={value => setGlobalState("tabsIcon", value)} />
-      </div>
-      <div className="theme-item">
-        <span>标签栏拖拽</span>
-        <Switch checked={tabsDrag} onChange={value => setGlobalState("tabsDrag", value)} />
       </div>
       <div className="theme-item">
         <span>页脚</span>

@@ -1,13 +1,36 @@
-.ant-layout-content {
+.app-main {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--hooks-colorBgContent);
+}
+.app-header {
+  z-index: 50;
+  flex-shrink: 0;
+  background-color: var(--hooks-colorBgHeader);
+}
+.app-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 20px 0 12px;
+}
+.app-content {
   position: relative;
   box-sizing: border-box;
   display: flex;
   flex: 1 1 0%;
   flex-direction: column;
+  width: calc(100% - 40px);
+  min-width: 0;
   min-height: 0;
-  padding: 10px 12px;
+  margin: 0 auto 16px;
   overflow: hidden auto;
-  background-color: var(--hooks-colorBgContent);
 }
 .keep-alive-item {
   display: flex;
@@ -30,16 +53,12 @@
     overflow: hidden auto;
   }
 }
-
-/* Only the visible page should lock content overflow; cached ProTables stay in DOM */
-.ant-layout-content:has(.keep-alive-item.is-active .ant-pro-table-scroll) {
+.app-content:has(.keep-alive-item.is-active .ant-pro-table-scroll) {
   overflow: hidden;
   .keep-alive-item.is-active {
     overflow: hidden;
   }
 }
-
-/* maximize */
 .maximize-icon {
   position: fixed;
   top: -25px;
@@ -60,5 +79,11 @@
     left: 19%;
     font-size: 14px;
     color: #ffffff;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .app-content {
+    width: calc(100% - 30px);
   }
 }

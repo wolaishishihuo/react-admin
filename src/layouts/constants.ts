@@ -1,0 +1,2 @@
+export const LAYOUT_SIDER_WIDTH = 230;
+export const LAYOUT_SIDER_COLLAPSED_WIDTH = 64;

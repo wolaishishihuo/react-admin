@@ -3,11 +3,11 @@
  */
 const headerTheme = {
   light: {
-    "--hooks-colorTextHeader": "#1f1f1f",
-    "--hooks-colorTextSecondaryHeader": "#8c8c8c",
-    "--hooks-colorTextHoverHeader": "#f0f0f0",
-    "--hooks-colorBgHeader": "#ffffff",
-    "--hooks-colorBorderHeader": "#f0f0f0"
+    "--hooks-colorTextHeader": "#383853",
+    "--hooks-colorTextSecondaryHeader": "#7987a1",
+    "--hooks-colorTextHoverHeader": "#edeff0",
+    "--hooks-colorBgHeader": "#fafbfc",
+    "--hooks-colorBorderHeader": "transparent"
   },
   inverted: {
     "--hooks-colorTextHeader": "#f1f1f1",
@@ -17,11 +17,11 @@ const headerTheme = {
     "--hooks-colorBorderHeader": "#303030"
   },
   dark: {
-    "--hooks-colorTextHeader": "#f1f1f1",
-    "--hooks-colorTextSecondaryHeader": "#afafaf",
-    "--hooks-colorTextHoverHeader": "#5a5a5a",
-    "--hooks-colorBgHeader": "#141414",
-    "--hooks-colorBorderHeader": "#303030"
+    "--hooks-colorTextHeader": "#e3e3e8",
+    "--hooks-colorTextSecondaryHeader": "#8f8fa3",
+    "--hooks-colorTextHoverHeader": "#252530",
+    "--hooks-colorBgHeader": "#070707",
+    "--hooks-colorBorderHeader": "transparent"
   }
 };
 
