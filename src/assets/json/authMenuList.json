@@ -43,7 +43,7 @@
           }
         },
         {
-          "path": "/list/useProTable/detail",
+          "path": "/list/useProTable/detail/:id",
           "element": "/list/useProTable/detail/index",
           "meta": {
             "key": "useProTableDetail",
@@ -54,8 +54,7 @@
             "isFull": false,
             "isAffix": false,
             "activeMenu": "/list/useProTable",
-            "isKeepAlive": true,
-            "multiTab": true
+            "isKeepAlive": true
           }
         }
       ]

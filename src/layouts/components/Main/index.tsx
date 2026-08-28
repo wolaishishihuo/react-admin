@@ -1,40 +1,13 @@
 import { useDebounceFn } from 'ahooks';
-import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
-import React from 'react';
-import { useEffect, useMemo } from 'react';
-import { useLocation, useOutlet } from 'react-router-dom';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import { setGlobalState, useGlobalStore, useAuthStore } from '@/stores';
-import { getTabId } from '@/utils';
-import { setKeepAliveRef } from '@/utils/keepAlive';
+import React, { useEffect } from 'react';
+import KeepAliveOutlet from '@/components/KeepAlive';
+import { setGlobalState, useGlobalStore } from '@/stores';
 import Maximize from './components/Maximize';
+import './index.less';
 
 const LayoutMain: React.FC = () => {
-  const outlet = useOutlet();
-  const location = useLocation();
-  const aliveRef = useKeepAliveRef();
-
-  // 缓存 key 与 Tabs 标签 key 同源，禁止各算一份
-  const cacheKey = getTabId(location.pathname + location.search);
-
   const maximize = useGlobalStore(state => state.maximize);
   const isCollapse = useGlobalStore(state => state.isCollapse);
-  const flatMenuList = useAuthStore(state => state.flatMenuList);
-
-  // 注入 KeepAlive ref，供 tabs action 命令式销毁/刷新
-  useEffect(() => {
-    setKeepAliveRef(aliveRef);
-    return () => setKeepAliveRef(null);
-  }, [aliveRef]);
-
-  // KeepAlive include：仅 isKeepAlive 页，正则匹配 pathname
-  const include = useMemo(
-    () =>
-      flatMenuList
-        .filter(item => item.meta?.isKeepAlive === true)
-        .map(item => new RegExp(`^${item.path!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\?|$)`)),
-    [flatMenuList]
-  );
 
   // 窗口 <1200px 自动折叠侧栏
   const { run } = useDebounceFn(
@@ -59,12 +32,7 @@ const LayoutMain: React.FC = () => {
   return (
     <React.Fragment>
       <Maximize />
-      <div className='p-20px box-border'>
-        <KeepAlive aliveRef={aliveRef} activeCacheKey={cacheKey} include={include} max={15}>
-          {/* 页面级错误边界，key 随路由变化复位错误态 */}
-          <ErrorBoundary key={cacheKey}>{outlet}</ErrorBoundary>
-        </KeepAlive>
-      </div>
+      <KeepAliveOutlet />
     </React.Fragment>
   );
 };

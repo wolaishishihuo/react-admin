@@ -1,36 +1,34 @@
 import { Icon as SvgIcon } from '@iconify/react/offline';
+import { useCreation } from 'ahooks';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Descriptions, Empty, Skeleton, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { useEffectOnActive, useKeepAliveContext } from 'keepalive-for-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '@/components/Icon';
 import { setTabTitle } from '@/stores';
+import { getTabId } from '@/utils';
 import { fetchUserDetail } from '../service';
 
 const GENDER_TEXT = ['男', '女', '保密'];
 const LIST_URL = '/list/useProTable';
 
-/** 缓存页数据获取示例：隐藏期间不发请求、不写全局状态 */
+/** 缓存详情：身份用 path param，ahooks useCreation 钉死首屏 */
 const UserDetail = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const id = searchParams.get('id') ?? '';
-
-  // 页面被缓存隐藏时 active 为 false
-  const { active } = useKeepAliveContext();
+  const { id: routeId } = useParams();
+  const id = useCreation(() => routeId ?? '', []);
+  const tabPath = useCreation(() => getTabId(), []);
 
   const { data, dataUpdatedAt, isFetching, refetch } = useQuery({
     queryKey: ['user-detail', id],
     queryFn: () => fetchUserDetail(id),
-    // 活跃门：隐藏页仍会响应依赖变化，且从全局 location 读到的是别人的 id
-    enabled: active && Boolean(id)
+    enabled: Boolean(id)
   });
 
-  // setTabTitle 按当前 URL 匹配标签，隐藏期间执行会改到别人的标签上
-  useEffectOnActive(() => {
-    if (data) setTabTitle(`详情 - ${data.username}`);
-  }, [data]);
+  useEffect(() => {
+    if (data) setTabTitle(`详情 - ${data.username}`, tabPath);
+  }, [data, tabPath]);
 
   const items = data && [
     { key: 'id', label: '用户 ID', children: data.id },
@@ -70,8 +68,8 @@ const UserDetail = () => {
       <Alert
         showIcon
         type='info'
-        title='缓存页活跃门示例'
-        description='从列表页打开多个用户的详情后在标签间来回切换：隐藏的详情页不会重新请求，「数据更新于」保持不变。'
+        title='缓存详情'
+        description='从列表打开多个用户详情后切标签：每份详情用自己的 id 请求，互不串数据。'
       />
 
       <div className='app-card p-24px'>

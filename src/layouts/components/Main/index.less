@@ -1,0 +1,16 @@
+.keep-alive-item {
+  box-sizing: border-box;
+  padding: 20px;
+  &:not(.is-active) {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  &.is-active {
+    position: relative;
+    z-index: 1;
+  }
+}

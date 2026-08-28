@@ -1,9 +1,10 @@
 import { Icon as SvgIcon } from '@iconify/react/offline';
 import { Dropdown, type DropdownProps, type MenuProps } from 'antd';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HOME_URL } from '@/config';
+import { RefreshContext } from '@/context/Refresh';
 import { closeMultipleTab, closeTabsOnSide, setGlobalState, useTabsStore } from '@/stores';
-import { refreshKeepAlive } from '@/utils/keepAlive';
 
 interface TabContextMenuProps {
   /** 菜单作用目标标签路径 */
@@ -19,6 +20,7 @@ interface TabContextMenuProps {
 /** 标签栏右键/more 双入口菜单：刷新、最大化、批量关闭 */
 const TabContextMenu: React.FC<TabContextMenuProps> = ({ path, activePath, trigger = ['contextMenu'], placement, children }) => {
   const navigate = useNavigate();
+  const { refresh } = useContext(RefreshContext);
   const tabsList = useTabsStore(state => state.tabsList);
 
   const clickedIndex = tabsList.findIndex(item => item.path === path);
@@ -45,7 +47,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({ path, activePath, trigg
       label: <span>刷新</span>,
       icon: <SvgIcon icon='ri:refresh-line' className='text-14px!' />,
       disabled: !isCurrentTab,
-      onClick: () => refreshKeepAlive(path)
+      onClick: refresh
     },
     {
       key: 'maximize',

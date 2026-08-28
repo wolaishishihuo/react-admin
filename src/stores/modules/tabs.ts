@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { getMenuByPath, getTabId } from '@/utils';
-import { destroyKeepAlive } from '@/utils/keepAlive';
 import { type TabsState, type TabsListProp } from '../interface';
 import { useAuthStore } from './auth';
 
@@ -12,7 +11,7 @@ export interface TabsStore extends TabsState {
   closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
   closeMultipleTab: (payload: { path?: string }) => void;
   validateTabs: () => void;
-  setTabTitle: (title: string) => void;
+  setTabTitle: (title: string, path?: string) => void;
 }
 
 export const useTabsStore = create<TabsStore>()(
@@ -37,52 +36,35 @@ export const useTabsStore = create<TabsStore>()(
           });
         }
         set({ tabsList: tabsList.filter(item => item.path !== path) });
-        destroyKeepAlive(path);
       },
       closeTabsOnSide: ({ path, type }) => {
         const { tabsList } = get();
         const currentIndex = tabsList.findIndex(item => item.path === path);
         if (currentIndex === -1) return;
         const range = type === 'left' ? [0, currentIndex] : [currentIndex + 1, tabsList.length];
-        const removed: string[] = [];
-        const nextTabsList = tabsList.filter((item, index) => {
-          const keep = index < range[0] || index >= range[1] || !item.closable;
-          if (!keep) removed.push(item.path);
-          return keep;
+        set({
+          tabsList: tabsList.filter((item, index) => index < range[0] || index >= range[1] || !item.closable)
         });
-        set({ tabsList: nextTabsList });
-        destroyKeepAlive(removed);
       },
       closeMultipleTab: ({ path }) => {
         const { tabsList } = get();
-        const removed: string[] = [];
-        const nextTabsList = tabsList.filter(item => {
-          const keep = item.path === path || !item.closable;
-          if (!keep) removed.push(item.path);
-          return keep;
+        set({
+          tabsList: tabsList.filter(item => item.path === path || !item.closable)
         });
-        set({ tabsList: nextTabsList });
-        destroyKeepAlive(removed);
       },
       validateTabs: () => {
         const { tabsList } = get();
         const { flatMenuList } = useAuthStore.getState();
-        const removed: string[] = [];
         const nextTabsList = tabsList.filter(item => {
           // 固定标签恒保留；其余反查菜单滤悬空标签（标签 path 带 query，getMenuByPath 会剥掉）
-          const keep = !item.closable || Boolean(getMenuByPath(flatMenuList, item.path).path);
-          if (!keep) removed.push(item.path);
-          return keep;
+          return !item.closable || Boolean(getMenuByPath(flatMenuList, item.path).path);
         });
-        if (removed.length) {
-          set({ tabsList: nextTabsList });
-          destroyKeepAlive(removed);
-        }
+        if (nextTabsList.length !== tabsList.length) set({ tabsList: nextTabsList });
       },
-      setTabTitle: title => {
-        const activeId = getTabId();
+      setTabTitle: (title, path) => {
+        const tabPath = path || getTabId();
         set(state => ({
-          tabsList: state.tabsList.map(item => (item.path === activeId ? { ...item, title } : item))
+          tabsList: state.tabsList.map(item => (item.path === tabPath ? { ...item, title } : item))
         }));
       }
     }),
@@ -100,4 +82,4 @@ export const closeTabsOnSide = (payload: { path: string; type: 'left' | 'right' 
   useTabsStore.getState().closeTabsOnSide(payload);
 export const closeMultipleTab = (payload: { path?: string }) => useTabsStore.getState().closeMultipleTab(payload);
 export const validateTabs = () => useTabsStore.getState().validateTabs();
-export const setTabTitle = (title: string) => useTabsStore.getState().setTabTitle(title);
+export const setTabTitle = (title: string, path?: string) => useTabsStore.getState().setTabTitle(title, path);

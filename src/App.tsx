@@ -4,6 +4,7 @@ import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import type React from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { RefreshProvider } from '@/context/Refresh';
 import RouterProvider from '@/routers';
 import { useGlobalStore } from '@/stores';
 import 'dayjs/locale/zh-cn';
@@ -57,7 +58,9 @@ const App: React.FC = () => {
     >
       <HappyProvider disabled={!isHappy}>
         <AppProvider>
-          <RouterProvider />
+          <RefreshProvider>
+            <RouterProvider />
+          </RefreshProvider>
         </AppProvider>
       </HappyProvider>
     </ConfigProvider>

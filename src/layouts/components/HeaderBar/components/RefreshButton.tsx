@@ -1,17 +1,11 @@
-import { useLocation } from 'react-router-dom';
-import { refreshKeepAlive } from '@/utils/keepAlive';
+import { useContext } from 'react';
+import { RefreshContext } from '@/context/Refresh';
 import IconButton from './IconButton';
 
 const RefreshButton: React.FC = () => {
-  const location = useLocation();
+  const { refresh } = useContext(RefreshContext);
 
-  return (
-    <IconButton
-      icon='ri:refresh-line'
-      className='refresh-btn lt-sm:!hidden'
-      onClick={() => refreshKeepAlive(location.pathname + location.search)}
-    />
-  );
+  return <IconButton icon='ri:refresh-line' className='refresh-btn lt-sm:!hidden' onClick={refresh} />;
 };
 
 export default RefreshButton;

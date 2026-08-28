@@ -144,7 +144,7 @@ const UseProTable = () => {
       search: false,
       render: (_, record) => (
         <Space size={0}>
-          <Button size='small' type='link' onClick={() => navigate(`/list/useProTable/detail?id=${record.id}`)}>
+          <Button size='small' type='link' onClick={() => navigate(`/list/useProTable/detail/${record.id}`)}>
             详情
           </Button>
           {BUTTONS.edit && (

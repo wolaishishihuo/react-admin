@@ -1,10 +1,5 @@
-/* 路由切换动画
- * keep-alive 接管渲染后，原 react-transition-group 的 .fade-* 已不再使用。
- * 改为作用于 keepalive-for-react 的缓存节点：节点被激活时（appendChild 并加 .active class）播放淡入 + 轻微左滑。
- * - 非缓存页：每次进入都会新建节点并激活 → 每次都有动画
- * - 缓存页：每次从其它标签切回都会重新 add .active → 动画重新播放
- */
-.keepalive-cache-div.active {
+/* 缓存页切入：激活节点播放淡入 + 轻微左滑 */
+.keep-alive-item.keep-alive-enter {
   animation: keepalive-fade-in 0.3s ease-in-out;
 }
 

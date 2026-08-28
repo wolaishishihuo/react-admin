@@ -16,7 +16,7 @@
 | ---------- | ------------------------------------------------------------------------------------------------------ |
 | 框架       | React 19 + TypeScript 5.9 + Vite 8(Rolldown)                                                           |
 | UI         | Ant Design 6(`@ant-design/happy-work-theme` 快乐主题可选)                                              |
-| 高级表格   | `@ant-design/pro-components@3.1.14-2`(仅用 ProTable,见 §5.1)                                           |
+| 高级表格   | `@ant-design/pro-components@3.1.14-6`(仅用 ProTable,见 §5.1)                                           |
 | 样式       | UnoCSS(presetWind4,工具类为主) + Less(antd 深覆盖/伪元素等留守场景),**无 CSS Modules**                 |
 | 客户端状态 | Zustand 5(persist 持久化)                                                                              |
 | 服务端状态 | @tanstack/react-query 5(ProTable request 走 `fetchQuery`;页面独立数据用 `useQuery`)                    |
@@ -24,7 +24,7 @@
 | 请求       | axios 二次封装于 `@/utils/http`(**禁止直接用 axios/fetch**)                                            |
 | 工具库     | ahooks(优先用现成 hook)、dayjs(zh-cn 已设)、clsx                                                       |
 | 图表       | echarts 6(经 `@/components/Echarts` 封装)                                                              |
-| 交互       | nprogress、react-countup、react-colorful、keepalive-for-react                                          |
+| 交互       | nprogress、react-countup、react-colorful、自研 KeepAlive(React 19 Activity)                            |
 | 图标       | `@iconify/react/offline`(ri 本地子集,清单 `src/assets/icons/ri-manifest.json`,改后 `pnpm icons:build`) |
 
 包管理器**仅允许 pnpm**(preinstall only-allow 强制),Node `^20.19.0 || >=22.12.0`。
@@ -55,8 +55,9 @@ pnpm commit              # git add -A && czg 交互式规范提交 && git push
 ├── src/
 │   ├── api/                # 接口定义:config/servicePort + modules/(按模块拆分)
 │   ├── assets/             # 图片、icons/(离线图标子集与清单)、json/(mock 菜单)
-│   ├── components/         # 全局通用组件(见 §5)
+│   ├── components/         # 全局通用组件(见 §5;KeepAlive 含 Refresh 再导出)
 │   ├── config/             # 全局常量(HOME_URL、LOGIN_URL、ROUTER_WHITE_LIST)、nprogress
+│   ├── context/            # RefreshProvider:页面刷新 nonce
 │   ├── hooks/              # 全局 Hooks:useXxx.ts,camelCase + default export
 │   ├── layouts/            # 单骨架(index.tsx:aside+main)+ Sidebar/HeaderBar/MixedMenu/Menu/Tabs/Main/ThemeDrawer
 │   ├── routers/            # index.tsx + helper/(ConvertRouter、RouterGuard) + modules/staticRouter
@@ -105,6 +106,10 @@ pnpm commit              # git add -A && czg 交互式规范提交 && git push
 **导入顺序**
 
 React/三方库 → `@/` 绝对路径 → 相对路径 → 样式文件,组间空行分隔;与既有文件风格保持一致。
+
+**引号**
+
+- 字符串与 JSX 属性一律单引号（Prettier `singleQuote` + `jsxSingleQuote`）。禁止双引号。
 
 **注释(硬约束)**
 
@@ -186,7 +191,8 @@ const requestRows = useCallback<NonNullable<ProTableProps<Row, SearchParams>['re
 | **TreeExpandIcon** + `useTreeExpand`    | 树表展开图标与展开状态管理                                                                                                                                |
 | **Error 三件套**(403/404/500)           | + `ComponentError`(视图缺失兜底)+ `MenuLoadError`(菜单请求失败重试)                                                                                       |
 | **Loading** / **Lazy** / **SwitchDark** | 加载态 / 懒加载包装 / 明暗切换                                                                                                                            |
-| **ErrorBoundary**                       | Main 已全局接线(key=cacheKey 包每个路由页),无需手动包                                                                                                     |
+| **ErrorBoundary**                       | KeepAlive 已按页包住,无需手动包                                                                                                                           |
+| **KeepAlive**                           | Main 已接线;缓存页用 `useParams` + ahooks `useCreation` 钉死首屏身份,不要用 `useSearchParams` 当请求身份                                                  |
 
 页内静态图标直接 `import { Icon as SvgIcon } from '@iconify/react/offline'`(**禁裸 `@iconify/react`**,eslint 强制);图标 100% 离线,新增图标名先入 `ri-manifest.json` 再 `pnpm icons:build`。
 
@@ -207,7 +213,7 @@ const { BUTTONS } = useAuthButton();
 
 **会话生命周期不在 hooks 里**:建立(`initPermissions`)与清除(`clearAuth`)同住 `@/utils/auth`,二者都是普通函数,组件外也能调。
 
-**src/utils/**(`@/utils` barrel):`validate.ts`(表单校验断言 + `asFormRule` 胶水:`rules={[asFormRule(validatePhone, '手机号格式不正确')]}`)、`download.ts`(blob/url 文件下载)、`date.ts`(RangePicker 日期范围预设)、`menu.ts`(菜单树助手:扁平化/过滤/面包屑)、`is.ts`(类型守卫)、`common.ts`。直接路径模块:`@/utils/http`、`@/utils/color`、`@/utils/keepAlive`、`@/utils/themeAnimation`。
+**src/utils/**(`@/utils` barrel):`validate.ts`(表单校验断言 + `asFormRule` 胶水:`rules={[asFormRule(validatePhone, '手机号格式不正确')]}`)、`download.ts`(blob/url 文件下载)、`date.ts`(RangePicker 日期范围预设)、`menu.ts`(菜单树助手:扁平化/过滤/面包屑)、`is.ts`(类型守卫)、`common.ts`。直接路径模块:`@/utils/http`、`@/utils/color`、`@/utils/themeAnimation`。
 
 ## 6. API 请求规范
 
@@ -244,16 +250,28 @@ api.get<ResPage<UserList>>({ url: '/user/list', params, showErrorMessage: false,
 
 **添加页面 = 建 `src/views/...` + 同步 `src/assets/json/authMenuList.json` 的 `path`/`element`**(element = 视图文件路径,如 `/list/useProTable/index`)。
 
-页面缓存:keepalive-for-react,工具在 `@/utils/keepAlive`(`setKeepAliveRef`/`refreshKeepAlive`/`destroyKeepAlive`),Main 已接线。
+页面缓存:自研 KeepAlive(`@/components/KeepAlive`),底层 React 19 `Activity`;`RefreshProvider` 在 `App.tsx`,刷新走 `refresh()`,关标签由 tabsList 同步剔除缓存。缓存 key 与标签同源,用 `getTabId`(默认 pathname,`meta.multiTab` 才带 query)。
 
-**缓存页副作用必须挂活跃门**(`meta.isKeepAlive: true` 的页面一律适用):隐藏不等于卸载,隐藏页的 effect、query、定时器全都还活着,且从全局 location 读到的是当前页的 URL。
+**缓存页按普通 hooks 写。** 多开详情把身份放 path（`/xxx/detail/:id`）,用 `useParams`;隐藏页里 `useParams` / `useLocation` 仍是地址栏当前 URL,首屏身份用 ahooks `useCreation` 钉死。
 
-- 请求:`useQuery({ ..., enabled: active && ... })`,`active` 取自 `useKeepAliveContext()`。
-- 副作用:`useEffect` 换 `useEffectOnActive(cb, deps, skipMount?)`,一次性初始化用 `useEffectOnCreate`。
-- 写全局状态(如 `setTabTitle` 按当前 URL 匹配标签)必须走活跃门,否则会改到别人的标签上。
-- 边界:`enabled: false` 不取消已在飞的请求;ProTable 的 `request` 是命令式的、不吃 `enabled`,需要时在 `actionRef.reload()` 调用处判断 `active`。
+```tsx
+const { id: routeId } = useParams();
+const id = useCreation(() => routeId ?? '', []);
+const tabPath = useCreation(() => getTabId(), []);
 
-示例见 `src/views/list/useProTable/detail`;完整推导见 `docs/SKYROC_REFERENCE.md` §6.4。
+useQuery({ queryKey: ['user-detail', id], queryFn: () => fetchUserDetail(id), enabled: Boolean(id) });
+
+useEffect(() => {
+  if (data) setTabTitle(`详情 - ${data.username}`, tabPath);
+}, [data, tabPath]);
+```
+
+- 本页 id / 请求 key: `useParams` + `useCreation`
+- 改标签标题: `setTabTitle(title, tabPath)`(第二参钉死本页标签)
+- `useEffect` / `useQuery` 照常写;ProTable `request` 照常写
+- 跳转、返回列表仍用 `useNavigate` / `useLocation`
+
+非 `isKeepAlive` 页不需要 `useCreation`。示例见 `src/views/list/useProTable/detail`。
 
 ## 9. 代码质量与提交规范
 
