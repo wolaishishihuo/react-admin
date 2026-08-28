@@ -2,13 +2,26 @@ import type { AuthUser } from '@/features/auth/types';
 import type { AuthorizedNavigation } from '@/features/navigation/types';
 
 export interface RouteMeta {
+  /** 文档标题、Tab 名；分组 layout 必须有，否则侧边栏没有这一级 */
   title?: string;
-  keepAlive?: boolean;
-  tab?: {
-    multi?: boolean;
-    fixed?: boolean;
+  /** 当前页是否走缓存 pane；Tab 上的 keepAlive 仍以菜单项为准 */
+  keepAlive?: boolean | null;
+  /** 外链。守卫从后往前找带 href 的 match，不要写在分组 layout 上 */
+  href?: string;
+  menu?: {
+    icon?: string;
+    hide?: boolean | null;
+    order?: number | null;
+    /** 隐藏页进入时侧边栏该高亮的 path */
+    activeMenu?: string | null;
   };
-  activeMenu?: string;
+  tab?: {
+    /** true：每个完整 URL 一个 Tab，详情页用 */
+    multi?: boolean | null;
+    fixed?: boolean | null;
+  };
+  /** static 模式的按钮码；dynamic 读菜单 handle.buttons */
+  buttons?: string[];
 }
 
 export interface AppRouterContext {

@@ -4,19 +4,17 @@ import { useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Icon } from '@/components/Icon';
 import { HOME_PATH } from '@/features/navigation/menu-normalize';
-import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
+import { useAuthorizedNavigation, useMenuSelectPath } from '@/features/navigation/menu-model';
 import { getAllBreadcrumbList, findMenuByPath } from '@/features/navigation/menu-tree';
 import type { NavigationItem } from '@/features/navigation/types';
-import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { useAdminLayoutStore } from '@/stores/modules/admin-layout.store';
 
 export default function BreadcrumbNav() {
-  const route = useRoute();
   const { tree } = useAuthorizedNavigation();
   const breadcrumb = useAdminLayoutStore(state => state.breadcrumb);
   const breadcrumbIcon = useAdminLayoutStore(state => state.breadcrumbIcon);
   const breadcrumbAllList = useMemo(() => getAllBreadcrumbList(tree), [tree]);
-  const selectedPath = getMenuSelectPath(route);
+  const selectedPath = useMenuSelectPath();
 
   const items = useMemo<ItemType[]>(() => {
     const matched = findMenuByPath(tree, selectedPath);

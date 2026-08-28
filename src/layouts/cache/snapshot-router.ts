@@ -1,9 +1,5 @@
 /**
- * Skyroc Router State snapshot clone.
- *
- * Source: skyroc packages/web/admin-layouts/src/modules/AdminContent.tsx
- * Commit: 67ae76c1
- *
+ * 缓存 pane 使用的只读 router 快照。
  * 全仓库唯一允许读写 router.__store / latestLocation 的文件。
  */
 import type { AnyRouter, RouterState } from '@tanstack/react-router';

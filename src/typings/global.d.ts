@@ -6,6 +6,7 @@ declare interface ViteEnv {
   VITE_PORT: number;
   VITE_OPEN: boolean;
   VITE_REPORT: boolean;
+  VITE_AUTH_ROUTE_MODE: 'static' | 'dynamic';
   VITE_ROUTER_MODE: 'hash' | 'history';
   VITE_BUILD_COMPRESS: 'gzip' | 'brotli' | 'gzip,brotli' | 'none';
   VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE: boolean;

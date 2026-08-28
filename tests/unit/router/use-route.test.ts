@@ -13,7 +13,7 @@ describe('route identity', () => {
         pathname: '/users/2',
         search: { tab: 'profile' },
         params: { userId: '2' },
-        staticData: { title: '用户资料', activeMenu: '/list/useProTable' }
+        staticData: { title: '用户资料', menu: { activeMenu: '/list/useProTable' } }
       }
     ]);
     expect(route.originPath).toBe('/users/$userId');

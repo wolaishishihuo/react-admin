@@ -1,70 +1,60 @@
 {
   "code": 200,
-  "data": [
-    {
-      "path": "/home",
-      "meta": {
-        "key": "home",
-        "icon": "ri:home-smile-2-line",
-        "title": "首页",
-        "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": true
-      }
-    },
-    {
-      "path": "/list",
-      "redirect": "/list/useProTable",
-      "meta": {
-        "key": "list",
-        "icon": "ri:table-line",
-        "title": "列表页面",
-        "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": false
-      },
-      "children": [
-        {
-          "path": "/list/useProTable",
-          "meta": {
-            "key": "useProTable",
-            "icon": "ri:apps-line",
-            "title": "用户列表",
-            "isLink": "",
-            "isHide": false,
-            "isFull": false,
-            "isAffix": false,
-            "auths": ["add", "edit", "delete", "batchDelete", "status"]
-          }
-        },
-        {
-          "path": "/list/useProTable/detail",
-          "meta": {
-            "key": "useProTableDetail",
-            "icon": "ri:file-list-3-line",
-            "title": "用户详情",
-            "isLink": "",
-            "isHide": true,
-            "isFull": false,
-            "isAffix": false
-          }
-        },
-        {
-          "path": "/users/:userId",
-          "meta": {
-            "key": "userProfile",
-            "icon": "ri:user-3-line",
-            "title": "用户资料",
-            "isLink": "",
-            "isHide": true,
-            "isFull": false,
-            "isAffix": false
-          }
+  "data": {
+    "home": "/home",
+    "routes": [
+      {
+        "path": "/home",
+        "handle": {
+          "title": "首页",
+          "icon": "ri:home-smile-2-line",
+          "keepAlive": false,
+          "fixedIndexInTab": 0,
+          "order": 1
         }
-      ]
-    }
-  ],
+      },
+      {
+        "path": "/list",
+        "redirect": "/list/useProTable",
+        "handle": {
+          "title": "列表页面",
+          "icon": "ri:table-line",
+          "order": 2
+        },
+        "children": [
+          {
+            "path": "/list/useProTable",
+            "handle": {
+              "title": "用户列表",
+              "icon": "ri:apps-line",
+              "keepAlive": true,
+              "buttons": ["add", "edit", "delete", "batchDelete", "status"]
+            }
+          },
+          {
+            "path": "/list/useProTable/detail",
+            "handle": {
+              "title": "用户详情",
+              "icon": "ri:file-list-3-line",
+              "hideInMenu": true,
+              "keepAlive": true,
+              "multiTab": true,
+              "activeMenu": "/list/useProTable"
+            }
+          },
+          {
+            "path": "/users/:userId",
+            "handle": {
+              "title": "用户资料",
+              "icon": "ri:user-3-line",
+              "hideInMenu": true,
+              "keepAlive": false,
+              "activeMenu": "/list/useProTable"
+            }
+          }
+        ]
+      }
+    ]
+  },
   "msg": "成功"
 }

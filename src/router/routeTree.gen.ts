@@ -15,6 +15,7 @@ import { Route as errors500RouteImport } from './../pages/(errors)/500'
 import { Route as errors404RouteImport } from './../pages/(errors)/404'
 import { Route as errors403RouteImport } from './../pages/(errors)/403'
 import { Route as authLoginLayoutRouteImport } from './../pages/(auth)/login/layout'
+import { Route as adminListLayoutRouteImport } from './../pages/(admin)/list/layout'
 import { Route as authLoginIndexRouteImport } from './../pages/(auth)/login/index'
 import { Route as adminListIndexRouteImport } from './../pages/(admin)/list/index'
 import { Route as adminHomeIndexRouteImport } from './../pages/(admin)/home/index'
@@ -51,15 +52,20 @@ const authLoginLayoutRoute = authLoginLayoutRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminListLayoutRoute = adminListLayoutRouteImport.update({
+  id: '/list',
+  path: '/list',
+  getParentRoute: () => adminLayoutRoute,
+} as any)
 const authLoginIndexRoute = authLoginIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => authLoginLayoutRoute,
 } as any)
 const adminListIndexRoute = adminListIndexRouteImport.update({
-  id: '/list/',
-  path: '/list/',
-  getParentRoute: () => adminLayoutRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => adminListLayoutRoute,
 } as any)
 const adminHomeIndexRoute = adminHomeIndexRouteImport.update({
   id: '/home/',
@@ -73,19 +79,20 @@ const adminUsersUserIdRoute = adminUsersUserIdRouteImport.update({
 } as any)
 const adminListUseProTableIndexRoute =
   adminListUseProTableIndexRouteImport.update({
-    id: '/list/useProTable/',
-    path: '/list/useProTable/',
-    getParentRoute: () => adminLayoutRoute,
+    id: '/useProTable/',
+    path: '/useProTable/',
+    getParentRoute: () => adminListLayoutRoute,
   } as any)
 const adminListUseProTableDetailIndexRoute =
   adminListUseProTableDetailIndexRouteImport.update({
-    id: '/list/useProTable/detail/',
-    path: '/list/useProTable/detail/',
-    getParentRoute: () => adminLayoutRoute,
+    id: '/useProTable/detail/',
+    path: '/useProTable/detail/',
+    getParentRoute: () => adminListLayoutRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/list': typeof adminListLayoutRouteWithChildren
   '/login': typeof authLoginLayoutRouteWithChildren
   '/403': typeof errors403Route
   '/404': typeof errors404Route
@@ -113,6 +120,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/(admin)': typeof adminLayoutRouteWithChildren
+  '/(admin)/list': typeof adminListLayoutRouteWithChildren
   '/(auth)/login': typeof authLoginLayoutRouteWithChildren
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
@@ -128,6 +136,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/list'
     | '/login'
     | '/403'
     | '/404'
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/(admin)'
+    | '/(admin)/list'
     | '/(auth)/login'
     | '/(errors)/403'
     | '/(errors)/404'
@@ -219,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/list': {
+      id: '/(admin)/list'
+      path: '/list'
+      fullPath: '/list'
+      preLoaderRoute: typeof adminListLayoutRouteImport
+      parentRoute: typeof adminLayoutRoute
+    }
     '/(auth)/login/': {
       id: '/(auth)/login/'
       path: '/'
@@ -228,10 +245,10 @@ declare module '@tanstack/react-router' {
     }
     '/(admin)/list/': {
       id: '/(admin)/list/'
-      path: '/list'
+      path: '/'
       fullPath: '/list/'
       preLoaderRoute: typeof adminListIndexRouteImport
-      parentRoute: typeof adminLayoutRoute
+      parentRoute: typeof adminListLayoutRoute
     }
     '/(admin)/home/': {
       id: '/(admin)/home/'
@@ -249,35 +266,47 @@ declare module '@tanstack/react-router' {
     }
     '/(admin)/list/useProTable/': {
       id: '/(admin)/list/useProTable/'
-      path: '/list/useProTable'
+      path: '/useProTable'
       fullPath: '/list/useProTable/'
       preLoaderRoute: typeof adminListUseProTableIndexRouteImport
-      parentRoute: typeof adminLayoutRoute
+      parentRoute: typeof adminListLayoutRoute
     }
     '/(admin)/list/useProTable/detail/': {
       id: '/(admin)/list/useProTable/detail/'
-      path: '/list/useProTable/detail'
+      path: '/useProTable/detail'
       fullPath: '/list/useProTable/detail/'
       preLoaderRoute: typeof adminListUseProTableDetailIndexRouteImport
-      parentRoute: typeof adminLayoutRoute
+      parentRoute: typeof adminListLayoutRoute
     }
   }
 }
 
-interface adminLayoutRouteChildren {
-  adminUsersUserIdRoute: typeof adminUsersUserIdRoute
-  adminHomeIndexRoute: typeof adminHomeIndexRoute
+interface adminListLayoutRouteChildren {
   adminListIndexRoute: typeof adminListIndexRoute
   adminListUseProTableIndexRoute: typeof adminListUseProTableIndexRoute
   adminListUseProTableDetailIndexRoute: typeof adminListUseProTableDetailIndexRoute
 }
 
-const adminLayoutRouteChildren: adminLayoutRouteChildren = {
-  adminUsersUserIdRoute: adminUsersUserIdRoute,
-  adminHomeIndexRoute: adminHomeIndexRoute,
+const adminListLayoutRouteChildren: adminListLayoutRouteChildren = {
   adminListIndexRoute: adminListIndexRoute,
   adminListUseProTableIndexRoute: adminListUseProTableIndexRoute,
   adminListUseProTableDetailIndexRoute: adminListUseProTableDetailIndexRoute,
+}
+
+const adminListLayoutRouteWithChildren = adminListLayoutRoute._addFileChildren(
+  adminListLayoutRouteChildren,
+)
+
+interface adminLayoutRouteChildren {
+  adminListLayoutRoute: typeof adminListLayoutRouteWithChildren
+  adminUsersUserIdRoute: typeof adminUsersUserIdRoute
+  adminHomeIndexRoute: typeof adminHomeIndexRoute
+}
+
+const adminLayoutRouteChildren: adminLayoutRouteChildren = {
+  adminListLayoutRoute: adminListLayoutRouteWithChildren,
+  adminUsersUserIdRoute: adminUsersUserIdRoute,
+  adminHomeIndexRoute: adminHomeIndexRoute,
 }
 
 const adminLayoutRouteWithChildren = adminLayoutRoute._addFileChildren(

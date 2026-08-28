@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRouter } from '@/router/router-ref';
+import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { useSessionStore } from '@/stores/modules/session.store';
 import { navigationQueryOptions } from './menu-query';
 import type { NavigationItem } from './types';
@@ -28,4 +29,10 @@ export function useAuthorizedNavigation() {
     pathMap: query.data?.pathMap ?? EMPTY_PATH_MAP,
     permissionMap: query.data?.permissionMap ?? EMPTY_PERMISSION_MAP
   };
+}
+
+export function useMenuSelectPath() {
+  const route = useRoute();
+  const { pathMap } = useAuthorizedNavigation();
+  return getMenuSelectPath(route, pathMap.get(route.originPath)?.activeMenu);
 }

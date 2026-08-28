@@ -14,7 +14,7 @@ import './index.less';
 export default function LayoutTabs() {
   const router = useRouter();
   const route = useRoute();
-  const { isSuccess: isNavigationReady, pathSet } = useAuthorizedNavigation();
+  const { isSuccess: isNavigationReady, pathMap, pathSet } = useAuthorizedNavigation();
   const tabsEnabled = useAdminLayoutStore(state => state.tabs);
   const homeTab = useTabsStore(state => state.homeTab);
   const tabs = useTabsStore(state => state.tabs);
@@ -25,7 +25,11 @@ export default function LayoutTabs() {
   const staticData = route.staticData;
   const routePath = route.originPath;
   const fullPath = route.fullPath;
-  const activeId = getTabId(routePath, Boolean(staticData.tab?.multi), fullPath);
+  const menuItem = pathMap.get(routePath);
+  const multi = Boolean(menuItem?.multi ?? staticData.tab?.multi);
+  const activeId = getTabId(routePath, multi, fullPath);
+  // 菜单项有值（含 false）就用菜单项；只有菜单里没有这条 path 时才回落 staticData
+  const keepAlive = Boolean(menuItem?.keepAlive ?? staticData.keepAlive);
 
   useEffect(() => {
     if (!isNavigationReady) return;
@@ -40,12 +44,12 @@ export default function LayoutTabs() {
         title: staticData.title,
         routePath,
         fullPath,
-        multi: Boolean(staticData.tab?.multi),
-        fixed: Boolean(staticData.tab?.fixed),
-        keepAlive: Boolean(staticData.keepAlive)
+        multi,
+        fixed: Boolean(staticData.tab?.fixed ?? menuItem?.fixed),
+        keepAlive
       })
     );
-  }, [staticData, routePath, fullPath]);
+  }, [staticData, routePath, fullPath, keepAlive, multi, menuItem?.fixed]);
 
   useEffect(() => {
     listRef.current?.querySelector('.tabs-item-active')?.scrollIntoView({

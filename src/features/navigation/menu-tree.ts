@@ -5,6 +5,7 @@ export function flattenMenu(items: NavigationItem[]): NavigationItem[] {
   return items.flatMap(item => [item, ...flattenMenu(item.children)]);
 }
 
+/** 侧边栏只展示 hidden=false 的节点；隐藏项仍留在 tree / pathMap 里给授权和 keepAlive 用。 */
 export function filterVisibleMenu(items: NavigationItem[]): NavigationItem[] {
   return items.filter(item => !item.hidden).map(item => ({ ...item, children: filterVisibleMenu(item.children) }));
 }
@@ -25,13 +26,8 @@ export function createPermissionMap(items: NavigationItem[]): Map<string, string
   return map;
 }
 
-export function createAuthorizedPathSet(items: NavigationItem[], catalog?: Set<string>): Set<string> {
-  const pathSet = new Set<string>();
-  for (const item of flattenMenu(items)) {
-    if (item.path && (!catalog || catalog.has(item.path))) pathSet.add(item.path);
-    if (item.redirect && (!catalog || catalog.has(item.redirect))) pathSet.add(item.redirect);
-  }
-  return pathSet;
+export function createAuthorizedPathSet(items: NavigationItem[]): Set<string> {
+  return new Set(createMenuPathMap(items).keys());
 }
 
 export function findMenuByPath(items: NavigationItem[], path: string): NavigationItem | undefined {
@@ -70,40 +66,6 @@ export function getParentPaths(menuList: NavigationItem[], path: string): string
 
 export function getRootMenuPath(menuList: NavigationItem[], path: string): string {
   return getParentPaths(menuList, path)[0] ?? normalizePath(path);
-}
-
-function warnUnknownPath(path: string) {
-  if (import.meta.env.DEV) console.warn('[navigation] 未知后端 path，已从导航删除', path);
-}
-
-function warnUnknownRedirect(path: string) {
-  if (import.meta.env.DEV) console.warn('[navigation] 未知 redirect，已删除', path);
-}
-
-export function intersectMenuWithRoutes(tree: NavigationItem[], catalog: Set<string>): NavigationItem[] {
-  const walk = (items: NavigationItem[]): NavigationItem[] => {
-    const result: NavigationItem[] = [];
-    for (const item of items) {
-      const children = walk(item.children);
-      const pathOk = Boolean(item.path && catalog.has(item.path));
-      const redirectOk = Boolean(item.redirect && catalog.has(item.redirect));
-      const isExternal = Boolean(item.external);
-
-      if (item.redirect && !redirectOk) warnUnknownRedirect(item.redirect);
-
-      if (!pathOk && !isExternal && children.length === 0) {
-        if (item.path) warnUnknownPath(item.path);
-        continue;
-      }
-
-      const nextItem: NavigationItem = { ...item, children };
-      if (!redirectOk) delete nextItem.redirect;
-      result.push(nextItem);
-    }
-    return result;
-  };
-
-  return walk(tree);
 }
 
 export type { NavigationItem };

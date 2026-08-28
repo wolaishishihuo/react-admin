@@ -35,7 +35,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "verify": "pnpm routes:check && pnpm type:check && pnpm lint:check && pnpm format:check && pnpm test && PLAYWRIGHT_PORT=19528 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && VITE_ROUTER_MODE=history PLAYWRIGHT_PORT=19529 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && pnpm build:pro && VITE_ROUTER_MODE=history pnpm build:dev",
+    "verify": "pnpm routes:check && pnpm type:check && pnpm lint:check && pnpm format:check && pnpm test && PLAYWRIGHT_PORT=19528 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && VITE_ROUTER_MODE=history PLAYWRIGHT_PORT=19529 PLAYWRIGHT_REUSE_SERVER=false pnpm test:e2e && VITE_AUTH_ROUTE_MODE=dynamic PLAYWRIGHT_PORT=19530 PLAYWRIGHT_REUSE_SERVER=false pnpm exec playwright test tests/e2e/cache.spec.ts tests/e2e/auth.spec.ts && pnpm build:pro && VITE_ROUTER_MODE=history pnpm build:dev",
     "lint:eslint": "eslint --fix \"{src,tests}/**/*.{js,jsx,ts,tsx}\"",
     "lint:prettier": "prettier --write \"*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \"{src,build,docs,tests}/**/*.{js,jsx,ts,tsx,json,css,less,scss,html,md,cjs,mjs,yml,yaml}\" \".{prettier,stylelint}rc.cjs\" \".github/workflows/*.{yml,yaml}\"",
     "lint:stylelint": "stylelint --cache --fix \"src/**/*.{less,postcss,css,scss}\" --cache-location node_modules/.cache/stylelint/",

@@ -3,9 +3,8 @@ import { useMemo } from 'react';
 import { Icon as SvgIcon } from '@iconify/react/offline';
 import logo from '@/assets/images/logo.svg';
 import useIsMobile from '@/hooks/useIsMobile';
-import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
+import { useAuthorizedNavigation, useMenuSelectPath } from '@/features/navigation/menu-model';
 import { getRootMenuPath } from '@/features/navigation/menu-tree';
-import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { patchAdminLayout, useAdminLayoutStore } from '@/stores/modules/admin-layout.store';
 import { selectIsDark, useThemeStore } from '@/stores/modules/theme.store';
 import LayoutMenu from '../Menu';
@@ -22,9 +21,8 @@ export default function Sidebar() {
   const menuType = useAdminLayoutStore(state => state.menuType);
   const isDark = useThemeStore(selectIsDark);
   const { tree, visibleTree } = useAuthorizedNavigation();
-  const route = useRoute();
+  const selectedPath = useMenuSelectPath();
   const isMobile = useIsMobile();
-  const selectedPath = getMenuSelectPath(route);
 
   const subMenuList = useMemo(() => {
     const rootPath = getRootMenuPath(tree, selectedPath);

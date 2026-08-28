@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-本文件是 **hooks-admin** 的 AI 编码全局指令与项目规范手册。生成的一切代码必须符合本文件；与本文件冲突的通用习惯一律以本文件为准。Agent 执行入口见 `AGENTS.md`，落地契约见 `docs/ARCHITECTURE.md`，表格见 `docs/PROTABLE.md`，视觉见 `docs/DESIGN.md`。
+本文件是 **hooks-admin** 的 AI 编码全局指令与项目规范手册。生成的一切代码必须符合本文件；与本文件冲突的通用习惯一律以本文件为准。Agent 执行入口见 `AGENTS.md`，落地契约见 `docs/ARCHITECTURE.md`，路由生成与使用见 `docs/ROUTING.md`，表格见 `docs/PROTABLE.md`，视觉见 `docs/DESIGN.md`。
 
 ## 0. 项目定位
 
@@ -29,7 +29,7 @@
 
 依赖版本以 `package.json` 和 `pnpm-lock.yaml` 为唯一事实来源；文档只保留架构边界与必须精确锁版的依赖。
 
-登录/用户/菜单走同源 Vite mock（`build/mock.ts`，必须在 proxy 之前）。失败开关：`localStorage.mockMenuFail=1`、`mockUserInfoFail=1`、`mockSessionExpired=1`。对接真实后端替换 `src/features/auth/api.ts` 与 `src/features/navigation/api.ts`。
+登录/用户/菜单走同源 Vite mock（`build/mock.ts`，必须在 proxy 之前，会挡住 `VITE_PROXY`）。失败开关：`localStorage.mockMenuFail=1`、`mockUserInfoFail=1`、`mockSessionExpired=1`。对接真实后端：关掉 mock 插件，改 `VITE_API_URL`，替换 `src/features/auth/api.ts` 与 `src/features/navigation/api.ts`。
 
 user 只在 Query；token 只在 `session.store.ts`。
 
@@ -37,18 +37,28 @@ user 只在 Query；token 只在 `session.store.ts`。
 
 ```bash
 pnpm dev
+pnpm preview          # build:dev + vite preview，仍挂 mock
 pnpm routes:check
 pnpm type:check
 pnpm lint:check
+pnpm lint:stylelint   # verify / CI 不跑；pre-commit 会跑
 pnpm format:check
 pnpm test
+pnpm test:watch
 pnpm test:e2e
 pnpm build:dev
 pnpm build:test
 pnpm build:pro
 pnpm verify
 pnpm icons:build
+pnpm commit           # czg + commitlint
 ```
+
+环境变量、mock/proxy、verify 与 CI 差异见 `README.md`。路由生成与加页见 `docs/ROUTING.md`。
+
+- 本地 `/api` 由 `build/mock.ts` 拦截，`VITE_PROXY` 不会生效；对接真实后端必须关掉 mock 插件并改 `VITE_API_URL`。
+- 改 `src/pages` 后确认 `src/router/routeTree.gen.ts` 已更新并提交；改 `ri-manifest.json` 后跑 `pnpm icons:build` 并提交 `ri-local.json`。
+- `pnpm verify` 额外跑 history E2E 和 dynamic 的 cache/auth E2E；CI matrix 只切 hash/history。页面私有文件放 `modules/` 或 `components/`，不要当成路由。
 
 ## 2. 目录
 
@@ -102,11 +112,11 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ### 文件路由与缓存
 
-添加页面 = 在 `src/pages/(admin)/...` 建文件路由 + 同步 `src/features/navigation/mock/menu.json` 的 path（不再用 `element` 选组件）。
+添加页面步骤见 `docs/ROUTING.md`。在 `src/pages/(admin)/...` 建文件路由并写 `staticData`。`dynamic` 还要同步 `src/features/navigation/mock/menu.json` 的 path（不使用 `element`）。
 
-`staticData`：`title`、`keepAlive`、`tab.multi` / `tab.fixed`、`activeMenu`。
+`staticData` 字段：`title`、`keepAlive`、`menu.icon` / `menu.hide` / `menu.order` / `menu.activeMenu`、`tab.multi` / `tab.fixed`。本模板额外允许 `buttons` 作为页面按钮码（static 不打菜单接口时使用）。`VITE_AUTH_ROUTE_MODE=static` 不请求菜单，侧边栏从本地 route tree 生成（没有 `staticData` 的节点不会把子路由提到上一级），Guard 只校验本地文件树。`dynamic` 登录后拉当前账号菜单，本地没有的 path 整节点丢掉，用这份树做侧边栏和 403；`keepAlive` / `multiTab` / `activeMenu` 读后端 `handle`（`meta` 等价）。Tab 的 keepAlive 以菜单项为准；停在当前页时缓存 pane 仍可用 `staticData.keepAlive`。`element` 忽略。`redirect` 不进入授权集合。
 
-缓存：Skyroc snapshot router + `display:none` pane。活动 entry 每次写入最新 `router.state`。缓存 pane 无进入动画。内部字段只允许 `src/layouts/cache/snapshot-router.ts` 访问。非 keepAlive 走活 Outlet。守卫、按钮权限、菜单选中、面包屑、Tabs、cache 和刷新统一使用最后一个 match 的 `fullPath` 作为 `originPath`。
+缓存：活动页把 `router.state` 做成只读快照，pane 用 `display:none` 挂着。活动 entry 每次写入最新 `router.state`。Tab 的 keepAlive 来自当前模式菜单项。缓存 pane 无进入动画。内部字段只允许 `src/layouts/cache/snapshot-router.ts` 访问。非 keepAlive 走活 Outlet。守卫、按钮权限、菜单选中、面包屑、Tabs、cache 和刷新统一使用最后一个 match 的 `fullPath` 作为 `originPath`。
 
 ### Store
 
@@ -116,7 +126,7 @@ Uno 布局/间距；≥3 处 shortcut；antd 深层覆盖才用 less。语义 to
 
 ## 6. 认证
 
-`initializeSession` 冷启动与登录后 single-flight，绑定 session epoch：拉 user + 菜单交集。登录/换用户递增 epoch，Token 续签只轮换凭据。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；401 在有 refresh token 时 single-flight 续签并只重发一次，没有或续签失败才清会话。user-info Query `retry: false`。HTTP 不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
+`initializeSession` 冷启动与登录后 single-flight，绑定 session epoch：拉 user；dynamic 再拉当前账号菜单，本地文件树没有的 path 整节点丢掉。登录/换用户递增 epoch，Token 续签只轮换凭据。用服务端 `AuthUser.id` 判断换用户。网络失败保留 token；401 在有 refresh token 时 single-flight 续签并只重发一次，没有或续签失败才清会话。user-info Query `retry: false`。HTTP 不静态导入 auth，也不请求 logout API。Guard 使用不导航的 `revokeSession`，主动退出才由 `logoutSession` 跳登录。
 
 ## 7. 质量
 
@@ -124,5 +134,5 @@ ESLint 10 flat + Prettier + Stylelint。提交使用 Conventional Commits；仅�
 
 - 纯文档改动：`pnpm exec prettier --check AGENTS.md CLAUDE.md README.md docs/*.md` 与 `git diff --check`。
 - 普通代码改动：至少运行 `pnpm type:check`、`pnpm lint:check`、`pnpm format:check` 与相关单测。
-- 路由、认证、HTTP、Tabs、缓存或发布前验证：运行 `pnpm verify`，覆盖 route tree、类型、lint、格式、单测、hash/history E2E 和生产/开发构建。
+- 路由、认证、HTTP、Tabs、缓存或发布前验证：运行 `pnpm verify`（比 CI 多跑 history E2E 与 dynamic 的 cache/auth）。
 - 交付前检查 `git status --short` 与最终 diff，确认没有无关改动或生成物漂移。

@@ -14,6 +14,7 @@ export const Route = createFileRoute('/(admin)/home/')({
   staticData: {
     title: '首页',
     keepAlive: false,
+    menu: { icon: 'ri:home-smile-2-line', order: 1 },
     tab: { fixed: true, multi: false }
   }
 });

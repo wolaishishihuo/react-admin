@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { appPath } from './helpers';
+import { appPath, authRouteMode } from './helpers';
 
 async function login(page: Page, username = 'admin') {
   await page.goto('/');
@@ -108,7 +108,21 @@ test('拼错 URL 显示 404', async ({ page }) => {
   await expect(page.getByText('404')).toBeVisible();
 });
 
-test('后端未授权本地路由显示 403', async ({ page }) => {
+test('static 不请求菜单且本地 catalog 内放行', async ({ page }) => {
+  test.skip(authRouteMode() === 'dynamic', 'dynamic 以当前账号菜单为进页权限');
+  let menuRequests = 0;
+  await page.route('**/api/menu/list', async route => {
+    menuRequests += 1;
+    await route.abort();
+  });
+  await login(page);
+  await page.goto(appPath('/list/useProTable'));
+  await expect(page.getByText('user_01')).toBeVisible({ timeout: 20000 });
+  expect(menuRequests).toBe(0);
+});
+
+test('dynamic 下后端未授权的本地路由显示 403', async ({ page }) => {
+  test.skip(authRouteMode() !== 'dynamic', 'static 只校验本地 catalog，不看后端菜单');
   await page.route('**/api/menu/list', async route => {
     await route.fulfill({
       status: 200,
@@ -116,7 +130,7 @@ test('后端未授权本地路由显示 403', async ({ page }) => {
       body: JSON.stringify({
         code: 200,
         msg: '成功',
-        data: [{ path: '/home', meta: { key: 'home', title: '首页', isAffix: true } }]
+        data: { home: '/home', routes: [{ path: '/home', handle: { title: '首页' } }] }
       })
     });
   });

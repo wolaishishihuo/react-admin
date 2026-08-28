@@ -10,6 +10,7 @@
 ## 指令路由
 
 - 所有代码实现与代码审查：读取 `CLAUDE.md` 和 `docs/ARCHITECTURE.md`。
+- 路由、文件路由、`staticData`、菜单授权或加页面：继续读取 `docs/ROUTING.md`。
 - 表格、列表查询或 ProTable：继续读取 `docs/PROTABLE.md`。
 - UI、布局、主题或样式：继续读取 `docs/DESIGN.md`。
 - 纯文档任务：读取目标文档及其直接引用来源，无需加载无关专业文档。

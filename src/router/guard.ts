@@ -1,19 +1,27 @@
 /**
  * 后台路由守卫：完成会话初始化、菜单授权、外链分流以及 403/404 判定。
+ * static：本地文件树里有这条 originPath 就放行。
+ * dynamic：还要求当前账号菜单里有这条 originPath。
  */
 import { notFound, redirect } from '@tanstack/react-router';
 import { HOME_PATH, LOGIN_PATH, normalizePath } from '@/features/navigation/menu-normalize';
-import { collectRouteCatalog } from '@/features/navigation/menu-query';
+import { AUTH_ROUTE_MODE, type AuthRouteMode } from '@/features/navigation/route-mode';
+import { collectAvailableRoutePaths, hasAuthorizedRoutePath } from '@/features/navigation/dynamic-routes';
 import { isSafeRedirect } from '@/router/safe-redirect';
 import { getOriginPathFromMatches } from '@/router/use-route';
 import { isHttpUrl, openExternal } from '@/utils/url';
-import type { AppRouterContext } from './context';
+import type { AppRouterContext, RouteMeta } from './context';
 import { getRouter } from './router-ref';
 
 interface GuardLocation {
   pathname: string;
   href: string;
   searchStr: string;
+}
+
+interface GuardMatch {
+  fullPath?: string;
+  staticData?: Partial<RouteMeta>;
 }
 
 export function loginRedirectSearch(location: GuardLocation) {
@@ -23,13 +31,24 @@ export function loginRedirectSearch(location: GuardLocation) {
   return { redirect: redirectPath };
 }
 
+/** 从后往前找带 href 的 match；分组 layout 写了 href 会带走子页。 */
+function getMatchedRouteHref(matches: GuardMatch[]) {
+  return matches.findLast(match => match.staticData?.href)?.staticData?.href;
+}
+
+function getRouteSwitchFallbackPath(originPath: string) {
+  return originPath === HOME_PATH ? '/404' : HOME_PATH;
+}
+
 export async function guardAdminRoute(options: {
   context: AppRouterContext;
   location: GuardLocation;
-  matches?: Array<{ fullPath?: string }>;
+  matches?: GuardMatch[];
   preload?: boolean;
+  routeMode?: AuthRouteMode;
 }) {
   const { context, location, matches = [], preload } = options;
+  const routeMode = options.routeMode ?? AUTH_ROUTE_MODE;
 
   if (!context.auth.isLoggedIn) {
     throw redirect({ to: LOGIN_PATH, search: loginRedirectSearch(location), replace: true });
@@ -41,22 +60,25 @@ export async function guardAdminRoute(options: {
     throw redirect({ to: LOGIN_PATH, search: loginRedirectSearch(location), replace: true });
   }
 
-  const navigation = await context.navigation.ensureMenu();
-  // 授权 identity 使用路由模板 fullPath，动态参数页面不会被具体 pathname 拆成不同权限项。
   const originPath = getOriginPathFromMatches(matches);
+  const catalog = collectAvailableRoutePaths(getRouter().routeTree);
 
-  const menuItem = navigation.pathMap.get(originPath);
-  if (menuItem?.external) {
-    if (!preload && isHttpUrl(menuItem.external)) openExternal(menuItem.external);
-    throw redirect({ to: HOME_PATH, replace: true });
+  if (routeMode !== 'dynamic') {
+    if (!catalog.has(originPath)) throw notFound();
+  } else {
+    const navigation = await context.navigation.ensureMenu();
+    if (!hasAuthorizedRoutePath(originPath, navigation, routeMode)) {
+      if (catalog.has(originPath)) {
+        throw redirect({ to: '/403', replace: true });
+      }
+      throw notFound();
+    }
   }
 
-  if (!navigation.pathSet.has(originPath)) {
-    // 本地路由存在但菜单未授权是 403；本地 catalog 也不存在才是未知 URL。
-    if (collectRouteCatalog(getRouter()).has(originPath)) {
-      throw redirect({ to: '/403', replace: true });
-    }
-    throw notFound();
+  const href = getMatchedRouteHref(matches);
+  if (href && !preload) {
+    if (isHttpUrl(href)) openExternal(href);
+    throw redirect({ to: getRouteSwitchFallbackPath(originPath), replace: true });
   }
 }
 

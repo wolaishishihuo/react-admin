@@ -23,7 +23,9 @@ export const Route = createFileRoute('/(admin)/list/useProTable/')({
   staticData: {
     title: '用户列表',
     keepAlive: true,
-    tab: { multi: false }
+    menu: { icon: 'ri:apps-line', order: 1 },
+    tab: { multi: false },
+    buttons: ['add', 'edit', 'delete', 'batchDelete', 'status']
   }
 });
 

@@ -21,6 +21,7 @@ export default defineConfig({
     reuseExistingServer,
     env: {
       VITE_OPEN: 'false',
+      VITE_AUTH_ROUTE_MODE: process.env.VITE_AUTH_ROUTE_MODE || 'static',
       VITE_ROUTER_MODE: process.env.VITE_ROUTER_MODE || 'hash'
     }
   }

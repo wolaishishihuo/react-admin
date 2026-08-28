@@ -4,10 +4,9 @@ import { Icon as SvgIcon } from '@iconify/react/offline';
 import logo from '@/assets/images/logo.svg';
 import { Icon } from '@/components/Icon';
 import useIsMobile from '@/hooks/useIsMobile';
-import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
+import { useAuthorizedNavigation, useMenuSelectPath } from '@/features/navigation/menu-model';
 import { getRootMenuPath } from '@/features/navigation/menu-tree';
 import type { NavigationItem } from '@/features/navigation/types';
-import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { navigateTo } from '@/router/router-ref';
 import { patchAdminLayout, useAdminLayoutStore } from '@/stores/modules/admin-layout.store';
 import { isHttpUrl, openExternal } from '@/utils/url';
@@ -19,11 +18,10 @@ interface DualRailProps {
 
 /** dual-menu 一级图标轨道列 */
 const DualRail: React.FC<DualRailProps> = ({ style }) => {
-  const route = useRoute();
   const dualMenuShowText = useAdminLayoutStore(state => state.dualMenuShowText);
   const { tree, visibleTree } = useAuthorizedNavigation();
   const isMobile = useIsMobile();
-  const selectedPath = getMenuSelectPath(route);
+  const selectedPath = useMenuSelectPath();
   const rootPath = getRootMenuPath(tree, selectedPath);
 
   const handleNavigation = (item: NavigationItem) => {

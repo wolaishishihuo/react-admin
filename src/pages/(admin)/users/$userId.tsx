@@ -7,8 +7,8 @@ export const Route = createFileRoute('/(admin)/users/$userId')({
   staticData: {
     title: '用户资料',
     keepAlive: true,
-    tab: { multi: false },
-    activeMenu: '/list/useProTable'
+    menu: { icon: 'ri:user-3-line', hide: true, activeMenu: '/list/useProTable' },
+    tab: { multi: false }
   }
 });
 

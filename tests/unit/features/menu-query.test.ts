@@ -5,6 +5,10 @@ import { getAuthMenuListApi } from '@/features/navigation/api';
 import { ensureAuthorizedNavigation } from '@/features/navigation/menu-query';
 import { setToken, useSessionStore } from '@/stores/modules/session.store';
 
+vi.mock('@/features/navigation/route-mode', () => ({
+  AUTH_ROUTE_MODE: 'dynamic'
+}));
+
 vi.mock('@/features/navigation/api', () => ({
   getAuthMenuListApi: vi.fn()
 }));
@@ -25,8 +29,8 @@ describe('navigation query session isolation', () => {
   it('token 变化后重新获取当前用户菜单', async () => {
     const client = new QueryClient();
     vi.mocked(getAuthMenuListApi)
-      .mockResolvedValueOnce([{ path: '/home', meta: { title: '首页' } }])
-      .mockResolvedValueOnce([{ path: '/users', meta: { title: '用户' } }]);
+      .mockResolvedValueOnce({ routes: [{ path: '/home', meta: { title: '首页' } }] })
+      .mockResolvedValueOnce({ routes: [{ path: '/users', meta: { title: '用户' } }] });
 
     setToken('token-a');
     const first = await ensureAuthorizedNavigation(client, router);

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { appPath } from './helpers';
+import { appPath, authRouteMode } from './helpers';
 
 async function login(page: Page) {
   await page.goto('/');
@@ -71,6 +71,19 @@ test('动态路由不同参数共用一个普通 Tab', async ({ page }) => {
   await expect(page.getByText('/users/2')).toBeVisible();
   const titles = await page.locator('.tabs-item span').allTextContents();
   expect(titles.filter(title => title.includes('用户资料')).length).toBe(1);
+});
+
+test('static 与 dynamic 使用各自的页面缓存配置', async ({ page }) => {
+  await login(page);
+  await page.goto(appPath('/users/1'));
+  await expect(page.getByText('/users/$userId')).toBeVisible({ timeout: 15000 });
+
+  const cachedPane = page.locator('[data-keep-alive-key="/users/$userId"]');
+  await expect(cachedPane).toHaveCount(1);
+
+  await page.locator('.tabs-item', { hasText: '首页' }).click();
+  await expect(page.getByText('Product Sale Overview')).toBeVisible({ timeout: 20000 });
+  await expect(cachedPane).toHaveCount(authRouteMode() === 'static' ? 1 : 0);
 });
 
 test('深层 URL 刷新仍停留在当前页', async ({ page }) => {

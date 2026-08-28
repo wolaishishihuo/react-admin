@@ -8,6 +8,7 @@ import { Outlet, RouterContextProvider, useRouter } from '@tanstack/react-router
 import { motion, useReducedMotion } from 'motion/react';
 import { useShallow } from 'zustand/react/shallow';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
 import { getTabId } from '@/stores/modules/tab-identity';
 import { useAdminLayoutStore } from '@/stores/modules/admin-layout.store';
 import { useTabsStore } from '@/stores/modules/tabs.store';
@@ -74,13 +75,15 @@ export default function AdminContent() {
   const prefersReducedMotion = useReducedMotion();
   const pageAnimate = useAdminLayoutStore(state => state.pageAnimate);
   const pageAnimateMode = useAdminLayoutStore(state => state.pageAnimateMode);
+  const { pathMap } = useAuthorizedNavigation();
   const animationMode = resolvePageAnimationMode({
     pageAnimate,
     pageAnimateMode,
     prefersReducedMotion
   });
-  const multi = Boolean(route.staticData.tab?.multi);
+  const multi = Boolean(pathMap.get(route.originPath)?.multi ?? route.staticData.tab?.multi);
   const activeCacheKey = getTabId(route.originPath, multi, route.fullPath);
+  // Tab.keepAlive 跟菜单项；停在当前页时再用 staticData.keepAlive 建 pane，离开后若 Tab 未缓存会卸掉。
   const routeKeepAlive = Boolean(route.staticData.keepAlive);
   const contentRevision = useTabsStore(state => state.contentRevision[activeCacheKey] ?? 0);
   const keepAliveTabIds = useTabsStore(

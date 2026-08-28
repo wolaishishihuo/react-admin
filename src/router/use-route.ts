@@ -31,8 +31,11 @@ export function getOriginPathFromMatches(matches: Array<{ fullPath?: string }>):
   return normalizePath(String(current.fullPath).split('?')[0] ?? '');
 }
 
-export function getMenuSelectPath(route: { originPath: string; staticData?: { activeMenu?: string } }): string {
-  const activeMenu = route.staticData?.activeMenu?.trim();
+export function getMenuSelectPath(
+  route: { originPath: string; staticData?: Partial<RouteMeta> },
+  menuActiveMenu?: string
+): string {
+  const activeMenu = (menuActiveMenu ?? route.staticData?.menu?.activeMenu)?.trim();
   return activeMenu ? normalizePath(activeMenu) : route.originPath;
 }
 

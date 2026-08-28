@@ -2,10 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon as SvgIcon } from '@iconify/react/offline';
 import { useThrottleFn } from 'ahooks';
 import { Icon } from '@/components/Icon';
-import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
+import { useAuthorizedNavigation, useMenuSelectPath } from '@/features/navigation/menu-model';
 import { getRootMenuPath } from '@/features/navigation/menu-tree';
 import type { NavigationItem } from '@/features/navigation/types';
-import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { navigateTo } from '@/router/router-ref';
 import { isHttpUrl, openExternal } from '@/utils/url';
 import './index.less';
@@ -22,9 +21,8 @@ const WHEEL_FAST_STEP = 35;
 const WHEEL_FAST_THRESHOLD = 100;
 
 const MixedMenu: React.FC = () => {
-  const route = useRoute();
   const { tree, visibleTree } = useAuthorizedNavigation();
-  const selectedPath = getMenuSelectPath(route);
+  const selectedPath = useMenuSelectPath();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState({ left: false, right: false });

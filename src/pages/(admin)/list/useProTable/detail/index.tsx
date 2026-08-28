@@ -22,8 +22,8 @@ export const Route = createFileRoute('/(admin)/list/useProTable/detail/')({
   staticData: {
     title: '用户详情',
     keepAlive: true,
-    tab: { multi: true },
-    activeMenu: '/list/useProTable'
+    menu: { icon: 'ri:file-list-3-line', hide: true, activeMenu: '/list/useProTable' },
+    tab: { multi: true }
   },
   component: UserDetail
 });

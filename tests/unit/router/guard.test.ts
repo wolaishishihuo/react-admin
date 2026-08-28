@@ -96,10 +96,22 @@ describe('guardAdminRoute', () => {
     ).resolves.toBeUndefined();
   });
 
-  it('本地存在但未授权的动态路由走 403', async () => {
+  it('static 不看后端菜单成员，本地 catalog 内放行', async () => {
     await expect(
       guardAdminRoute({
         context: context(),
+        routeMode: 'static',
+        location: { pathname: '/list/useProTable', href: '/list/useProTable', searchStr: '' },
+        matches: [{ fullPath: '/list/useProTable' }]
+      })
+    ).resolves.toBeUndefined();
+  });
+
+  it('dynamic 下本地存在但未授权的路由走 403', async () => {
+    await expect(
+      guardAdminRoute({
+        context: context(),
+        routeMode: 'dynamic',
         location: { pathname: '/list/useProTable', href: '/list/useProTable', searchStr: '' },
         matches: [{ fullPath: '/list/useProTable' }]
       })
@@ -118,7 +130,20 @@ describe('guardAdminRoute', () => {
     expect(vi.mocked(notFound)).toHaveBeenCalled();
   });
 
-  it('external preload 不打开窗口，非 preload 才 openExternal', async () => {
+  it('static 外链读 matched staticData.href；preload 不打开也不跳转', async () => {
+    await expect(
+      guardAdminRoute({
+        context: context(),
+        routeMode: 'static',
+        location: { pathname: '/list/useProTable', href: '/list/useProTable', searchStr: '' },
+        matches: [{ fullPath: '/list/useProTable', staticData: { href: 'https://static.example' } }],
+        preload: true
+      })
+    ).resolves.toBeUndefined();
+    expect(openExternal).not.toHaveBeenCalled();
+  });
+
+  it('dynamic 外链同样读 matched staticData.href', async () => {
     const pathMap = new Map([
       [
         '/docs',
@@ -129,8 +154,7 @@ describe('guardAdminRoute', () => {
           hidden: false,
           fixed: false,
           permissions: [],
-          children: [],
-          external: 'https://example.com'
+          children: []
         }
       ]
     ]);
@@ -146,20 +170,40 @@ describe('guardAdminRoute', () => {
     await expect(
       guardAdminRoute({
         context: ctx,
+        routeMode: 'dynamic',
         location: { pathname: '/docs', href: '/docs', searchStr: '' },
-        matches: [{ fullPath: '/docs' }],
-        preload: true
-      })
-    ).rejects.toThrow('redirect');
-    expect(openExternal).not.toHaveBeenCalled();
-
-    await expect(
-      guardAdminRoute({
-        context: ctx,
-        location: { pathname: '/docs', href: '/docs', searchStr: '' },
-        matches: [{ fullPath: '/docs' }]
+        matches: [{ fullPath: '/docs', staticData: { href: 'https://example.com' } }]
       })
     ).rejects.toThrow('redirect');
     expect(openExternal).toHaveBeenCalledWith('https://example.com');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith({ to: '/home', replace: true });
+  });
+
+  it('从后往前找 href：父级 layout 的 href 会带走子页', async () => {
+    vi.mocked(openExternal).mockClear();
+    await expect(
+      guardAdminRoute({
+        context: context(),
+        routeMode: 'static',
+        location: { pathname: '/list/useProTable', href: '/list/useProTable', searchStr: '' },
+        matches: [{ fullPath: '/list', staticData: { href: 'https://parent.example' } }, { fullPath: '/list/useProTable' }]
+      })
+    ).rejects.toThrow('redirect');
+    expect(openExternal).toHaveBeenCalledWith('https://parent.example');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith({ to: '/home', replace: true });
+  });
+
+  it('首页外链打开后回 /404，避免循环', async () => {
+    vi.mocked(openExternal).mockClear();
+    await expect(
+      guardAdminRoute({
+        context: context(),
+        routeMode: 'static',
+        location: { pathname: '/home', href: '/home', searchStr: '' },
+        matches: [{ fullPath: '/home', staticData: { href: 'https://home.example' } }]
+      })
+    ).rejects.toThrow('redirect');
+    expect(openExternal).toHaveBeenCalledWith('https://home.example');
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith({ to: '/404', replace: true });
   });
 });

@@ -4,9 +4,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { Icon } from '@/components/Icon';
 import type { NavigationItem } from '@/features/navigation/types';
 import useIsMobile from '@/hooks/useIsMobile';
-import { useAuthorizedNavigation } from '@/features/navigation/menu-model';
+import { useAuthorizedNavigation, useMenuSelectPath } from '@/features/navigation/menu-model';
 import { getParentPaths } from '@/features/navigation/menu-tree';
-import { getMenuSelectPath, useRoute } from '@/router/use-route';
 import { navigateTo } from '@/router/router-ref';
 import { patchAdminLayout, useAdminLayoutStore } from '@/stores/modules/admin-layout.store';
 import { isHttpUrl, openExternal } from '@/utils/url';
@@ -19,7 +18,6 @@ interface LayoutMenuProps {
 }
 
 export default function LayoutMenu({ mode, menuList, popupClassName }: LayoutMenuProps) {
-  const route = useRoute();
   const isMobile = useIsMobile();
   const { menuType, accordion, isCollapse } = useAdminLayoutStore(
     useShallow(state => ({
@@ -56,7 +54,7 @@ export default function LayoutMenu({ mode, menuList, popupClassName }: LayoutMen
 
   const antdMenuList = useMemo(() => handleMenuAsAntdFormat(menuList ?? visibleTree), [menuList, visibleTree, popupClassName]);
 
-  const selectedPath = getMenuSelectPath(route);
+  const selectedPath = useMenuSelectPath();
   const selectedKeys = [selectedPath];
 
   useEffect(() => {
