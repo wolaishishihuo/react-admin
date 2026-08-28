@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
-import { UserAction, UserState } from '@/stores/interface';
+import { UserAction, UserState } from "@/stores/interface";
 
 export type UserStoreState = UserState & UserAction;
 
@@ -10,9 +10,8 @@ export const useUserStore = create<UserStoreState>()(
   immer(
     persist(
       set => ({
-        token: '',
-        userInfo: { name: 'Hooks' },
-        searchHistory: [],
+        token: "",
+        userInfo: { name: "Hooks" },
         setToken: token =>
           set((state: UserState) => {
             state.token = token;
@@ -20,22 +19,10 @@ export const useUserStore = create<UserStoreState>()(
         setUserInfo: userInfo =>
           set((state: UserState) => {
             state.userInfo = userInfo;
-          }),
-        setSearchHistory: searchHistory =>
-          set((state: UserState) => {
-            state.searchHistory = searchHistory;
-          }),
-        addSearchHistory: path =>
-          set((state: UserState) => {
-            state.searchHistory = [path, ...state.searchHistory.filter(item => item !== path)].slice(0, 10);
-          }),
-        removeSearchHistory: path =>
-          set((state: UserState) => {
-            state.searchHistory = state.searchHistory.filter(item => item !== path);
           })
       }),
       {
-        name: 'user-state',
+        name: "hooks-user",
         version: 1.0
       }
     )

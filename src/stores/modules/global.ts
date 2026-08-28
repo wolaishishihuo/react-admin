@@ -1,10 +1,10 @@
-import { persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import { shallow } from 'zustand/shallow';
-import { createWithEqualityFn } from 'zustand/traditional';
+import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import { shallow } from "zustand/shallow";
+import { createWithEqualityFn } from "zustand/traditional";
 
-import { DEFAULT_PRIMARY } from '@/config';
-import { GlobalAction, GlobalState, ThemeModeType } from '@/stores/interface';
+import { DEFAULT_PRIMARY } from "@/config";
+import { GlobalAction, GlobalState } from "@/stores/interface";
 
 export type GlobalStoreState = GlobalState & GlobalAction;
 
@@ -12,20 +12,16 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
   immer(
     persist(
       set => ({
-        // Legacy layout contract used by the original HeaderBar/Sidebar/Tabs.
-        menuType: 'left',
-        menuThemeType: 'design',
-        menuOpenWidth: 230,
-        themeMode: 'auto' as ThemeModeType,
-        dualMenuShowText: true,
-        // Compatibility layout fields retained for existing copied screens.
-        layout: 'vertical',
+        // layout mode (vertical | classic | transverse | columns)
+        layout: "vertical",
         // antd component size ("small" | "middle" | "large")
-        componentSize: 'middle',
+        componentSize: "middle",
         // antd compact theme
         compactAlgorithm: false,
         // antd border radius
         borderRadius: 6,
+        // current system language
+        language: null,
         // Whether the current page is full screen
         maximize: false,
         // theme color
@@ -37,7 +33,7 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         // weakness mode
         isWeak: false,
         // happy mode
-        isHappy: true,
+        isHappy: false,
         // menu splitting
         menuSplit: true,
         // sidebar Invert Color
@@ -53,29 +49,25 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         // breadcrumb
         breadcrumb: true,
         // breadcrumb icon
-        breadcrumbIcon: false,
+        breadcrumbIcon: true,
         // tabs
         tabs: true,
         // tabs icon
         tabsIcon: true,
         // tabs drag
         tabsDrag: true,
+        // footer
+        footer: true,
         // theme box display status
         themeDrawerVisible: false,
         setGlobalState: (key, value) =>
           set((state: GlobalState) => {
-            state[key] = value as never;
-          }),
-        setThemeMode: mode =>
-          set((state: GlobalState) => {
-            state.themeMode = mode;
-            state.isDark = mode === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : mode === 'dark';
+            state[key] = value;
           })
       }),
       {
-        name: 'global-state',
-        version: 1,
-        migrate: persistedState => persistedState as GlobalState
+        name: "hooks-global",
+        version: 1.0
       }
     )
   ),

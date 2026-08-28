@@ -6,14 +6,14 @@ import type {
   PieSeriesOption,
   RadarSeriesOption,
   ScatterSeriesOption
-} from 'echarts/charts';
-import { BarChart, GaugeChart, LineChart, LinesChart, PieChart, RadarChart, ScatterChart } from 'echarts/charts';
+} from "echarts/charts";
+import { BarChart, GaugeChart, LineChart, LinesChart, PieChart, RadarChart, ScatterChart } from "echarts/charts";
 import type {
   DatasetComponentOption,
   GridComponentOption,
   TitleComponentOption,
   TooltipComponentOption
-} from 'echarts/components';
+} from "echarts/components";
 import {
   DatasetComponent,
   GeoComponent,
@@ -24,11 +24,11 @@ import {
   ToolboxComponent,
   TooltipComponent,
   TransformComponent
-} from 'echarts/components';
-import type { ComposeOption } from 'echarts/core';
-import * as echarts from 'echarts/core';
-import { LabelLayout, UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
+} from "echarts/components";
+import type { ComposeOption } from "echarts/core";
+import * as echarts from "echarts/core";
+import { LabelLayout, UniversalTransition } from "echarts/features";
+import { CanvasRenderer } from "echarts/renderers";
 
 export type ECOption = ComposeOption<
   | BarSeriesOption

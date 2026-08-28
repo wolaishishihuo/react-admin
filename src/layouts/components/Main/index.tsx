@@ -1,42 +1,53 @@
-import './index.less';
+import "./index.less";
 
-import { useDebounceFn } from 'ahooks';
-import React, { useEffect } from 'react';
+import { useDebounceFn } from "ahooks";
+import { Layout } from "antd";
+import React, { useEffect } from "react";
 
-import KeepAliveOutlet from '@/components/KeepAlive';
-import { useGlobalStore } from '@/stores';
+import KeepAliveOutlet from "@/components/KeepAlive";
+import LayoutFooter from "@/layouts/components/Footer";
+import LayoutTabs from "@/layouts/components/Tabs";
+import { useGlobalStore } from "@/stores";
 
-import Maximize from './components/Maximize';
+import Maximize from "./components/Maximize";
+
+const { Content } = Layout;
 
 const LayoutMain: React.FC = () => {
-  const maximize = useGlobalStore(state => state.maximize);
-  const isCollapse = useGlobalStore(state => state.isCollapse);
-  const setGlobalState = useGlobalStore(state => state.setGlobalState);
+  const { maximize, isCollapse, setGlobalState } = useGlobalStore(state => ({
+    maximize: state.maximize,
+    isCollapse: state.isCollapse,
+    setGlobalState: state.setGlobalState
+  }));
 
-  // 窗口 <1200px 自动折叠侧栏
+  // Monitor window changes, collapse menu
   const { run } = useDebounceFn(
     () => {
       const screenWidth = document.body.clientWidth;
       const shouldCollapse = screenWidth < 1200;
-      if (isCollapse !== shouldCollapse) setGlobalState('isCollapse', shouldCollapse);
+      if (isCollapse !== shouldCollapse) setGlobalState("isCollapse", shouldCollapse);
     },
     { wait: 100 }
   );
   useEffect(() => {
-    window.addEventListener('resize', run, false);
-    return () => window.removeEventListener('resize', run);
+    window.addEventListener("resize", run, false);
+    return () => window.removeEventListener("resize", run);
   }, []);
 
-  // 最大化时给 root 挂 class
+  // Monitor whether the current page is maximized, dynamically add class
   useEffect(() => {
-    const root = document.getElementById('root') as HTMLElement;
-    root.classList.toggle('main-maximize', maximize);
+    const root = document.getElementById("root") as HTMLElement;
+    root.classList.toggle("main-maximize", maximize);
   }, [maximize]);
 
   return (
     <React.Fragment>
       <Maximize />
-      <KeepAliveOutlet />
+      <LayoutTabs />
+      <Content>
+        <KeepAliveOutlet />
+      </Content>
+      <LayoutFooter />
     </React.Fragment>
   );
 };

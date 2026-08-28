@@ -1,18 +1,18 @@
 // ? Not used yet, currently use global Loading to control repeated requests
-import qs from 'qs';
+import qs from "qs";
 
-import { CustomAxiosRequestConfig } from '../index';
+import { CustomAxiosRequestConfig } from "../index";
 
 // Declare a Map to store the identity and cancel function for each request
 let pendingMap = new Map<string, AbortController>();
 
 // Serialize parameters to ensure consistent order of object properties
 const sortedStringify = (obj: any) => {
-  return qs.stringify(obj, { arrayFormat: 'repeat', sort: (a, b) => a.localeCompare(b) });
+  return qs.stringify(obj, { arrayFormat: "repeat", sort: (a, b) => a.localeCompare(b) });
 };
 // Serialization parameters
 export const getPendingUrl = (config: CustomAxiosRequestConfig) => {
-  return [config.method, config.url, sortedStringify(config.data), sortedStringify(config.params)].join('&');
+  return [config.method, config.url, sortedStringify(config.data), sortedStringify(config.params)].join("&");
 };
 export class AxiosCanceler {
   /**

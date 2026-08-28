@@ -1,5 +1,5 @@
-import { useAuthStore } from '@/stores';
-import { getMenuByPath } from '@/utils';
+import { useAuthStore } from "@/stores";
+import { getMenuByPath } from "@/utils";
 
 /**
  * @description  Use auth button hook

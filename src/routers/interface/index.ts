@@ -1,4 +1,4 @@
-import { RouteObject } from 'react-router-dom';
+import { RouteObject } from "react-router-dom";
 
 export interface MetaProps {
   key?: string;
@@ -12,7 +12,7 @@ export interface MetaProps {
   isKeepAlive?: boolean;
 }
 
-export type RouteObjectType = Omit<RouteObject, 'children'> & {
+export type RouteObjectType = Omit<RouteObject, "children"> & {
   redirect?: string;
   meta?: MetaProps;
   children?: RouteObjectType[];

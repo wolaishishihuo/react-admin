@@ -1,6 +1,21 @@
-.keep-alive-item {
+.ant-layout-content {
+  position: relative;
   box-sizing: border-box;
-  padding: 20px;
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px 12px;
+  overflow: hidden auto;
+  background-color: var(--hooks-colorBgContent);
+}
+.keep-alive-item {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   &:not(.is-active) {
     position: absolute;
     inset: 0;
@@ -12,5 +27,38 @@
   &.is-active {
     position: relative;
     z-index: 1;
+    overflow: hidden auto;
+  }
+}
+
+/* Only the visible page should lock content overflow; cached ProTables stay in DOM */
+.ant-layout-content:has(.keep-alive-item.is-active .ant-pro-table-scroll) {
+  overflow: hidden;
+  .keep-alive-item.is-active {
+    overflow: hidden;
+  }
+}
+
+/* maximize */
+.maximize-icon {
+  position: fixed;
+  top: -25px;
+  right: -25px;
+  z-index: 999;
+  width: 55px;
+  height: 55px;
+  cursor: pointer;
+  background-color: var(--hooks-colorIcon);
+  border-radius: 50%;
+  opacity: 0.7;
+  &:hover {
+    background-color: var(--hooks-colorIconHover);
+  }
+  .iconfont {
+    position: relative;
+    top: 48%;
+    left: 19%;
+    font-size: 14px;
+    color: #ffffff;
   }
 }

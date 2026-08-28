@@ -1,9 +1,9 @@
-import { RequestData } from '@ant-design/pro-components';
+import { RequestData } from "@ant-design/pro-components";
 
-import { ResPage } from '@/apis/interface';
-import { RouterModeEnum } from '@/constants';
-import { RouteObjectType } from '@/routers/interface';
-import { useAuthStore } from '@/stores';
+import { ResPage } from "@/apis/interface";
+import { RouterModeEnum } from "@/constants";
+import { RouteObjectType } from "@/routers/interface";
+import { useAuthStore } from "@/stores";
 
 const mode = import.meta.env.VITE_ROUTER_MODE;
 
@@ -48,6 +48,18 @@ export function setStyleProperty(key: string, val: string) {
 export function convertToSixDigitHexColor(str: string) {
   if (str.length > 4) return str.toLocaleUpperCase();
   else return (str[0] + str[1] + str[1] + str[2] + str[2] + str[3] + str[3]).toLocaleUpperCase();
+}
+
+/**
+ * @description Get the default language of the browser.
+ * @returns {String}
+ */
+export function getBrowserLang() {
+  let browserLang = navigator.language ? navigator.language : navigator.browserLanguage;
+  let defaultBrowserLang = "";
+  if (["cn", "zh", "zh-cn"].includes(browserLang.toLowerCase())) defaultBrowserLang = "zh";
+  else defaultBrowserLang = "en";
+  return defaultBrowserLang;
 }
 
 /**
@@ -96,7 +108,7 @@ export function getMenuByPath(
 ) {
   const menuItem = menulist.find(menu => {
     // Match Dynamic routing through regular
-    const regex = new RegExp(`^${menu.path?.replace(/:.[^/]*/, '.*')}$`);
+    const regex = new RegExp(`^${menu.path?.replace(/:.[^/]*/, ".*")}$`);
     return regex.test(path);
   });
   return menuItem || {};
@@ -139,36 +151,14 @@ export function getUrlWithParams() {
  * @returns {Array}
  */
 export function getOpenKeys(path: string): string[] {
-  let currentKey: string = '';
+  let currentKey: string = "";
   let openKeys: string[] = [];
-  let pathSegments: string[] = path.split('/').map((segment: string) => '/' + segment);
+  let pathSegments: string[] = path.split("/").map((segment: string) => "/" + segment);
   for (let i: number = 1; i < pathSegments.length - 1; i++) {
     currentKey += pathSegments[i];
     openKeys.push(currentKey);
   }
   return openKeys;
-}
-
-export function getParentPaths(menuList: RouteObjectType[], path: string): string[] {
-  const visit = (list: RouteObjectType[], parents: string[]): string[] | null => {
-    for (const item of list) {
-      if (item.path === path) return parents;
-      if (item.children?.length) {
-        const found = visit(item.children, [...parents, item.path!]);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
-  return visit(menuList, []) ?? [];
-}
-
-export function getRootMenuPath(menuList: RouteObjectType[], path: string): string {
-  return getParentPaths(menuList, path)[0] ?? path;
-}
-
-export function getTabId(fullPath: string = getUrlWithParams()): string {
-  return fullPath.split('?')[0];
 }
 
 /**
@@ -195,10 +185,10 @@ export function blockDebugger() {
       (function () {
         return false;
       })
-        ['constructor']('debugger')
-        ['call']();
+        ["constructor"]("debugger")
+        ["call"]();
     } catch (err) {
-      console.log('Debugger is blocked');
+      console.log("Debugger is blocked");
     }
   }
   // Start the execution using setInterval and return the interval ID

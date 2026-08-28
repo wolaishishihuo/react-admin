@@ -1,6 +1,6 @@
-import { getAuthButtonListApi, getAuthMenuListApi } from '@/apis/modules/login';
-import { notification } from '@/hooks/useMessage';
-import { useAuthStore, useTabsStore, useUserStore } from '@/stores';
+import { getAuthButtonListApi, getAuthMenuListApi } from "@/apis/modules/login";
+import { notification } from "@/hooks/useMessage";
+import { useAuthStore, useUserStore } from "@/stores";
 
 let inFlight: { token: string; promise: Promise<void> } | null = null;
 
@@ -11,7 +11,6 @@ const usePermissions = () => {
   const setToken = useUserStore(state => state.setToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
   const setAuthButtonList = useAuthStore(state => state.setAuthButtonList);
-  const validateTabs = useTabsStore(state => state.validateTabs);
 
   const initPermissions = (token: string) => {
     if (!token) return Promise.resolve();
@@ -27,16 +26,14 @@ const usePermissions = () => {
 
         if (!menuList.length) {
           notification.warning({
-            title: '无权限访问',
-            description: '当前账号无任何菜单权限，请联系系统管理员！'
+            title: "无权限访问",
+            description: "当前账号无任何菜单权限，请联系系统管理员！"
           });
-          setToken('');
-          return Promise.reject('No permission');
+          setToken("");
+          return Promise.reject("No permission");
         }
-
-        validateTabs();
       } catch (error) {
-        setToken('');
+        setToken("");
         return Promise.reject(error);
       } finally {
         if (inFlight?.token === token) inFlight = null;

@@ -1,56 +1,48 @@
-import './index.less';
+import "./index.less";
 
-import { Menu, type MenuProps } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useMatches, useNavigate } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
+import { Menu, MenuProps } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useMatches, useNavigate } from "react-router-dom";
 
-import { Icon } from '@/components/Icon';
-import useIsMobile from '@/hooks/useIsMobile';
-import { type MetaProps, type RouteObjectType } from '@/routers/interface';
-import { useAuthStore, useGlobalStore } from '@/stores';
-import { getParentPaths } from '@/utils';
+import { Icon } from "@/components/Icon";
+import { MetaProps, RouteObjectType } from "@/routers/interface";
+import { useAuthStore, useGlobalStore } from "@/stores";
+import { getOpenKeys } from "@/utils";
 
 interface LayoutMenuProps {
-  mode: MenuProps['mode'];
+  mode: MenuProps["mode"];
   menuList?: RouteObjectType[];
   menuSplit?: boolean;
-  /** 弹出子菜单容器类名 */
-  popupClassName?: string;
 }
 
-const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, popupClassName }) => {
+const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) => {
   const matches = useMatches();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isMobile = useIsMobile();
 
-  const { menuType, accordion, isCollapse } = useGlobalStore(
-    useShallow(state => ({
-      menuType: state.menuType,
-      accordion: state.accordion,
-      isCollapse: state.isCollapse
-    }))
-  );
-  const setGlobalState = useGlobalStore(state => state.setGlobalState);
-  const { showMenuList, flatMenuList } = useAuthStore(
-    useShallow(state => ({
-      showMenuList: state.showMenuList,
-      flatMenuList: state.flatMenuList
-    }))
-  );
+  const { layout, isDark, accordion, isCollapse, siderInverted, headerInverted } = useGlobalStore(state => ({
+    layout: state.layout,
+    isDark: state.isDark,
+    accordion: state.accordion,
+    isCollapse: state.isCollapse,
+    siderInverted: state.siderInverted,
+    headerInverted: state.headerInverted
+  }));
+  const showMenuList = useAuthStore(state => state.showMenuList);
+  const flatMenuList = useAuthStore(state => state.flatMenuList);
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [splitSelectedKeys, setSplitSelectedKeys] = useState<string[]>([]);
 
-  type MenuItem = Required<MenuProps>['items'][number];
+  type MenuItem = Required<MenuProps>["items"][number];
 
   function getItem(
     label: React.ReactNode,
     key?: React.Key | null,
     icon?: React.ReactNode,
     children?: MenuItem[],
-    type?: 'group'
+    type?: "group"
   ): MenuItem {
     return {
       key,
@@ -65,25 +57,28 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, popupClassName 
     return list.map(item => {
       return !item?.children?.length
         ? getItem(item.meta?.title, item.path, <Icon name={item.meta!.icon!} />)
-        : ({
-            ...getItem(item.meta?.title, item.path, <Icon name={item.meta!.icon!} />, handleMenuAsAntdFormat(item.children!)),
-            popupClassName
-          } as MenuItem);
+        : getItem(item.meta?.title, item.path, <Icon name={item.meta!.icon!} />, handleMenuAsAntdFormat(item.children!));
     });
   };
 
-  const antdMenuList = useMemo(() => handleMenuAsAntdFormat(menuList ?? showMenuList), [menuList, showMenuList, popupClassName]);
+  const antdMenuList = useMemo(() => handleMenuAsAntdFormat(menuList ?? showMenuList), [menuList, showMenuList]);
 
   useEffect(() => {
-    const meta = matches[matches.length - 1].loaderData as MetaProps;
+    const meta = matches[matches.length - 1].data as MetaProps;
+    // Set Selected Keys
     const path = meta?.activeMenu ?? pathname;
     setSelectedKeys([path]);
 
-    // setTimeout 防菜单展开样式异常；openKeys 取祖先 path 链
-    if (accordion) setTimeout(() => isCollapse || setOpenKeys(getParentPaths(menuList ?? showMenuList, path)));
+    // Set Split Selected Keys (find can be found to represent children)
+    const splitPath = `/${path.split("/")[1]}`;
+    const splitKeys = showMenuList.find(item => item.path === splitPath) ? splitPath : path;
+    setSplitSelectedKeys([splitKeys]);
+
+    // Use setTimeout to prevent style exceptions from menu expansion
+    if (accordion) setTimeout(() => isCollapse || setOpenKeys(getOpenKeys(pathname)));
   }, [matches, isCollapse]);
 
-  const onOpenChange: MenuProps['onOpenChange'] = openKeys => {
+  const onOpenChange: MenuProps["onOpenChange"] = openKeys => {
     if (openKeys.length === 0 || openKeys.length === 1) return setOpenKeys(openKeys);
     const latestOpenKey = openKeys[openKeys.length - 1];
     if (latestOpenKey.includes(openKeys[0])) return setOpenKeys(openKeys);
@@ -92,26 +87,39 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, popupClassName 
 
   const handleMenuNavigation = (path: string) => {
     const menuItem = flatMenuList.find(item => item.path === path);
-    if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, '_blank');
+    if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, "_blank");
     navigate(path);
-    // 移动端导航后收起侧栏
-    if (isMobile) setGlobalState('isCollapse', true);
   };
 
-  const clickMenu: MenuProps['onClick'] = ({ key }) => handleMenuNavigation(key);
+  const clickMenu: MenuProps["onClick"] = ({ key }) => {
+    // If not split menu
+    if (!menuSplit) return handleMenuNavigation(key);
 
-  const isTopMenu = useMemo(() => menuType === 'top', [menuType]);
+    // If split menu
+    const children = showMenuList.find(item => item.path === key)?.children;
+    if (children?.length) return handleMenuNavigation(children[0].path!);
+    handleMenuNavigation(key);
+  };
+
+  const isClassicLayout = useMemo(() => layout === "classic", [layout]);
+  const isTransverseLayout = useMemo(() => layout === "transverse", [layout]);
+
+  const isDarkTheme = useMemo(() => {
+    if (isDark) return true;
+    if (headerInverted && isTransverseLayout) return true;
+    if (headerInverted && isClassicLayout && menuSplit) return true;
+    if (siderInverted && !isTransverseLayout && !menuSplit) return true;
+    return false;
+  }, [layout, isDark, headerInverted, siderInverted, menuSplit]);
 
   return (
-    // theme 固定 light：暗色走 darkAlgorithm，不用 antd dark 菜单主题
     <Menu
-      theme='light'
+      theme={isDarkTheme ? "dark" : "light"}
       mode={mode}
-      selectedKeys={selectedKeys}
+      selectedKeys={menuSplit ? splitSelectedKeys : selectedKeys}
       onClick={clickMenu}
       items={antdMenuList}
-      {...(mode === 'inline' && { inlineCollapsed: !isMobile && isCollapse })}
-      {...(!isTopMenu && accordion && { openKeys, onOpenChange })}
+      {...(!isTransverseLayout && accordion && { openKeys, onOpenChange })}
     />
   );
 };

@@ -1,54 +1,56 @@
-import { theme } from 'antd';
-import { useLayoutEffect } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { theme } from "antd";
+import { useEffect } from "react";
 
-import { useGlobalStore } from '@/stores';
-import globalTheme from '@/styles/theme/global';
-import siderTheme from '@/styles/theme/sider';
-import { setStyleProperty } from '@/utils';
-import { getDarkColor, getLightColor } from '@/utils/color';
+import { useGlobalStore } from "@/stores";
+import globalTheme from "@/styles/theme/global";
+import headerTheme from "@/styles/theme/header";
+import siderTheme from "@/styles/theme/sider";
+import { setStyleProperty } from "@/utils";
+import { getDarkColor, getLightColor } from "@/utils/color";
 
-type ThemeType = 'light' | 'dark';
+type ThemeType = "light" | "inverted" | "dark";
 
-/** 全局主题设置 Hook：把 antd token 与自定义主题写入 --hooks-* CSS 变量 */
+/**
+ * @description  Use global theme settings hook
+ */
 const useTheme = () => {
   const { token } = theme.useToken();
 
-  const { isDark, primary, isWeak, borderRadius, compactAlgorithm } = useGlobalStore(
-    useShallow(state => ({
+  const { isDark, primary, isGrey, isWeak, borderRadius, compactAlgorithm, siderInverted, headerInverted } = useGlobalStore(
+    state => ({
       isDark: state.isDark,
       primary: state.primary,
+      isGrey: state.isGrey,
       isWeak: state.isWeak,
       borderRadius: state.borderRadius,
-      compactAlgorithm: state.compactAlgorithm
-    }))
+      compactAlgorithm: state.compactAlgorithm,
+      siderInverted: state.siderInverted,
+      headerInverted: state.headerInverted
+    })
   );
 
-  useLayoutEffect(() => {
-    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
-    const followSystemTheme = () => {
-      const { themeMode, setGlobalState } = useGlobalStore.getState();
-      if (themeMode === 'auto') setGlobalState('isDark', mediaQueryList.matches);
-    };
-    followSystemTheme();
-    mediaQueryList.addEventListener('change', followSystemTheme);
-    return () => mediaQueryList.removeEventListener('change', followSystemTheme);
-  }, []);
-
-  useLayoutEffect(() => switchDark(), [isDark]);
+  /**
+   * @description Toggle dark mode
+   */
+  useEffect(() => switchDark(), [isDark]);
   const switchDark = () => {
     const html = document.documentElement;
-    html.setAttribute('class', isDark ? 'dark' : '');
+    html.setAttribute("class", isDark ? "dark" : "");
     changePrimary();
   };
 
-  useLayoutEffect(() => changePrimary(), [primary, borderRadius, compactAlgorithm]);
+  /**
+   * @description Toggle primary colors
+   */
+  useEffect(() => changePrimary(), [primary, borderRadius, compactAlgorithm]);
   const changePrimary = () => {
-    const type: ThemeType = isDark ? 'dark' : 'light';
+    const type: ThemeType = isDark ? "dark" : "light";
+    // custom less variable
     Object.entries(globalTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
+    // antd less variable
     Object.entries(token).forEach(([key, val]) => setStyleProperty(`--hooks-${key}`, val));
-    // 主题色浅/深两档（ThemeDrawer 消费）
-    for (const i of [5, 8]) {
+    // antd primaryColor less variable
+    for (let i = 1; i <= 9; i++) {
       setStyleProperty(
         `--hooks-colorPrimary${i}`,
         isDark ? `${getDarkColor(primary, i / 10)}` : `${getLightColor(primary, i / 10)}`
@@ -56,16 +58,31 @@ const useTheme = () => {
     }
   };
 
-  useLayoutEffect(() => changeWeak(), [isWeak]);
-  const changeWeak = () => {
+  /**
+   * @description Switch between gray and weak colors
+   */
+  useEffect(() => changeGreyOrWeak(), [isGrey, isWeak]);
+  const changeGreyOrWeak = () => {
     const html = document.documentElement;
-    html.style.filter = isWeak ? 'invert(80%)' : '';
+    html.style.filter = isWeak ? "invert(80%)" : isGrey ? "grayscale(1)" : "";
   };
 
-  useLayoutEffect(() => changeSiderTheme(), [isDark]);
+  /**
+   * @description Toggle sider theme
+   */
+  useEffect(() => changeSiderTheme(), [isDark, siderInverted]);
   const changeSiderTheme = () => {
-    const type: ThemeType = isDark ? 'dark' : 'light';
+    const type: ThemeType = isDark ? "dark" : siderInverted ? "inverted" : "light";
     Object.entries(siderTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
+  };
+
+  /**
+   * @description Toggle header theme
+   */
+  useEffect(() => changeHeaderTheme(), [isDark, headerInverted]);
+  const changeHeaderTheme = () => {
+    const type: ThemeType = isDark ? "dark" : headerInverted ? "inverted" : "light";
+    Object.entries(headerTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
   };
 };
 

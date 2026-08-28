@@ -1,54 +1,34 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-  createBrowserRouter,
-  createHashRouter,
-  Outlet,
-  RouteObject,
-  RouterProvider as Router,
-  useLocation
-} from 'react-router-dom';
+import { useEffect, useMemo, useState } from "react";
+import { createBrowserRouter, createHashRouter, RouteObject, RouterProvider as Router } from "react-router-dom";
 
-import NotFound from '@/components/Error/404';
-import { Loading } from '@/components/Loading';
-import { LOGIN_URL } from '@/config';
-import NProgress from '@/config/nprogress';
-import { RouterModeEnum } from '@/constants';
-import useMessage from '@/hooks/useMessage';
-import usePermissions from '@/hooks/usePermissions';
-import useTheme from '@/hooks/useTheme';
-import { useAuthStore, useUserStore } from '@/stores';
+import NotFound from "@/components/Error/404";
+import { Loading } from "@/components/Loading";
+import { LOGIN_URL } from "@/config";
+import { RouterModeEnum } from "@/constants";
+import useMessage from "@/hooks/useMessage";
+import usePermissions from "@/hooks/usePermissions";
+import useTheme from "@/hooks/useTheme";
+import { useAuthStore, useUserStore } from "@/stores";
 
-import { convertToDynamicRouterFormat } from './helper/ConvertRouter';
-import RouterGuard from './helper/RouterGuard';
-import { wrappedStaticRouter } from './modules/staticRouter';
+import { convertToDynamicRouterFormat } from "./helper/ConvertRouter";
+import RouterGuard from "./helper/RouterGuard";
+import { wrappedStaticRouter } from "./modules/staticRouter";
 
 const mode = import.meta.env.VITE_ROUTER_MODE;
 
-const PUBLIC_PATHS = new Set([LOGIN_URL, '/403', '/404', '/500', '/']);
+const PUBLIC_PATHS = new Set([LOGIN_URL, "/403", "/404", "/500", "/"]);
 
 const getLocationPath = () => {
   if (mode === RouterModeEnum.HASH) {
-    const hash = window.location.hash.replace(/^#/, '');
-    return (hash || '/').split('?')[0] || '/';
+    const hash = window.location.hash.replace(/^#/, "");
+    return (hash || "/").split("?")[0] || "/";
   }
   return window.location.pathname;
-};
-
-const RouteProgress = () => {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    NProgress.start();
-    NProgress.done();
-  }, [pathname]);
-
-  return <Outlet />;
 };
 
 const createAppRouter = (routerList: RouteObject[]) => {
   const routes: RouteObject[] = [
     {
-      element: <RouteProgress />,
       hydrateFallbackElement: <Loading />,
       children: routerList
     }
@@ -84,7 +64,7 @@ const RouterProvider: React.FC = () => {
 
     const dynamicRouter = convertToDynamicRouterFormat(authMenuList);
     const staticRouter = wrappedStaticRouter.map(route =>
-      route.path === '*'
+      route.path === "*"
         ? {
             ...route,
             element: (

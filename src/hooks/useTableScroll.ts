@@ -1,7 +1,7 @@
 // ? Not yet used, currently using CSS solution for resolution
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { useGlobalStore } from '@/stores';
+import { useGlobalStore } from "@/stores";
 
 /**
  * @description Get the visible height of the first table
@@ -11,14 +11,14 @@ import { useGlobalStore } from '@/stores';
 const useTableScroll = ({ extraHeight = 105, id }: { extraHeight?: number; id?: string } = {}) => {
   const tabs = useGlobalStore(state => state.tabs);
 
-  const [scrollY, setScrollY] = useState('');
+  const [scrollY, setScrollY] = useState("");
 
   useEffect(() => {
     let tHeader = null;
     if (id) {
-      tHeader = document.getElementById(id)?.getElementsByClassName('ant-table-thead')[0] || null;
+      tHeader = document.getElementById(id)?.getElementsByClassName("ant-table-thead")[0] || null;
     } else {
-      tHeader = document.getElementsByClassName('ant-table-thead')[0] || null;
+      tHeader = document.getElementsByClassName("ant-table-thead")[0] || null;
     }
 
     // Distance between the table content and the top

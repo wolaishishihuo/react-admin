@@ -1,194 +1,256 @@
-import './index.less';
+import "./index.less";
 
-import { Icon as SvgIcon } from '@iconify/react/offline';
-import { Divider, Drawer, InputNumber, Popover, Switch } from 'antd';
+import { CheckCircleFilled, FireOutlined, LayoutOutlined, QuestionCircleOutlined, SettingOutlined } from "@ant-design/icons";
+import { Divider, Drawer, InputNumber, Popover, Switch, Tooltip } from "antd";
 
-import dualColumnImg from '@/assets/images/menu_layouts/dual_column.png';
-import horizontalImg from '@/assets/images/menu_layouts/horizontal.png';
-import mixedImg from '@/assets/images/menu_layouts/mixed.png';
-import verticalImg from '@/assets/images/menu_layouts/vertical.png';
-import darkMenuImg from '@/assets/images/menu_styles/dark.png';
-import designMenuImg from '@/assets/images/menu_styles/design.png';
-import lightMenuImg from '@/assets/images/menu_styles/light.png';
-import darkThemeImg from '@/assets/images/theme_styles/dark.png';
-import lightThemeImg from '@/assets/images/theme_styles/light.png';
-import systemThemeImg from '@/assets/images/theme_styles/system.png';
-import { type MenuThemeType, type MenuTypeType, type ThemeModeType, useGlobalStore } from '@/stores';
-import { themeTransition } from '@/utils/themeAnimation';
+import { useGlobalStore } from "@/stores";
 
-import ColorPicker from './components/ColorPicker';
-
-// 明暗三档卡片（预览图 + 浅色/深色/系统）
-const themeModeList: { mode: ThemeModeType; name: string; img: string }[] = [
-  { mode: 'light', name: '浅色', img: lightThemeImg },
-  { mode: 'dark', name: '深色', img: darkThemeImg },
-  { mode: 'auto', name: '系统', img: systemThemeImg }
-];
-
-// 布局缩略图四卡（图片卡 + 底部名字）
-const menuTypeList: { type: MenuTypeType; name: string; img: string }[] = [
-  { type: 'left', name: '纵向', img: verticalImg },
-  { type: 'top', name: '横向', img: horizontalImg },
-  { type: 'top-left', name: '混合', img: mixedImg },
-  { type: 'dual-menu', name: '分栏', img: dualColumnImg }
-];
-
-// 菜单风格三卡（横向/分栏/isDark 时禁用切换）
-const menuThemeList: { theme: MenuThemeType; img: string }[] = [
-  { theme: 'design', img: designMenuImg },
-  { theme: 'dark', img: darkMenuImg },
-  { theme: 'light', img: lightMenuImg }
-];
+import ColorPicker from "./components/ColorPicker";
 
 const ThemeDrawer: React.FC = () => {
-  const menuType = useGlobalStore(state => state.menuType);
-  const menuThemeType = useGlobalStore(state => state.menuThemeType);
-  const menuOpenWidth = useGlobalStore(state => state.menuOpenWidth);
-  const isDark = useGlobalStore(state => state.isDark);
-  const themeMode = useGlobalStore(state => state.themeMode);
-  const compactAlgorithm = useGlobalStore(state => state.compactAlgorithm);
-  const borderRadius = useGlobalStore(state => state.borderRadius);
-  const isWeak = useGlobalStore(state => state.isWeak);
-  const isHappy = useGlobalStore(state => state.isHappy);
-  const watermark = useGlobalStore(state => state.watermark);
-  const breadcrumb = useGlobalStore(state => state.breadcrumb);
-  const breadcrumbIcon = useGlobalStore(state => state.breadcrumbIcon);
-  const tabs = useGlobalStore(state => state.tabs);
-  const themeDrawerVisible = useGlobalStore(state => state.themeDrawerVisible);
-  const setGlobalState = useGlobalStore(state => state.setGlobalState);
-  const setThemeMode = useGlobalStore(state => state.setThemeMode);
-
-  // top/dual-menu/isDark 时禁用菜单风格切换
-  const menuStyleDisabled = isDark || menuType === 'top' || menuType === 'dual-menu';
+  const {
+    layout,
+    compactAlgorithm,
+    borderRadius,
+    isDark,
+    isGrey,
+    isWeak,
+    isHappy,
+    menuSplit,
+    siderInverted,
+    headerInverted,
+    isCollapse,
+    accordion,
+    watermark,
+    breadcrumb,
+    breadcrumbIcon,
+    tabs,
+    tabsIcon,
+    tabsDrag,
+    footer,
+    themeDrawerVisible,
+    setGlobalState
+  } = useGlobalStore(state => ({
+    layout: state.layout,
+    compactAlgorithm: state.compactAlgorithm,
+    borderRadius: state.borderRadius,
+    isDark: state.isDark,
+    isGrey: state.isGrey,
+    isWeak: state.isWeak,
+    isHappy: state.isHappy,
+    menuSplit: state.menuSplit,
+    siderInverted: state.siderInverted,
+    headerInverted: state.headerInverted,
+    isCollapse: state.isCollapse,
+    accordion: state.accordion,
+    watermark: state.watermark,
+    breadcrumb: state.breadcrumb,
+    breadcrumbIcon: state.breadcrumbIcon,
+    tabs: state.tabs,
+    tabsIcon: state.tabsIcon,
+    tabsDrag: state.tabsDrag,
+    footer: state.footer,
+    themeDrawerVisible: state.themeDrawerVisible,
+    setGlobalState: state.setGlobalState
+  }));
 
   return (
     <Drawer
-      title='主题配置'
-      styles={{ wrapper: { width: 290 } }}
+      title="主题配置"
+      size={290}
       zIndex={999}
       closable={false}
       mask={{ closable: true }}
       open={themeDrawerVisible}
-      className='theme-drawer'
-      onClose={() => setGlobalState('themeDrawerVisible', false)}
+      className="theme-drawer"
+      onClose={() => setGlobalState("themeDrawerVisible", false)}
     >
-      {/* 布局切换 */}
-      <Divider className='divider'>
-        <SvgIcon icon='ri:layout-line' />
+      {/* layout switching */}
+      <Divider className="divider">
+        <LayoutOutlined />
         布局样式
       </Divider>
-      <div className='theme-style-box'>
-        {menuTypeList.map(item => (
-          <div key={item.type} className='theme-style-item' onClick={() => setGlobalState('menuType', item.type)}>
-            <div className={`box ${item.type === menuType ? 'is-active' : ''}`}>
-              <img src={item.img} alt={item.name} />
-            </div>
-            <p className='name'>{item.name}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* 菜单风格 */}
-      <Divider className='divider'>
-        <SvgIcon icon='ri:t-shirt-line' />
-        菜单风格
-      </Divider>
-      <div className='theme-style-box menu-style-box'>
-        {menuThemeList.map(item => (
+      <div className="layout-box">
+        <Tooltip placement="top" title="纵向" arrow={true} mouseEnterDelay={0.2}>
           <div
-            key={item.theme}
-            className={`theme-style-item ${menuStyleDisabled ? 'is-disabled' : ''}`}
-            onClick={() => !menuStyleDisabled && setGlobalState('menuThemeType', item.theme)}
+            className={`layout-item mb22 layout-vertical ${layout === "vertical" && "layout-active"}`}
+            onClick={() => setGlobalState("layout", "vertical")}
           >
-            <div className={`box ${item.theme === menuThemeType ? 'is-active' : ''}`}>
-              <img src={item.img} alt='' />
+            <div className="layout-dark"></div>
+            <div className="layout-container">
+              <div className="layout-light"></div>
+              <div className="layout-content"></div>
             </div>
+            {layout === "vertical" && <CheckCircleFilled />}
           </div>
-        ))}
+        </Tooltip>
+        <Tooltip placement="top" title="经典" arrow={true} mouseEnterDelay={0.2}>
+          <div
+            className={`layout-item mb22 layout-classic ${layout === "classic" && "layout-active"}`}
+            onClick={() => setGlobalState("layout", "classic")}
+          >
+            <div className="layout-dark"></div>
+            <div className="layout-container">
+              <div className="layout-light"></div>
+              <div className="layout-content"></div>
+            </div>
+            {layout === "classic" && <CheckCircleFilled />}
+          </div>
+        </Tooltip>
+        <Tooltip placement="top" title="横向" arrow={true} mouseEnterDelay={0.2}>
+          <div
+            className={`layout-item layout-transverse ${layout === "transverse" && "layout-active"}`}
+            onClick={() => setGlobalState("layout", "transverse")}
+          >
+            <div className="layout-dark"></div>
+            <div className="layout-content"></div>
+            {layout === "transverse" && <CheckCircleFilled />}
+          </div>
+        </Tooltip>
+        <Tooltip placement="top" title="分栏" arrow={true} mouseEnterDelay={0.2}>
+          <div
+            className={`layout-item layout-columns ${layout === "columns" && "layout-active"}`}
+            onClick={() => setGlobalState("layout", "columns")}
+          >
+            <div className="layout-dark"></div>
+            <div className="layout-light"></div>
+            <div className="layout-content"></div>
+            {layout === "columns" && <CheckCircleFilled />}
+          </div>
+        </Tooltip>
+      </div>
+      <div className="theme-item mt30">
+        <span>
+          菜单分割
+          <Tooltip title="经典模式下生效">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </span>
+        <Switch disabled={layout !== "classic"} checked={menuSplit} onChange={value => setGlobalState("menuSplit", value)} />
+      </div>
+      <div className="theme-item">
+        <span>
+          侧边栏反转色
+          <Tooltip title="侧边栏颜色变为深色模式">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </span>
+        <Switch checked={siderInverted} onChange={value => setGlobalState("siderInverted", value)} />
+      </div>
+      <div className="theme-item mb35">
+        <span>
+          头部反转色
+          <Tooltip title="头部颜色变为深色模式">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </span>
+        <Switch checked={headerInverted} onChange={value => setGlobalState("headerInverted", value)} />
       </div>
 
-      {/* 主题设置 */}
-      <Divider className='divider'>
-        <SvgIcon icon='ri:fire-line' />
+      {/* theme settings */}
+      <Divider className="divider">
+        <FireOutlined />
         全局主题
       </Divider>
-      <div className='theme-style-box'>
-        {themeModeList.map(item => (
-          <div key={item.mode} className='theme-style-item' onClick={() => themeTransition(() => setThemeMode(item.mode))}>
-            <div className={`box ${item.mode === themeMode ? 'is-active' : ''}`}>
-              <img src={item.img} alt={item.name} />
-            </div>
-            <p className='name'>{item.name}</p>
-          </div>
-        ))}
-      </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>主题颜色</span>
-        <Popover placement='left' trigger='click' content={ColorPicker}>
-          <label className='primary'></label>
+        <Popover placement="left" trigger="click" content={ColorPicker}>
+          <label className="primary"></label>
         </Popover>
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
+        <span>暗黑模式</span>
+        <Switch
+          checked={isDark}
+          checkedChildren={<span className="dark-icon dark-icon-sun">🌞</span>}
+          unCheckedChildren={<span className="dark-icon dark-icon-moon">🌛</span>}
+          onChange={value => setGlobalState("isDark", value)}
+        />
+      </div>
+      <div className="theme-item">
+        <span>灰色模式</span>
+        <Switch
+          checked={isGrey}
+          onChange={value => {
+            if (isWeak) setGlobalState("isWeak", false);
+            setGlobalState("isGrey", value);
+          }}
+        />
+      </div>
+      <div className="theme-item">
         <span>色弱模式</span>
-        <Switch checked={isWeak} onChange={value => setGlobalState('isWeak', value)} />
+        <Switch
+          checked={isWeak}
+          onChange={value => {
+            if (isGrey) setGlobalState("isGrey", false);
+            setGlobalState("isWeak", value);
+          }}
+        />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>快乐模式</span>
-        <Switch checked={isHappy} onChange={value => setGlobalState('isHappy', value)} />
+        <Switch checked={isHappy} onChange={value => setGlobalState("isHappy", value)} />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>紧凑主题</span>
-        <Switch checked={compactAlgorithm} onChange={value => setGlobalState('compactAlgorithm', value)} />
+        <Switch checked={compactAlgorithm} onChange={value => setGlobalState("compactAlgorithm", value)} />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item mb35">
         <span>圆角大小</span>
         <InputNumber
           min={1}
           max={20}
-          className='w-80px'
+          style={{ width: 80 }}
           defaultValue={borderRadius}
           formatter={value => `${value}px`}
-          parser={value => (value ? value!.replace('px', '') : 6) as number}
+          parser={value => (value ? value!.replace("px", "") : 6) as number}
           onChange={value => {
             const newValue = value || 6;
-            setGlobalState('borderRadius', newValue);
+            setGlobalState("borderRadius", newValue);
           }}
         />
       </div>
 
-      {/* 界面设置 */}
-      <Divider className='divider'>
-        <SvgIcon icon='ri:settings-line' />
+      {/* interface settings */}
+      <Divider className="divider">
+        <SettingOutlined />
         界面设置
       </Divider>
-      <div className='theme-item'>
+      <div className="theme-item">
+        <span>菜单折叠</span>
+        <Switch checked={isCollapse} onChange={value => setGlobalState("isCollapse", value)} />
+      </div>
+      <div className="theme-item">
+        <span>菜单手风琴</span>
+        <Switch checked={accordion} onChange={value => setGlobalState("accordion", value)} />
+      </div>
+      <div className="theme-item">
         <span>水印</span>
-        <Switch checked={watermark} onChange={value => setGlobalState('watermark', value)} />
+        <Switch checked={watermark} onChange={value => setGlobalState("watermark", value)} />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>面包屑</span>
-        <Switch checked={breadcrumb} onChange={value => setGlobalState('breadcrumb', value)} />
+        <Switch checked={breadcrumb} onChange={value => setGlobalState("breadcrumb", value)} />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>面包屑图标</span>
-        <Switch checked={breadcrumbIcon} onChange={value => setGlobalState('breadcrumbIcon', value)} />
+        <Switch checked={breadcrumbIcon} onChange={value => setGlobalState("breadcrumbIcon", value)} />
       </div>
-      <div className='theme-item'>
+      <div className="theme-item">
         <span>标签栏</span>
-        <Switch checked={tabs} onChange={value => setGlobalState('tabs', value)} />
+        <Switch checked={tabs} onChange={value => setGlobalState("tabs", value)} />
       </div>
-      <div className='theme-item'>
-        <span>菜单宽度</span>
-        <InputNumber
-          min={180}
-          max={320}
-          step={10}
-          className='w-80px'
-          defaultValue={menuOpenWidth}
-          formatter={value => `${value}px`}
-          parser={value => (value ? value!.replace('px', '') : 230) as number}
-          onChange={value => setGlobalState('menuOpenWidth', value || 230)}
-        />
+      <div className="theme-item">
+        <span>标签栏图标</span>
+        <Switch checked={tabsIcon} onChange={value => setGlobalState("tabsIcon", value)} />
+      </div>
+      <div className="theme-item">
+        <span>标签栏拖拽</span>
+        <Switch checked={tabsDrag} onChange={value => setGlobalState("tabsDrag", value)} />
+      </div>
+      <div className="theme-item">
+        <span>页脚</span>
+        <Switch checked={footer} onChange={value => setGlobalState("footer", value)} />
       </div>
     </Drawer>
   );

@@ -1,39 +1,35 @@
-import { ReqLogin, ResLogin, ResultData } from '@/apis/interface/index';
-import authButtonList from '@/assets/json/authButtonList.json';
-import authMenuList from '@/assets/json/authMenuList.json';
-
-/** md5('123456') — matches the login form hash */
-export const MOCK_LOGIN_PASSWORD_MD5 = 'e10adc3949ba59abbe56e057f20f883e';
-export const MOCK_LOGIN_USERS = ['admin', 'user'] as const;
-
-const wait = (ms = 200) =>
-  import.meta.env.MODE === 'test' ? Promise.resolve() : new Promise<void>(resolve => setTimeout(resolve, ms));
+import http from "@/apis";
+import { PORT1 } from "@/apis/config/servicePort";
+import { ReqLogin, ResLogin } from "@/apis/interface/index";
+import authButtonList from "@/assets/json/authButtonList.json";
+import authMenuList from "@/assets/json/authMenuList.json";
+import { AuthState } from "@/stores/interface";
 
 /**
  * @name AuthModule
  */
-export const loginApi = async (params: ReqLogin): Promise<ResultData<ResLogin>> => {
-  await wait();
-  const isValidUser = (MOCK_LOGIN_USERS as readonly string[]).includes(params.username);
-  if (!isValidUser || params.password !== MOCK_LOGIN_PASSWORD_MD5) {
-    return Promise.reject({ code: 500, msg: '用户名或密码错误' });
-  }
-  return {
-    code: 200,
-    data: { access_token: `mock_token_${params.username}` },
-    msg: '成功'
-  };
+// User login
+export const loginApi = (params: ReqLogin) => {
+  return http.post<ResLogin>(PORT1 + `/login`, params);
+  // return http.post<ResLogin>(PORT1 + `/login`, params, { loading: false });
+  // return http.post<ResLogin>(PORT1 + `/login`, {}, { params });
+  // return http.post<ResLogin>(PORT1 + `/login`, qs.stringify(params));
+  // return http.get<ResLogin>(PORT1 + `/login?${qs.stringify(params, { arrayFormat: "repeat" })}`);
 };
 
+// Get menu list
 export const getAuthMenuListApi = () => {
+  return http.get<AuthState["authMenuList"]>(PORT1 + `/menu/list`);
   return authMenuList;
 };
 
+// Get button permissions
 export const getAuthButtonListApi = () => {
+  return http.get<AuthState["authButtonList"]>(PORT1 + `/auth/buttons`);
   return authButtonList;
 };
 
-export const logoutApi = async (): Promise<ResultData<null>> => {
-  await wait(100);
-  return { code: 200, data: null, msg: '成功' };
+// User logout
+export const logoutApi = () => {
+  return http.post(PORT1 + `/logout`, {}, { loading: true });
 };

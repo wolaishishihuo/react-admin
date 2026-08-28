@@ -1,23 +1,20 @@
-import { RouteObjectType } from '@/routers/interface';
+import type { ConfigProviderProps } from "antd";
 
-export type SizeType = 'small' | 'middle' | 'large';
-export type MenuTypeType = 'left' | 'top' | 'top-left' | 'dual-menu';
-export type MenuThemeType = 'design' | 'dark' | 'light';
-export type ThemeModeType = 'light' | 'dark' | 'auto';
-export type LayoutType = 'vertical' | 'classic' | 'transverse' | 'columns';
+import { RouteObjectType } from "@/routers/interface";
+
+export type SizeType = NonNullable<ConfigProviderProps["componentSize"]>;
+
+export type LayoutType = "vertical" | "classic" | "transverse" | "columns";
+
+export type LanguageType = "zh" | "en" | null;
 
 /* GlobalState */
 export interface GlobalState {
-  menuType: MenuTypeType;
-  menuThemeType: MenuThemeType;
-  menuOpenWidth: number;
-  themeMode: ThemeModeType;
-  dualMenuShowText: boolean;
-  // Compatibility fields retained for copied pages that still read the newer layout settings.
   layout: LayoutType;
   componentSize: SizeType;
   compactAlgorithm: boolean;
   borderRadius: number;
+  language: LanguageType;
   maximize: boolean;
   primary: string;
   isDark: boolean;
@@ -35,16 +32,17 @@ export interface GlobalState {
   tabs: boolean;
   tabsIcon: boolean;
   tabsDrag: boolean;
+  footer: boolean;
   themeDrawerVisible: boolean;
 }
 
 export interface GlobalAction {
   setGlobalState: <T extends keyof GlobalState>(key: T, value: GlobalState[T]) => void;
-  setThemeMode: (mode: ThemeModeType) => void;
 }
 
 /* tabsMenuProps */
 export interface TabsListProp {
+  icon: string;
   title: string;
   path: string;
   closable: boolean;
@@ -56,28 +54,23 @@ export interface TabsState {
 }
 
 export interface TabsAction {
-  setTabsList: (tabsList: TabsState['tabsList']) => void;
+  setTabsList: (tabsList: TabsState["tabsList"]) => void;
   addTab: (tabs: TabsListProp) => void;
-  removeTab: (payload: { path: string; isCurrent: boolean }) => void;
-  closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
-  closeMultipleTab: (payload: { path?: string }) => void;
-  validateTabs: () => void;
-  setTabTitle: (title: string, path?: string) => void;
+  removeTab: (path: string, isCurrent: boolean) => void;
+  closeTabsOnSide: (path: string, type: "left" | "right") => void;
+  closeMultipleTab: (path?: string) => void;
+  setTabTitle: (title: string) => void;
 }
 
 /* UserState */
 export interface UserState {
   token: string;
   userInfo: { name: string };
-  searchHistory: string[];
 }
 
 export interface UserAction {
-  setToken: (token: UserState['token']) => void;
-  setUserInfo: (token: UserState['userInfo']) => void;
-  setSearchHistory: (searchHistory: string[]) => void;
-  addSearchHistory: (path: string) => void;
-  removeSearchHistory: (path: string) => void;
+  setToken: (token: UserState["token"]) => void;
+  setUserInfo: (token: UserState["userInfo"]) => void;
 }
 
 /* AuthState */
@@ -89,6 +82,6 @@ export interface AuthState {
 }
 
 export interface AuthAction {
-  setAuthButtonList: (authButtonList: AuthState['authButtonList']) => void;
-  setAuthMenuList: (authMenuList: AuthState['authMenuList']) => void;
+  setAuthButtonList: (authButtonList: AuthState["authButtonList"]) => void;
+  setAuthMenuList: (authMenuList: AuthState["authMenuList"]) => void;
 }

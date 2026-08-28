@@ -1,6 +1,6 @@
 // Request response parameters (excluding data)
 export interface Result {
-  code: number;
+  code: string;
   msg: string;
 }
 
@@ -30,4 +30,17 @@ export interface ReqLogin {
 
 export interface ResLogin {
   access_token: string;
+}
+
+export interface UserList {
+  id: string;
+  username: string;
+  gender: 1 | 2;
+  age: number;
+  idCard: string;
+  email: string;
+  address: string;
+  createTime: string;
+  status: boolean;
+  avatar: string;
 }

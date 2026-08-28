@@ -1,9 +1,22 @@
-/* 缓存页切入：激活节点播放淡入 + 轻微左滑 */
-.keep-alive-item.keep-alive-enter {
-  animation: keepalive-fade-in 0.3s ease-in-out;
+/* fade */
+.fade-enter,
+.fade-appear {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+.fade-enter-active,
+.fade-appear-active,
+.fade-exit-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s ease-in-out;
+}
+.fade-exit {
+  opacity: 0;
+  transform: translateX(40px);
 }
 
-@keyframes keepalive-fade-in {
+@keyframes fade-slide-in {
   from {
     opacity: 0;
     transform: translateX(-40px);
@@ -12,4 +25,7 @@
     opacity: 1;
     transform: translateX(0);
   }
+}
+.keep-alive-item.keep-alive-enter {
+  animation: fade-slide-in 0.3s ease-in-out;
 }

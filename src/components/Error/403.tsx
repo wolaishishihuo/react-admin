@@ -1,19 +1,19 @@
-import './index.less';
+import "./index.less";
 
-import { Button, Result } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const NotAuth = () => {
   const navigate = useNavigate();
 
   return (
     <Result
-      className='error-page'
-      status='403'
-      title='403'
-      subTitle='Sorry, you are not authorized to access this page.'
+      className="error-page"
+      status="403"
+      title="403"
+      subTitle="Sorry, you are not authorized to access this page."
       extra={
-        <Button type='primary' onClick={() => navigate(-1)}>
+        <Button type="primary" onClick={() => navigate(-1)}>
           Go Back
         </Button>
       }

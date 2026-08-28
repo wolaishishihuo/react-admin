@@ -1,19 +1,19 @@
-import './index.less';
+import "./index.less";
 
-import { Button, Result } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
   const navigate = useNavigate();
 
   return (
     <Result
-      className='error-page'
-      status='404'
-      title='404'
-      subTitle='Sorry, the page you visited does not exist.'
+      className="error-page"
+      status="404"
+      title="404"
+      subTitle="Sorry, the page you visited does not exist."
       extra={
-        <Button type='primary' onClick={() => navigate(-1)}>
+        <Button type="primary" onClick={() => navigate(-1)}>
           Go Back
         </Button>
       }

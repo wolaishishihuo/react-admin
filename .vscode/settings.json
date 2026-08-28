@@ -93,5 +93,6 @@
     "zhuti",
     "zlevel",
     "Zustand"
-  ]
+  ],
+  "i18n-ally.localesPaths": ["src/languages"]
 }

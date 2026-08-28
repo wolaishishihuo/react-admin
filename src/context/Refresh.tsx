@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useState } from 'react';
+import { createContext, useCallback, useMemo, useState } from "react";
 
 interface RefreshContextType {
   outletShow: boolean;
