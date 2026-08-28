@@ -1,9 +1,12 @@
-import { setGlobalState } from '@/stores';
+import { useGlobalStore } from '@/stores';
+
 import IconButton from './IconButton';
 
 const ThemeSetting: React.FC = () => {
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
+
   const setThemeDrawerVisible = () => {
-    setGlobalState({ key: 'themeDrawerVisible', value: true });
+    setGlobalState('themeDrawerVisible', true);
   };
 
   return <IconButton icon='ri:settings-line' className='setting-btn' onClick={setThemeDrawerVisible} />;

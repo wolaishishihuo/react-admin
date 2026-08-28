@@ -1,15 +1,18 @@
+import './index.less';
+
+import { Icon as SvgIcon } from '@iconify/react/offline';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Icon as SvgIcon } from '@iconify/react/offline';
+
 import logo from '@/assets/images/logo.svg';
 import useIsMobile from '@/hooks/useIsMobile';
 import LayoutMenu from '@/layouts/components/Menu';
-import { setGlobalState, useGlobalStore, useAuthStore } from '@/stores';
+import { useAuthStore, useGlobalStore } from '@/stores';
 import { getRootMenuPath } from '@/utils';
+
 import DualRail from './DualRail';
 import { getMenuTheme } from './theme';
-import './index.less';
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
@@ -19,6 +22,7 @@ const Sidebar: React.FC = () => {
   const menuThemeType = useGlobalStore(state => state.menuThemeType);
   const isDark = useGlobalStore(state => state.isDark);
   const menuType = useGlobalStore(state => state.menuType);
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
   const showMenuList = useAuthStore(state => state.showMenuList);
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
@@ -73,7 +77,7 @@ const Sidebar: React.FC = () => {
       </div>
       {/* dual 第二列右缘 11×50 悬浮折叠钮（aside 悬停浮现） */}
       {isDual && !!subMenuList.length && (
-        <div className='dual-collapse-btn' onClick={() => setGlobalState({ key: 'isCollapse', value: !isCollapse })}>
+        <div className='dual-collapse-btn' onClick={() => setGlobalState('isCollapse', !isCollapse)}>
           <SvgIcon icon={isCollapse ? 'ri:arrow-right-wide-fill' : 'ri:arrow-left-wide-fill'} />
         </div>
       )}

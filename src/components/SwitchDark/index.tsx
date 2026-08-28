@@ -1,9 +1,11 @@
-import { Button } from 'antd';
 import { Icon as SvgIcon } from '@iconify/react/offline';
-import { setThemeMode, useGlobalStore } from '@/stores';
+import { Button } from 'antd';
+
+import { useGlobalStore } from '@/stores';
 
 const SwitchDark: React.FC = () => {
   const isDark = useGlobalStore(state => state.isDark);
+  const setThemeMode = useGlobalStore(state => state.setThemeMode);
 
   return (
     <Button

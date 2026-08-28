@@ -1,8 +1,8 @@
+import './index.less';
+
 import { Icon as SvgIcon } from '@iconify/react/offline';
-import { Drawer, Divider, Switch, Popover, InputNumber } from 'antd';
-import darkThemeImg from '@/assets/images/theme_styles/dark.png';
-import lightThemeImg from '@/assets/images/theme_styles/light.png';
-import systemThemeImg from '@/assets/images/theme_styles/system.png';
+import { Divider, Drawer, InputNumber, Popover, Switch } from 'antd';
+
 import dualColumnImg from '@/assets/images/menu_layouts/dual_column.png';
 import horizontalImg from '@/assets/images/menu_layouts/horizontal.png';
 import mixedImg from '@/assets/images/menu_layouts/mixed.png';
@@ -10,17 +10,13 @@ import verticalImg from '@/assets/images/menu_layouts/vertical.png';
 import darkMenuImg from '@/assets/images/menu_styles/dark.png';
 import designMenuImg from '@/assets/images/menu_styles/design.png';
 import lightMenuImg from '@/assets/images/menu_styles/light.png';
-import {
-  setGlobalState,
-  setThemeMode,
-  useGlobalStore,
-  type MenuThemeType,
-  type MenuTypeType,
-  type ThemeModeType
-} from '@/stores';
+import darkThemeImg from '@/assets/images/theme_styles/dark.png';
+import lightThemeImg from '@/assets/images/theme_styles/light.png';
+import systemThemeImg from '@/assets/images/theme_styles/system.png';
+import { type MenuThemeType, type MenuTypeType, type ThemeModeType, useGlobalStore } from '@/stores';
 import { themeTransition } from '@/utils/themeAnimation';
+
 import ColorPicker from './components/ColorPicker';
-import './index.less';
 
 // 明暗三档卡片（预览图 + 浅色/深色/系统）
 const themeModeList: { mode: ThemeModeType; name: string; img: string }[] = [
@@ -59,6 +55,8 @@ const ThemeDrawer: React.FC = () => {
   const breadcrumbIcon = useGlobalStore(state => state.breadcrumbIcon);
   const tabs = useGlobalStore(state => state.tabs);
   const themeDrawerVisible = useGlobalStore(state => state.themeDrawerVisible);
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
+  const setThemeMode = useGlobalStore(state => state.setThemeMode);
 
   // top/dual-menu/isDark 时禁用菜单风格切换
   const menuStyleDisabled = isDark || menuType === 'top' || menuType === 'dual-menu';
@@ -72,7 +70,7 @@ const ThemeDrawer: React.FC = () => {
       mask={{ closable: true }}
       open={themeDrawerVisible}
       className='theme-drawer'
-      onClose={() => setGlobalState({ key: 'themeDrawerVisible', value: false })}
+      onClose={() => setGlobalState('themeDrawerVisible', false)}
     >
       {/* 布局切换 */}
       <Divider className='divider'>
@@ -81,7 +79,7 @@ const ThemeDrawer: React.FC = () => {
       </Divider>
       <div className='theme-style-box'>
         {menuTypeList.map(item => (
-          <div key={item.type} className='theme-style-item' onClick={() => setGlobalState({ key: 'menuType', value: item.type })}>
+          <div key={item.type} className='theme-style-item' onClick={() => setGlobalState('menuType', item.type)}>
             <div className={`box ${item.type === menuType ? 'is-active' : ''}`}>
               <img src={item.img} alt={item.name} />
             </div>
@@ -100,7 +98,7 @@ const ThemeDrawer: React.FC = () => {
           <div
             key={item.theme}
             className={`theme-style-item ${menuStyleDisabled ? 'is-disabled' : ''}`}
-            onClick={() => !menuStyleDisabled && setGlobalState({ key: 'menuThemeType', value: item.theme })}
+            onClick={() => !menuStyleDisabled && setGlobalState('menuThemeType', item.theme)}
           >
             <div className={`box ${item.theme === menuThemeType ? 'is-active' : ''}`}>
               <img src={item.img} alt='' />
@@ -132,15 +130,15 @@ const ThemeDrawer: React.FC = () => {
       </div>
       <div className='theme-item'>
         <span>色弱模式</span>
-        <Switch checked={isWeak} onChange={value => setGlobalState({ key: 'isWeak', value })} />
+        <Switch checked={isWeak} onChange={value => setGlobalState('isWeak', value)} />
       </div>
       <div className='theme-item'>
         <span>快乐模式</span>
-        <Switch checked={isHappy} onChange={value => setGlobalState({ key: 'isHappy', value })} />
+        <Switch checked={isHappy} onChange={value => setGlobalState('isHappy', value)} />
       </div>
       <div className='theme-item'>
         <span>紧凑主题</span>
-        <Switch checked={compactAlgorithm} onChange={value => setGlobalState({ key: 'compactAlgorithm', value })} />
+        <Switch checked={compactAlgorithm} onChange={value => setGlobalState('compactAlgorithm', value)} />
       </div>
       <div className='theme-item'>
         <span>圆角大小</span>
@@ -153,7 +151,7 @@ const ThemeDrawer: React.FC = () => {
           parser={value => (value ? value!.replace('px', '') : 6) as number}
           onChange={value => {
             const newValue = value || 6;
-            setGlobalState({ key: 'borderRadius', value: newValue });
+            setGlobalState('borderRadius', newValue);
           }}
         />
       </div>
@@ -165,19 +163,19 @@ const ThemeDrawer: React.FC = () => {
       </Divider>
       <div className='theme-item'>
         <span>水印</span>
-        <Switch checked={watermark} onChange={value => setGlobalState({ key: 'watermark', value })} />
+        <Switch checked={watermark} onChange={value => setGlobalState('watermark', value)} />
       </div>
       <div className='theme-item'>
         <span>面包屑</span>
-        <Switch checked={breadcrumb} onChange={value => setGlobalState({ key: 'breadcrumb', value })} />
+        <Switch checked={breadcrumb} onChange={value => setGlobalState('breadcrumb', value)} />
       </div>
       <div className='theme-item'>
         <span>面包屑图标</span>
-        <Switch checked={breadcrumbIcon} onChange={value => setGlobalState({ key: 'breadcrumbIcon', value })} />
+        <Switch checked={breadcrumbIcon} onChange={value => setGlobalState('breadcrumbIcon', value)} />
       </div>
       <div className='theme-item'>
         <span>标签栏</span>
-        <Switch checked={tabs} onChange={value => setGlobalState({ key: 'tabs', value })} />
+        <Switch checked={tabs} onChange={value => setGlobalState('tabs', value)} />
       </div>
       <div className='theme-item'>
         <span>菜单宽度</span>
@@ -189,7 +187,7 @@ const ThemeDrawer: React.FC = () => {
           defaultValue={menuOpenWidth}
           formatter={value => `${value}px`}
           parser={value => (value ? value!.replace('px', '') : 230) as number}
-          onChange={value => setGlobalState({ key: 'menuOpenWidth', value: value || 230 })}
+          onChange={value => setGlobalState('menuOpenWidth', value || 230)}
         />
       </div>
     </Drawer>

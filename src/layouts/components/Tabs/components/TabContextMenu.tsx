@@ -2,9 +2,10 @@ import { Icon as SvgIcon } from '@iconify/react/offline';
 import { Dropdown, type DropdownProps, type MenuProps } from 'antd';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { HOME_URL } from '@/config';
 import { RefreshContext } from '@/context/Refresh';
-import { closeMultipleTab, closeTabsOnSide, setGlobalState, useTabsStore } from '@/stores';
+import { closeMultipleTab, closeTabsOnSide, useGlobalStore, useTabsStore } from '@/stores';
 
 interface TabContextMenuProps {
   /** 菜单作用目标标签路径 */
@@ -22,6 +23,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({ path, activePath, trigg
   const navigate = useNavigate();
   const { refresh } = useContext(RefreshContext);
   const tabsList = useTabsStore(state => state.tabsList);
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
 
   const clickedIndex = tabsList.findIndex(item => item.path === path);
   const activeIndex = tabsList.findIndex(item => item.path === activePath);
@@ -53,7 +55,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({ path, activePath, trigg
       key: 'maximize',
       label: <span>最大化</span>,
       icon: <SvgIcon icon='ri:fullscreen-line' className='text-14px!' />,
-      onClick: () => setGlobalState({ key: 'maximize', value: true })
+      onClick: () => setGlobalState('maximize', true)
     },
     {
       type: 'divider'

@@ -1,11 +1,12 @@
 import { theme } from 'antd';
 import { useLayoutEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+
 import { useGlobalStore } from '@/stores';
 import globalTheme from '@/styles/theme/global';
 import siderTheme from '@/styles/theme/sider';
 import { setStyleProperty } from '@/utils';
-import { getLightColor, getDarkColor } from '@/utils/color';
+import { getDarkColor, getLightColor } from '@/utils/color';
 
 type ThemeType = 'light' | 'dark';
 
@@ -22,6 +23,17 @@ const useTheme = () => {
       compactAlgorithm: state.compactAlgorithm
     }))
   );
+
+  useLayoutEffect(() => {
+    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+    const followSystemTheme = () => {
+      const { themeMode, setGlobalState } = useGlobalStore.getState();
+      if (themeMode === 'auto') setGlobalState('isDark', mediaQueryList.matches);
+    };
+    followSystemTheme();
+    mediaQueryList.addEventListener('change', followSystemTheme);
+    return () => mediaQueryList.removeEventListener('change', followSystemTheme);
+  }, []);
 
   useLayoutEffect(() => switchDark(), [isDark]);
   const switchDark = () => {

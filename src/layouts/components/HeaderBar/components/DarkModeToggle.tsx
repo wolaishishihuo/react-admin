@@ -1,9 +1,11 @@
-import { setThemeMode, useGlobalStore } from '@/stores';
+import { useGlobalStore } from '@/stores';
 import { themeTransition } from '@/utils/themeAnimation';
+
 import IconButton from './IconButton';
 
 const DarkModeToggle: React.FC = () => {
   const isDark = useGlobalStore(state => state.isDark);
+  const setThemeMode = useGlobalStore(state => state.setThemeMode);
 
   return (
     <IconButton

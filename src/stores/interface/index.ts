@@ -40,6 +40,7 @@ export interface GlobalState {
 
 export interface GlobalAction {
   setGlobalState: <T extends keyof GlobalState>(key: T, value: GlobalState[T]) => void;
+  setThemeMode: (mode: ThemeModeType) => void;
 }
 
 /* tabsMenuProps */

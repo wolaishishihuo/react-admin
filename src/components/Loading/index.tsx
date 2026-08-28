@@ -1,9 +1,6 @@
 import './index.less';
 
 import { Spin } from 'antd';
-import { useEffect } from 'react';
-
-import NProgress from '@/config/nprogress';
 
 export const Loading = () => {
   return (
@@ -13,13 +10,4 @@ export const Loading = () => {
   );
 };
 
-export const PageLoader = () => {
-  useEffect(() => {
-    NProgress.start();
-    return () => {
-      NProgress.done();
-    };
-  }, []);
-
-  return <Loading />;
-};
+export const PageLoader = () => <Loading />;

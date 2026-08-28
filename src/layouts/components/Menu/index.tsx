@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Icon } from '@/components/Icon';
 import useIsMobile from '@/hooks/useIsMobile';
 import { type MetaProps, type RouteObjectType } from '@/routers/interface';
-import { setGlobalState, useAuthStore, useGlobalStore } from '@/stores';
+import { useAuthStore, useGlobalStore } from '@/stores';
 import { getParentPaths } from '@/utils';
 
 interface LayoutMenuProps {
@@ -32,6 +32,7 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, popupClassName 
       isCollapse: state.isCollapse
     }))
   );
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
   const { showMenuList, flatMenuList } = useAuthStore(
     useShallow(state => ({
       showMenuList: state.showMenuList,
@@ -94,7 +95,7 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, popupClassName 
     if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, '_blank');
     navigate(path);
     // 移动端导航后收起侧栏
-    if (isMobile) setGlobalState({ key: 'isCollapse', value: true });
+    if (isMobile) setGlobalState('isCollapse', true);
   };
 
   const clickMenu: MenuProps['onClick'] = ({ key }) => handleMenuNavigation(key);

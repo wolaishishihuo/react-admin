@@ -1,27 +1,30 @@
+import './index.less';
+
 import { Watermark } from 'antd';
 import clsx from 'clsx';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
+
 import useIsMobile from '@/hooks/useIsMobile';
 import HeaderBar from '@/layouts/components/HeaderBar';
 import LayoutMain from '@/layouts/components/Main';
 import Sidebar from '@/layouts/components/Sidebar';
 import LayoutTabs from '@/layouts/components/Tabs';
 import ThemeDrawer from '@/layouts/components/ThemeDrawer';
-import { setGlobalState, useGlobalStore } from '@/stores';
-import './index.less';
+import { useGlobalStore } from '@/stores';
 
 const LayoutIndex: React.FC = () => {
   const menuType = useGlobalStore(state => state.menuType);
   const watermark = useGlobalStore(state => state.watermark);
   const isCollapse = useGlobalStore(state => state.isCollapse);
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
   const isMobile = useIsMobile();
 
   const headerRef = useRef<HTMLElement>(null);
 
   // 移动端视口自动收起侧栏
   useEffect(() => {
-    if (isMobile) setGlobalState({ key: 'isCollapse', value: true });
+    if (isMobile) setGlobalState('isCollapse', true);
   }, [isMobile]);
 
   // 头部实测高度写入 --app-header-height，供列表页视口高度计算
@@ -57,9 +60,7 @@ const LayoutIndex: React.FC = () => {
         </main>
       </section>
       {/* 移动端侧栏 overlay 展开时的全屏遮罩，点击收起（四模式统一抽屉范式） */}
-      {isMobile && !isCollapse && (
-        <div className='mobile-sider-mask' onClick={() => setGlobalState({ key: 'isCollapse', value: true })} />
-      )}
+      {isMobile && !isCollapse && <div className='mobile-sider-mask' onClick={() => setGlobalState('isCollapse', true)} />}
       <ThemeDrawer />
     </Watermark>
   );

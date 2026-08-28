@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createBrowserRouter, createHashRouter, RouteObject, RouterProvider as Router } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  createHashRouter,
+  Outlet,
+  RouteObject,
+  RouterProvider as Router,
+  useLocation
+} from 'react-router-dom';
 
 import NotFound from '@/components/Error/404';
 import { Loading } from '@/components/Loading';
 import { LOGIN_URL } from '@/config';
+import NProgress from '@/config/nprogress';
 import { RouterModeEnum } from '@/constants';
 import useMessage from '@/hooks/useMessage';
 import usePermissions from '@/hooks/usePermissions';
@@ -26,9 +34,21 @@ const getLocationPath = () => {
   return window.location.pathname;
 };
 
+const RouteProgress = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    NProgress.start();
+    NProgress.done();
+  }, [pathname]);
+
+  return <Outlet />;
+};
+
 const createAppRouter = (routerList: RouteObject[]) => {
   const routes: RouteObject[] = [
     {
+      element: <RouteProgress />,
       hydrateFallbackElement: <Loading />,
       children: routerList
     }

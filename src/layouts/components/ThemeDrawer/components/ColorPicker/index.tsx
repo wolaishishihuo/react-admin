@@ -1,11 +1,12 @@
+import './index.less';
+
 import { Input, Space } from 'antd';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
+
+import { useGlobalStore } from '@/stores';
 import { convertToSixDigitHexColor } from '@/utils/color';
 import { isHexColor } from '@/utils/is';
-
-import { setGlobalState, useGlobalStore } from '@/stores';
-import './index.less';
 
 const presetColors = [
   '#1677FF',
@@ -24,10 +25,11 @@ const presetColors = [
 
 const ColorPicker = () => {
   const primary = useGlobalStore(state => state.primary);
+  const setGlobalState = useGlobalStore(state => state.setGlobalState);
   const [inputPrimary, setInputPrimary] = useState(primary);
 
   const changePrimary = (value: string) => {
-    setGlobalState({ key: 'primary', value });
+    setGlobalState('primary', value);
   };
 
   return (

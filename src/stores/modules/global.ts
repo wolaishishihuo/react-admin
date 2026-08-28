@@ -62,11 +62,15 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         tabsDrag: true,
         // theme box display status
         themeDrawerVisible: false,
-        setGlobalState: ((keyOrPayload: keyof GlobalState | { key: keyof GlobalState; value: unknown }, value?: unknown) =>
+        setGlobalState: (key, value) =>
           set((state: GlobalState) => {
-            const key = typeof keyOrPayload === 'object' ? keyOrPayload.key : keyOrPayload;
-            state[key] = (typeof keyOrPayload === 'object' ? keyOrPayload.value : value) as never;
-          })) as GlobalAction['setGlobalState']
+            state[key] = value as never;
+          }),
+        setThemeMode: mode =>
+          set((state: GlobalState) => {
+            state.themeMode = mode;
+            state.isDark = mode === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : mode === 'dark';
+          })
       }),
       {
         name: 'global-state',
@@ -77,23 +81,3 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
   ),
   shallow
 );
-
-export const setGlobalState = <T extends keyof GlobalState>(payload: { key: T; value: GlobalState[T] }) =>
-  useGlobalStore.getState().setGlobalState(payload.key, payload.value);
-
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-export const setThemeMode = (mode: ThemeModeType) => {
-  setGlobalState({ key: 'themeMode', value: mode });
-  setGlobalState({ key: 'isDark', value: mode === 'auto' ? prefersDark.matches : mode === 'dark' });
-};
-
-prefersDark.addEventListener('change', event => {
-  if (useGlobalStore.getState().themeMode === 'auto') {
-    setGlobalState({ key: 'isDark', value: event.matches });
-  }
-});
-
-if (useGlobalStore.getState().themeMode === 'auto' && useGlobalStore.getState().isDark !== prefersDark.matches) {
-  setGlobalState({ key: 'isDark', value: prefersDark.matches });
-}
