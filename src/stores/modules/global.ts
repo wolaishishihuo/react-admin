@@ -77,3 +77,23 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
   ),
   shallow
 );
+
+export const setGlobalState = <T extends keyof GlobalState>(payload: { key: T; value: GlobalState[T] }) =>
+  useGlobalStore.getState().setGlobalState(payload.key, payload.value);
+
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+export const setThemeMode = (mode: ThemeModeType) => {
+  setGlobalState({ key: 'themeMode', value: mode });
+  setGlobalState({ key: 'isDark', value: mode === 'auto' ? prefersDark.matches : mode === 'dark' });
+};
+
+prefersDark.addEventListener('change', event => {
+  if (useGlobalStore.getState().themeMode === 'auto') {
+    setGlobalState({ key: 'isDark', value: event.matches });
+  }
+});
+
+if (useGlobalStore.getState().themeMode === 'auto' && useGlobalStore.getState().isDark !== prefersDark.matches) {
+  setGlobalState({ key: 'isDark', value: prefersDark.matches });
+}

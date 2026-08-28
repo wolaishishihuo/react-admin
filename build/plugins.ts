@@ -1,20 +1,17 @@
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import UnoCSS from 'unocss/vite';
 import { PluginOption } from 'vite';
 import checker from 'vite-plugin-checker';
 import viteCompression from 'vite-plugin-compression';
 import { createHtmlPlugin } from 'vite-plugin-html';
-import { VitePWA } from 'vite-plugin-pwa';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
 /**
  * Create vite plugin
  * @param viteEnv
  */
 export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOption[])[] => {
-  const { VITE_GLOB_APP_TITLE, VITE_REPORT, VITE_PWA } = viteEnv;
+  const { VITE_GLOB_APP_TITLE, VITE_REPORT } = viteEnv;
 
   return [
     react(),
@@ -30,13 +27,6 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
         data: { title: VITE_GLOB_APP_TITLE }
       }
     }),
-    // Create svg icons
-    createSvgIconsPlugin({
-      iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
-      symbolId: 'icon-[dir]-[name]'
-    }),
-    // vitePWA
-    VITE_PWA && createVitePwa(viteEnv),
     // Whether to generate package preview, analyze dependent package size for optimization
     VITE_REPORT && (visualizer({ filename: 'stats.html', gzipSize: true, brotliSize: true }) as PluginOption)
   ];
@@ -69,38 +59,4 @@ const createCompression = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
     );
   }
   return plugins;
-};
-
-/**
- * @description VitePwa
- * @param viteEnv
- */
-const createVitePwa = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
-  const { VITE_GLOB_APP_TITLE } = viteEnv;
-  return VitePWA({
-    registerType: 'autoUpdate',
-    manifest: {
-      name: VITE_GLOB_APP_TITLE,
-      short_name: VITE_GLOB_APP_TITLE,
-      theme_color: '#ffffff',
-      icons: [
-        {
-          src: '/logo.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: '/logo.png',
-          sizes: '512x512',
-          type: 'image/png'
-        },
-        {
-          src: '/logo.png',
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable'
-        }
-      ]
-    }
-  });
 };

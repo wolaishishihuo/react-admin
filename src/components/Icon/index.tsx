@@ -1,4 +1,3 @@
-import { createFromIconfontCN } from '@ant-design/icons';
 import { Icon as IconifyIcon } from '@iconify/react/offline';
 import React from 'react';
 
@@ -17,8 +16,4 @@ const legacyIconMap: Record<string, string> = {
 export const Icon: React.FC<IconProps> = React.memo(({ name, className }) => {
   if (!name) return null;
   return <IconifyIcon icon={legacyIconMap[name] ?? name} className={className} />;
-});
-
-export const IconFont = createFromIconfontCN({
-  scriptUrl: ['//at.alicdn.com/t/c/font_3878708_l04g6iwc6y.js']
 });

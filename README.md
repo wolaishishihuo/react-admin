@@ -7,7 +7,7 @@
 ### 主要功能 🔨
 
 - 使用 React 19 + TypeScript 开发，整个项目使用 Hooks + TypeScript 完成
-- 使用 Vite 8 作为开发、打包工具（配置 Gzip 压缩打包、PWA 应用、Visualizer 包分析…）
+- 使用 Vite 8 作为开发、打包工具（配置 Gzip 压缩打包、Visualizer 包分析…）
 - 使用 React-Router v7 数据路由，项目支持多路由（Hash | History）切换、路由懒加载配置
 - 项目菜单、路由权限使用 **动态路由** 控制，完全根据后端菜单数据动态生成路由
 - 基于 React 19 `Activity` 实现页面 **KeepAlive**，通过路由 `meta.isKeepAlive` 开关，与多标签页同步缓存 / 关闭 / 刷新
