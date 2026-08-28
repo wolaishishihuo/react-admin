@@ -41,6 +41,7 @@ tests                Vitest unit + Playwright e2e
 - 守卫、按钮权限、菜单选中、面包屑、Tabs、cache 和刷新统一使用最后一个 match 的 `fullPath` 作为 `originPath`，不要用具体 pathname 做授权 identity。
 - 菜单选中优先读授权树上的 `activeMenu`，否则读本地 `staticData.menu.activeMenu`。
 - 外链：守卫从后往前找 `staticData.href`；先鉴权再打开。非 preload 时 `window.open(..., noopener,noreferrer)`，当前页回首页（当前已是首页则回 `/404`）。打开前仍过滤非 http(s)。
+- 内嵌页：`staticData.url` / 菜单 `handle.url` 只是元信息，页面用 `IframePage` / `IframeRoutePage` 自己渲染。内置路由 `/iframe/$url`（`decodeURIComponent`，只接受 http(s)）。守卫只处理 `href`，不处理 `url`。
 
 ## 认证与菜单
 

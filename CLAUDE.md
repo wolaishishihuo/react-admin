@@ -88,7 +88,7 @@ src/app/             AntdBridge + feedback
 
 语义 token，禁裸 hex，禁 `text-[var(--hooks-...)]` 长咒语。暗色 = `html.dark`。新组件必须适配暗色。
 
-页面二选一：普通页根节点不锁高度，滚 `.app-main`；标准列表页根节点 `.app-pro-table`，卡片 `.app-pro-table-card`，高度链用 less 建立，禁止页面里写死表体高度。完整规则见 `docs/DESIGN.md`。
+页面三类：普通页根节点不锁高度，滚 `.app-main`；标准列表页根节点 `.app-pro-table`，卡片 `.app-pro-table-card`，高度链用 less 建立，禁止页面里写死表体高度；内嵌页根节点 `.app-iframe`，高度链在 `IframePage` 的 less。完整规则见 `docs/DESIGN.md`。
 
 ## 5. 组件与工具（先复用）
 
@@ -133,6 +133,7 @@ const requestRows = useCallback<NonNullable<ProTableProps<Row, Search>['request'
 | StatCardGrid    | 统计卡片栅格                                                                                          |
 | TableExpandIcon | 配 `useTreeExpand`                                                                                    |
 | ThemeToggle     | 明暗切换                                                                                              |
+| IframePage      | `<IframePage url={url} title={title} />`；文件路由用 `IframeRoutePage` + `staticData.url`             |
 | Loading         | 加载态；路由 pending 复用 `pages/loading.tsx`                                                         |
 | ErrorBoundary   | AdminContent 已包，页面不必再包                                                                       |
 
@@ -178,7 +179,7 @@ QueryClient：`refetchOnWindowFocus: false`，`retry: 1`；mutation `retry: fals
 | static   | 本地 `staticData`；无文件 → 404       | 文件 + `staticData`；分组自己写带 `title` 的 `layout.tsx`                    |
 | dynamic  | 当前账号菜单 ∩ 本地文件；否则 403/404 | 文件 + 菜单数据源里同一条 path；**父级 path 也必须有本地路由**，否则整棵丢掉 |
 
-`staticData` 常用字段：`title`、`keepAlive`、`menu.icon` / `hide` / `order` / `activeMenu`、`tab.multi` / `fixed`、`buttons`、`href`。完整表见 `docs/ROUTING.md`。
+`staticData` 常用字段：`title`、`keepAlive`、`menu.icon` / `hide` / `order` / `activeMenu`、`tab.multi` / `fixed`、`buttons`、`href`、`url`。完整表见 `docs/ROUTING.md`。
 
 - `originPath` = 最后一个 match 的模板 `fullPath`，不要用 pathname 做授权 / Tab / 缓存 identity。
 - 跨模块跳转用 `navigateTo`（`@/router/router-ref`），缓存页里不要 `useNavigate`。

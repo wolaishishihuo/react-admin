@@ -14,7 +14,8 @@ const routeTree = {
     { fullPath: '/list' },
     { fullPath: '/list/useProTable' },
     { fullPath: '/list/useProTable/detail' },
-    { fullPath: '/users/$userId' }
+    { fullPath: '/users/$userId' },
+    { fullPath: '/iframe/$url' }
   ]
 };
 
@@ -115,6 +116,25 @@ describe('createBackendRouteNormalizer', () => {
     });
     expect(next[1]?.external).toBeUndefined();
     expect(next[1]?.activeMenu).toBeUndefined();
+  });
+
+  it('合法 url 拷到 iframe；无本地文件仍丢掉；非法 url 丢弃', () => {
+    const next = createBackendRouteNormalizer(routeTree)([
+      { path: '/home', handle: { title: '首页', url: 'https://example.com/home' } },
+      { path: '/ghost-docs', handle: { title: '文档', url: 'https://example.com/docs' } },
+      { path: '/list', handle: { title: '列表', url: 'javascript:alert(1)' } }
+    ]);
+    expect(next.map(item => item.path)).toEqual(['/home', '/list']);
+    expect(next[0]?.iframe).toBe('https://example.com/home');
+    expect(next[1]?.iframe).toBeUndefined();
+  });
+
+  it('href 与 url 可同时保留', () => {
+    const next = createBackendRouteNormalizer(routeTree)([
+      { path: '/home', handle: { title: '首页', href: 'https://a.example', url: 'https://b.example' } }
+    ]);
+    expect(next[0]?.external).toBe('https://a.example');
+    expect(next[0]?.iframe).toBe('https://b.example');
   });
 });
 

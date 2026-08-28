@@ -59,24 +59,25 @@
 | `name`                               | 仅当 `handle.title` 为空时当标题           |
 | `element` / `component` / `redirect` | **前端忽略**。不要用它们指定页面或授权     |
 
-**path 约束（设施，不是业务）：** 每一项（含分组父级）必须能对上前端已有路由。对不上则整节点连 children 丢掉，打开子页 403。分组 `/list` 要求前端有 `/list` 这条路由（通常 `layout.tsx`），不能只建子页。
+**path 约束（设施，不是业务）：** 每一项（含分组父级）必须能对上前端已有路由。对不上则整节点连 children 丢掉，打开子页 403。分组 `/list` 要求前端有 `/list` 这条路由（通常 `layout.tsx`），不能只建子页。`handle.url` 不会在没有本地文件时自动改挂到 `/iframe/$url`。
 
 ### `handle` / `meta`（开工把字段名定死）
 
 这些是壳要用的设施字段，不是某张业务表。叫 `handle` 还是 `meta`、下面这些键叫什么，必须前期定好。
 
-| 字段       | 本模板键名        | 作用                             |
-| ---------- | ----------------- | -------------------------------- |
-| 标题       | `title`           | 侧边栏、Tab                      |
-| 图标       | `icon`            | iconify 名，如 `ri:apps-line`    |
-| 不进侧边栏 | `hideInMenu`      | 详情仍可授权进入                 |
-| 页面缓存   | `keepAlive`       | Tab 切走再回来是否保留实例       |
-| 多 Tab     | `multiTab`        | 每个完整 URL 一个标签            |
-| 高亮菜单   | `activeMenu`      | 隐藏页高亮哪条 path              |
-| 外链       | `href`            | 仅 `http(s)://`                  |
-| 排序       | `order`           | 同级                             |
-| 固定 Tab   | `fixedIndexInTab` | 有值则不可关闭                   |
-| 按钮码     | `buttons`         | `string[]`，与后端鉴权码一字不差 |
+| 字段       | 本模板键名        | 作用                                 |
+| ---------- | ----------------- | ------------------------------------ |
+| 标题       | `title`           | 侧边栏、Tab                          |
+| 图标       | `icon`            | iconify 名，如 `ri:apps-line`        |
+| 不进侧边栏 | `hideInMenu`      | 详情仍可授权进入                     |
+| 页面缓存   | `keepAlive`       | Tab 切走再回来是否保留实例           |
+| 多 Tab     | `multiTab`        | 每个完整 URL 一个标签                |
+| 高亮菜单   | `activeMenu`      | 隐藏页高亮哪条 path                  |
+| 外链       | `href`            | 仅 `http(s)://`                      |
+| 内嵌页     | `url`             | 仅 `http(s)://`；页面自己渲染 iframe |
+| 排序       | `order`           | 同级                                 |
+| 固定 Tab   | `fixedIndexInTab` | 有值则不可关闭                       |
+| 按钮码     | `buttons`         | `string[]`，与后端鉴权码一字不差     |
 
 未下发的键当未配置（`keepAlive` 未写 = Tab 不缓存）。菜单按账号滤好再下发，前端不再按角色名滤。
 

@@ -41,6 +41,7 @@
 | Logo 标题   | **18px**                                                                                                                                          |
 | 标签栏 Tabs | 容器 `px-20px pb-12px`（≤640px 侧沟 15px），芯片间 gap 6px；芯片高 32px（`chip` 基底）、文字 12px、无 icon                                        |
 | 列表页节奏  | `.app-pro-table` flex 列 gap **12px**；卡内 padding **24px**（`app-card` 不含 padding，使用方自给）；工具栏与表格间 `mt-12px`                     |
+| 内嵌页      | `.app-iframe` 高度 `100vh - var(--app-header-height) - 40px`（与列表同一条内容区高度链）；≤800px 改 `100dvh`；滚动在 iframe 内                    |
 | 图标钮      | 工具栏 `toolbar-icon-btn` 32×32 / rd-6px / 16px 图标 / 底 `bg-hover/55`→hover `bg-hover`；Header `icon-btn` 34×34 / rd-4px / 20px 图标            |
 | 响应式断点  | 移动端 **800px**（`useIsMobile`，侧栏 overlay：遮罩 z-600 < 侧栏 z-601，点遮罩/导航后自动收起）；列表页 **640px** 以下回退整页滚                  |
 

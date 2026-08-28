@@ -4,7 +4,7 @@
  */
 import type { RouteMeta } from '@/router/context';
 import type { AnyRouter } from '@tanstack/react-router';
-import { isHttpUrl } from '@/utils/url';
+import { toHttpUrl } from '@/utils/url';
 import { normalizePath } from './menu-normalize';
 import { createAuthorizedPathSet, createMenuPathMap, createPermissionMap, filterVisibleMenu } from './menu-tree';
 import type { AuthorizedNavigation, NavigationItem } from './types';
@@ -51,7 +51,8 @@ function transformStaticRouteToMenu(route: WalkableRoute): NavigationItem | null
   if (!path || path === '/') return null;
 
   const activeMenu = staticData.menu?.activeMenu?.trim();
-  const href = staticData.href?.trim();
+  const href = toHttpUrl(staticData.href);
+  const iframe = toHttpUrl(staticData.url);
   const childMenus = generateStaticChildMenus(route);
 
   return {
@@ -65,7 +66,8 @@ function transformStaticRouteToMenu(route: WalkableRoute): NavigationItem | null
     multi: staticData.tab?.multi ?? undefined,
     activeMenu: activeMenu ? normalizePath(activeMenu) : undefined,
     order: staticData.menu?.order ?? undefined,
-    external: href && isHttpUrl(href) ? href : undefined,
+    external: href,
+    iframe,
     permissions: staticData.buttons ?? [],
     children: childMenus
   };

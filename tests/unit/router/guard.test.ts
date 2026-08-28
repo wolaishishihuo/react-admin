@@ -29,7 +29,12 @@ vi.mock('@/router/router-ref', () => ({
   getRouter: () => ({
     routeTree: {
       fullPath: '/',
-      children: [{ fullPath: '/home' }, { fullPath: '/users/$userId' }, { fullPath: '/list/useProTable' }]
+      children: [
+        { fullPath: '/home' },
+        { fullPath: '/users/$userId' },
+        { fullPath: '/list/useProTable' },
+        { fullPath: '/iframe/$url' }
+      ]
     }
   })
 }));
@@ -205,5 +210,18 @@ describe('guardAdminRoute', () => {
     ).rejects.toThrow('redirect');
     expect(openExternal).toHaveBeenCalledWith('https://home.example');
     expect(vi.mocked(redirect)).toHaveBeenCalledWith({ to: '/404', replace: true });
+  });
+
+  it('staticData.url 不是外链，不打开新窗口', async () => {
+    vi.mocked(openExternal).mockClear();
+    await expect(
+      guardAdminRoute({
+        context: context(),
+        routeMode: 'static',
+        location: { pathname: '/iframe/https%3A%2F%2Fexample.com', href: '/iframe/https%3A%2F%2Fexample.com', searchStr: '' },
+        matches: [{ fullPath: '/iframe/$url', staticData: { url: 'https://example.com' } }]
+      })
+    ).resolves.toBeUndefined();
+    expect(openExternal).not.toHaveBeenCalled();
   });
 });

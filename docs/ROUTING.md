@@ -70,6 +70,7 @@
 | `tab.fixed`       | `fixedIndexInTab != null` |
 | `buttons`         | `buttons`                 |
 | `href`            | `href`                    |
+| `url`             | `url`                     |
 
 ## 2. 加页维护哪一份：钉死一种，还是以后要改开关
 
@@ -112,19 +113,20 @@
 
 ### 当前页面对照
 
-| 文件                                        | URL                        | 角色                                                       |
-| ------------------------------------------- | -------------------------- | ---------------------------------------------------------- |
-| `pages/index.tsx`                           | `/`                        | 重定向到 `/home`                                           |
-| `(admin)/layout.tsx`                        | （无额外段）               | `AdminLayout` + `guardAdminRoute`                          |
-| `(admin)/home/index.tsx`                    | `/home`                    | 首页，固定 Tab                                             |
-| `(admin)/list/layout.tsx`                   | `/list`                    | 侧边栏父级「列表页面」                                     |
-| `(admin)/list/index.tsx`                    | `/list`                    | 无 `staticData`，`beforeLoad` 重定向到 `/list/useProTable` |
-| `(admin)/list/useProTable/index.tsx`        | `/list/useProTable`        | 标准缓存列表                                               |
-| `(admin)/list/useProTable/detail/index.tsx` | `/list/useProTable/detail` | `tab.multi` 详情                                           |
-| `(admin)/users/$userId.tsx`                 | `/users/$userId`           | 动态段；菜单里写 `/users/:userId`                          |
-| `(auth)/login/layout.tsx` + `index.tsx`     | `/login`                   | 已登录则跳走                                               |
-| `(errors)/403.tsx`                          | `/403`                     | 仅当前是 dynamic：本地有文件、账号菜单没有                 |
-| `(errors)/500.tsx`                          | `/500`                     | 离线等                                                     |
+| 文件                                        | URL                        | 角色                                                            |
+| ------------------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| `pages/index.tsx`                           | `/`                        | 重定向到 `/home`                                                |
+| `(admin)/layout.tsx`                        | （无额外段）               | `AdminLayout` + `guardAdminRoute`                               |
+| `(admin)/home/index.tsx`                    | `/home`                    | 首页，固定 Tab                                                  |
+| `(admin)/list/layout.tsx`                   | `/list`                    | 侧边栏父级「列表页面」                                          |
+| `(admin)/list/index.tsx`                    | `/list`                    | 无 `staticData`，`beforeLoad` 重定向到 `/list/useProTable`      |
+| `(admin)/list/useProTable/index.tsx`        | `/list/useProTable`        | 标准缓存列表                                                    |
+| `(admin)/list/useProTable/detail/index.tsx` | `/list/useProTable/detail` | `tab.multi` 详情                                                |
+| `(admin)/users/$userId.tsx`                 | `/users/$userId`           | 动态段；菜单里写 `/users/:userId`                               |
+| `(admin)/iframe/$url.tsx`                   | `/iframe/$url`             | 内嵌页；`menu.hide`；`$url` 经 `decodeURIComponent`，仅 http(s) |
+| `(auth)/login/layout.tsx` + `index.tsx`     | `/login`                   | 已登录则跳走                                                    |
+| `(errors)/403.tsx`                          | `/403`                     | 仅当前是 dynamic：本地有文件、账号菜单没有                      |
+| `(errors)/500.tsx`                          | `/500`                     | 离线等                                                          |
 
 ## 4. `staticData`
 
@@ -145,18 +147,39 @@ export const Route = createFileRoute('/(admin)/list/useProTable/')({
 });
 ```
 
-| 字段              | 作用                                                                             |
-| ----------------- | -------------------------------------------------------------------------------- |
-| `title`           | 文档标题、Tab 名；分组 layout 必填                                               |
-| `keepAlive`       | static：切走再回来是否保留实例。dynamic：人还停在这页时有没有缓存 pane           |
-| `menu.icon`       | 侧边栏图标                                                                       |
-| `menu.hide`       | 不出现在侧边栏（详情页常用），但仍可授权进入                                     |
-| `menu.order`      | 同级排序                                                                         |
-| `menu.activeMenu` | 隐藏页高亮哪条菜单                                                               |
-| `tab.multi`       | `true` 时每个完整 URL 一个 Tab（详情）                                           |
-| `tab.fixed`       | 不可关闭                                                                         |
-| `buttons`         | static 的页面按钮码，`useAuthButton()` 读取                                      |
-| `href`            | 外链。守卫从后往前找带 `href` 的 match，打开后离开当前页。不要写在分组 layout 上 |
+| 字段              | 作用                                                                              |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `title`           | 文档标题、Tab 名；分组 layout 必填                                                |
+| `keepAlive`       | static：切走再回来是否保留实例。dynamic：人还停在这页时有没有缓存 pane            |
+| `menu.icon`       | 侧边栏图标                                                                        |
+| `menu.hide`       | 不出现在侧边栏（详情页常用），但仍可授权进入                                      |
+| `menu.order`      | 同级排序                                                                          |
+| `menu.activeMenu` | 隐藏页高亮哪条菜单                                                                |
+| `tab.multi`       | `true` 时每个完整 URL 一个 Tab（详情）                                            |
+| `tab.fixed`       | 不可关闭                                                                          |
+| `buttons`         | static 的页面按钮码，`useAuthButton()` 读取                                       |
+| `href`            | 外链。守卫从后往前找带 `href` 的 match，打开后离开当前页。不要写在分组 layout 上  |
+| `url`             | 页内 iframe。只是元信息，页面用 `IframeRoutePage` 渲染。`url` 不会自动变成 iframe |
+
+`href` 是新窗口；`url` 是页内嵌。菜单点击只处理 `href`（`window.open`）。`url` 要页面自己渲染。
+
+固定地址的内嵌页：文件路由 + `staticData.url`，`component` 用 `IframeRoutePage`（读 `staticData.url`，dynamic 也可读菜单 `iframe`）。
+
+```tsx
+import { IframeRoutePage } from '@/components/IframePage';
+
+export const Route = createFileRoute('/(admin)/docs/')({
+  component: IframeRoutePage,
+  staticData: {
+    title: '文档',
+    keepAlive: true,
+    url: 'https://example.com',
+    menu: { icon: 'ri:book-2-line' }
+  }
+});
+```
+
+任意地址走内置 `/iframe/$url`（`menu.hide`，`keepAlive` + `tab.multi`）。参数按 `decodeURIComponent` 还原；只接受 `http(s)://`。dynamic 下这条内置路由仍要出现在当前账号菜单里（path `/iframe/$url` 或 `/iframe/:url`），否则 403。后端 `handle.url` **不会**在没有本地文件时自动改挂到这条路由。
 
 ## 5. 添加一个后台页面
 
@@ -192,7 +215,7 @@ export const Route = createFileRoute('/(admin)/list/useProTable/')({
 
 1. 无 token → `/login`（从 `/home` 进来不带 `redirect`）。
 2. 初始化用户失败 → `revokeSession`，再去登录。
-3. 先鉴权，再看 matched 里是否有 `staticData.href`。非 preload 时打开新窗口，当前页不是首页则回 `/home`，已经是首页则回 `/404`。不要把 `href` 写在分组 layout 上（会把子页一起带走）。hover preload 不打开、不跳转。
+3. 先鉴权，再看 matched 里是否有 `staticData.href`。非 preload 时打开新窗口，当前页不是首页则回 `/home`，已经是首页则回 `/404`。不要把 `href` 写在分组 layout 上（会把子页一起带走）。hover preload 不打开、不跳转。`url` 不是外链，不会走这一步。
 4. 其余按第 1 节当前开关判定 404 或 403。
 
 登录页 `redirect` 只接受站内路径。跨模块跳转用 `navigateTo('/list/useProTable')`（`src/router/router-ref.ts` 的 `history.push`）。缓存 pane 里的 `useNavigate` 可能写到 snapshot store，看起来跳了、真路由没动。
@@ -213,6 +236,7 @@ export const Route = createFileRoute('/(admin)/list/useProTable/')({
 - 侧边栏没有新页面：是不是写在 `modules/` 里了；`staticData.title` 有没有；`menu.hide` 是否误开。当前是 dynamic 时还要看菜单是否漏了 path，以及**父级 path 有没有本地路由**。
 - 打开后变成 404：URL 没匹配到任何文件路由（`routeTree.gen.ts` 里没有），或动态段没写成 `$param`。
 - 打开后变成 403：只会发生在当前是 dynamic——本地有文件，账号菜单没有这条 path（父级被裁掉时，子页也会变成这样）。
+- 内嵌页空白：`url` / `handle.url` 不是 `http(s)://`，或页面没用 `IframeRoutePage` / `IframePage`。
 - 详情高亮丢了：补 `menu.activeMenu`（dynamic 时菜单里也要有）。
 - 侧边栏有分组、点分组没子项：分组 layout 写了 `title`，但子页没写 `staticData`（static）；或菜单子 path 对不上本地文件（dynamic）。
 - Tab 跳了页面没变：改成 `navigateTo`，不要在缓存页里 `useNavigate`。

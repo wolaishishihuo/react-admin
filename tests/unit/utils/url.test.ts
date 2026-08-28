@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isHttpUrl, openExternal } from '@/utils/url';
+import { isHttpUrl, openExternal, toHttpUrl } from '@/utils/url';
 
 describe('isHttpUrl', () => {
   it('接受 http 与 https', () => {
@@ -17,6 +17,15 @@ describe('isHttpUrl', () => {
     expect(isHttpUrl('example.com')).toBe(false);
     expect(isHttpUrl('')).toBe(false);
     expect(isHttpUrl(undefined)).toBe(false);
+  });
+});
+
+describe('toHttpUrl', () => {
+  it('trim 后只留下 http(s)', () => {
+    expect(toHttpUrl('  https://example.com/path  ')).toBe('https://example.com/path');
+    expect(toHttpUrl('javascript:alert(1)')).toBeUndefined();
+    expect(toHttpUrl('')).toBeUndefined();
+    expect(toHttpUrl(null)).toBeUndefined();
   });
 });
 

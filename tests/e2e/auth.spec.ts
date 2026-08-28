@@ -138,3 +138,11 @@ test('dynamic 下后端未授权的本地路由显示 403', async ({ page }) => 
   await page.goto(appPath('/list/useProTable'));
   await expect(page.getByText('403')).toBeVisible({ timeout: 15000 });
 });
+
+test('内置 iframe 路由按 decodeURIComponent 渲染 http(s)', async ({ page }) => {
+  await login(page);
+  const encoded = encodeURIComponent('https://example.com');
+  await page.goto(appPath(`/iframe/${encoded}`));
+  const frame = page.locator('iframe[src="https://example.com"]');
+  await expect(frame).toHaveCount(1, { timeout: 15000 });
+});

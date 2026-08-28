@@ -7,6 +7,7 @@ export interface BackendRouteHandle {
   multiTab?: boolean | null;
   activeMenu?: string | null;
   href?: string | null;
+  url?: string | null;
   order?: number | null;
   fixedIndexInTab?: number | null;
   buttons?: string[] | null;
@@ -42,6 +43,7 @@ export interface NavigationItem {
   activeMenu?: string;
   order?: number;
   external?: string;
+  iframe?: string;
   permissions: string[];
   children: NavigationItem[];
 }

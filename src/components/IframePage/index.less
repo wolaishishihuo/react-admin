@@ -1,0 +1,11 @@
+/* 内嵌页：与标准列表同一条内容区高度链，iframe 内部滚动 */
+.app-iframe {
+  height: calc(100vh - var(--app-header-height, 100px) - 40px);
+  min-height: 0;
+}
+
+@media (width <= 800px) {
+  .app-iframe {
+    height: calc(100dvh - var(--app-header-height, 100px) - 40px);
+  }
+}

@@ -3,7 +3,7 @@
  * path 对不上本地文件时，这一项连同它的 children 一起丢掉，避免侧边栏出现点了 404 的空菜单。
  */
 import type { AnyRoute } from '@tanstack/react-router';
-import { isHttpUrl } from '@/utils/url';
+import { toHttpUrl } from '@/utils/url';
 import { normalizePath, toTanStackRoutePath, unwrapBackendRoutes } from './menu-normalize';
 import type { AuthRouteMode } from './route-mode';
 import type { AuthorizedNavigation, BackendRoutePayload, BackendRouteResponse, NavigationItem } from './types';
@@ -25,14 +25,11 @@ function warn(message: string, extra?: unknown) {
   if (import.meta.env.DEV) console.warn(`[navigation] ${message}`, extra ?? '');
 }
 
-function toExternal(link?: string | null) {
+function toSafeHttpUrl(link: string | null | undefined, label: 'href' | 'url') {
   if (!link?.trim()) return undefined;
-  const trimmed = link.trim();
-  if (!isHttpUrl(trimmed)) {
-    warn('非法 href，已丢弃', trimmed);
-    return undefined;
-  }
-  return trimmed;
+  const httpUrl = toHttpUrl(link);
+  if (!httpUrl) warn(`非法 ${label}，已丢弃`, link.trim());
+  return httpUrl;
 }
 
 /** 本地文件路由里所有规范化后的 path，用作 dynamic 裁菜单的白名单。 */
@@ -83,7 +80,8 @@ export function createBackendRouteNormalizer(routeTree: AnyRoute | WalkableRoute
       multi: handle.multiTab ?? undefined,
       activeMenu: toAvailableRoutePath(handle.activeMenu),
       order: handle.order ?? undefined,
-      external: toExternal(handle.href),
+      external: toSafeHttpUrl(handle.href, 'href'),
+      iframe: toSafeHttpUrl(handle.url, 'url'),
       permissions: handle.buttons ?? [],
       children
     };

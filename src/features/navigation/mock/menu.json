@@ -53,6 +53,15 @@
             }
           }
         ]
+      },
+      {
+        "path": "/iframe/:url",
+        "handle": {
+          "title": "内嵌页面",
+          "hideInMenu": true,
+          "keepAlive": true,
+          "multiTab": true
+        }
       }
     ]
   },

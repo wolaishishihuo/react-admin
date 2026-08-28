@@ -52,6 +52,23 @@ describe('generateStaticNavigation', () => {
                   keepAlive: true,
                   menu: { hide: true, activeMenu: '/list/useProTable' }
                 }
+              },
+              {
+                fullPath: '/iframe/$url',
+                staticData: {
+                  title: '内嵌页面',
+                  keepAlive: true,
+                  menu: { hide: true },
+                  tab: { multi: true }
+                }
+              },
+              {
+                fullPath: '/docs/',
+                staticData: {
+                  title: '文档',
+                  url: 'https://example.com/docs',
+                  menu: { icon: 'ri:book-2-line' }
+                }
               }
             ]
           }
@@ -59,8 +76,10 @@ describe('generateStaticNavigation', () => {
       })
     );
 
-    expect(navigation.visibleTree.map(item => item.path)).toEqual(['/home', '/list']);
-    expect(navigation.visibleTree[1]?.children.map(item => item.path)).toEqual(['/list/useProTable']);
+    expect(navigation.visibleTree.map(item => item.path)).toEqual(['/docs', '/home', '/list']);
+    expect(navigation.visibleTree.find(item => item.path === '/list')?.children.map(item => item.path)).toEqual([
+      '/list/useProTable'
+    ]);
     expect(navigation.pathMap.get('/list/useProTable/detail')).toMatchObject({
       hidden: true,
       keepAlive: true,
@@ -68,6 +87,9 @@ describe('generateStaticNavigation', () => {
       activeMenu: '/list/useProTable'
     });
     expect(navigation.pathMap.get('/users/$userId')?.hidden).toBe(true);
+    expect(navigation.pathMap.get('/iframe/$url')).toMatchObject({ hidden: true, keepAlive: true, multi: true });
+    expect(navigation.visibleTree.map(item => item.path)).not.toContain('/iframe/$url');
+    expect(navigation.pathMap.get('/docs')).toMatchObject({ iframe: 'https://example.com/docs' });
     expect(navigation.permissionMap.get('/list/useProTable')).toEqual(['add']);
   });
 

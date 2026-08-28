@@ -26,6 +26,7 @@ export default function LayoutTabs() {
   const routePath = route.originPath;
   const fullPath = route.fullPath;
   const menuItem = pathMap.get(routePath);
+  const title = menuItem?.title ?? staticData.title;
   const multi = Boolean(menuItem?.multi ?? staticData.tab?.multi);
   const activeId = getTabId(routePath, multi, fullPath);
   // 菜单项有值（含 false）就用菜单项；只有菜单里没有这条 path 时才回落 staticData
@@ -38,10 +39,10 @@ export default function LayoutTabs() {
   }, [isNavigationReady, pathSet, routePath, router]);
 
   useEffect(() => {
-    if (!staticData.title) return;
+    if (!title) return;
     upsertTab(
       buildTabFromRoute({
-        title: staticData.title,
+        title,
         routePath,
         fullPath,
         multi,
@@ -49,7 +50,7 @@ export default function LayoutTabs() {
         keepAlive
       })
     );
-  }, [staticData, routePath, fullPath, keepAlive, multi, menuItem?.fixed]);
+  }, [title, staticData.tab?.fixed, routePath, fullPath, keepAlive, multi, menuItem?.fixed]);
 
   useEffect(() => {
     listRef.current?.querySelector('.tabs-item-active')?.scrollIntoView({

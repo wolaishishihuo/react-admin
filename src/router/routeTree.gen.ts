@@ -20,6 +20,7 @@ import { Route as authLoginIndexRouteImport } from './../pages/(auth)/login/inde
 import { Route as adminListIndexRouteImport } from './../pages/(admin)/list/index'
 import { Route as adminHomeIndexRouteImport } from './../pages/(admin)/home/index'
 import { Route as adminUsersUserIdRouteImport } from './../pages/(admin)/users/$userId'
+import { Route as adminIframeUrlRouteImport } from './../pages/(admin)/iframe/$url'
 import { Route as adminListUseProTableIndexRouteImport } from './../pages/(admin)/list/useProTable/index'
 import { Route as adminListUseProTableDetailIndexRouteImport } from './../pages/(admin)/list/useProTable/detail/index'
 
@@ -77,6 +78,11 @@ const adminUsersUserIdRoute = adminUsersUserIdRouteImport.update({
   path: '/users/$userId',
   getParentRoute: () => adminLayoutRoute,
 } as any)
+const adminIframeUrlRoute = adminIframeUrlRouteImport.update({
+  id: '/iframe/$url',
+  path: '/iframe/$url',
+  getParentRoute: () => adminLayoutRoute,
+} as any)
 const adminListUseProTableIndexRoute =
   adminListUseProTableIndexRouteImport.update({
     id: '/useProTable/',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
+  '/iframe/$url': typeof adminIframeUrlRoute
   '/users/$userId': typeof adminUsersUserIdRoute
   '/home/': typeof adminHomeIndexRoute
   '/list/': typeof adminListIndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/403': typeof errors403Route
   '/404': typeof errors404Route
   '/500': typeof errors500Route
+  '/iframe/$url': typeof adminIframeUrlRoute
   '/users/$userId': typeof adminUsersUserIdRoute
   '/home': typeof adminHomeIndexRoute
   '/list': typeof adminListIndexRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/(errors)/403': typeof errors403Route
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
+  '/(admin)/iframe/$url': typeof adminIframeUrlRoute
   '/(admin)/users/$userId': typeof adminUsersUserIdRoute
   '/(admin)/home/': typeof adminHomeIndexRoute
   '/(admin)/list/': typeof adminListIndexRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/403'
     | '/404'
     | '/500'
+    | '/iframe/$url'
     | '/users/$userId'
     | '/home/'
     | '/list/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/403'
     | '/404'
     | '/500'
+    | '/iframe/$url'
     | '/users/$userId'
     | '/home'
     | '/list'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/(errors)/403'
     | '/(errors)/404'
     | '/(errors)/500'
+    | '/(admin)/iframe/$url'
     | '/(admin)/users/$userId'
     | '/(admin)/home/'
     | '/(admin)/list/'
@@ -264,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminUsersUserIdRouteImport
       parentRoute: typeof adminLayoutRoute
     }
+    '/(admin)/iframe/$url': {
+      id: '/(admin)/iframe/$url'
+      path: '/iframe/$url'
+      fullPath: '/iframe/$url'
+      preLoaderRoute: typeof adminIframeUrlRouteImport
+      parentRoute: typeof adminLayoutRoute
+    }
     '/(admin)/list/useProTable/': {
       id: '/(admin)/list/useProTable/'
       path: '/useProTable'
@@ -299,12 +318,14 @@ const adminListLayoutRouteWithChildren = adminListLayoutRoute._addFileChildren(
 
 interface adminLayoutRouteChildren {
   adminListLayoutRoute: typeof adminListLayoutRouteWithChildren
+  adminIframeUrlRoute: typeof adminIframeUrlRoute
   adminUsersUserIdRoute: typeof adminUsersUserIdRoute
   adminHomeIndexRoute: typeof adminHomeIndexRoute
 }
 
 const adminLayoutRouteChildren: adminLayoutRouteChildren = {
   adminListLayoutRoute: adminListLayoutRouteWithChildren,
+  adminIframeUrlRoute: adminIframeUrlRoute,
   adminUsersUserIdRoute: adminUsersUserIdRoute,
   adminHomeIndexRoute: adminHomeIndexRoute,
 }

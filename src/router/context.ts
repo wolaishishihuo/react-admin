@@ -8,6 +8,8 @@ export interface RouteMeta {
   keepAlive?: boolean | null;
   /** 外链。守卫从后往前找带 href 的 match，不要写在分组 layout 上 */
   href?: string;
+  /** 页内 iframe 地址。只是元信息，页面用 IframeRoutePage / IframePage 自己渲染 */
+  url?: string;
   menu?: {
     icon?: string;
     hide?: boolean | null;
