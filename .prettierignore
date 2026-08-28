@@ -5,8 +5,5 @@
 **/*.svg
 **/*.sh
 
-.npmrc
-
 /public/*
 stats.html
-pnpm-lock.yaml

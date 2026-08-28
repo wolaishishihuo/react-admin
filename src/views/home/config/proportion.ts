@@ -1,4 +1,4 @@
-import { getTooltipStyle, type ECOption } from '@/components/Echarts/config';
+import { ECOption } from '@/components/Echarts/config';
 
 export const pieOptionsFn = (isDark: boolean): ECOption => {
   return {
@@ -8,7 +8,7 @@ export const pieOptionsFn = (isDark: boolean): ECOption => {
       left: 'center',
       textStyle: { color: isDark ? '#d1d1d1' : '#222222' }
     },
-    tooltip: getTooltipStyle(isDark, 'item'),
+    tooltip: { trigger: 'item' },
     legend: {
       bottom: '0%',
       padding: 20,

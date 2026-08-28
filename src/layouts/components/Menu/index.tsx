@@ -1,17 +1,20 @@
+import './index.less';
+
 import { Menu, type MenuProps } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useMatches } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
+
 import { Icon } from '@/components/Icon';
 import useIsMobile from '@/hooks/useIsMobile';
-import { type RouteObjectType, type MetaProps } from '@/routers/interface';
-import { setGlobalState, useGlobalStore, useAuthStore } from '@/stores';
+import { type MetaProps, type RouteObjectType } from '@/routers/interface';
+import { setGlobalState, useAuthStore, useGlobalStore } from '@/stores';
 import { getParentPaths } from '@/utils';
-import './index.less';
 
 interface LayoutMenuProps {
   mode: MenuProps['mode'];
   menuList?: RouteObjectType[];
+  menuSplit?: boolean;
   /** 弹出子菜单容器类名 */
   popupClassName?: string;
 }

@@ -1,7 +1,7 @@
-export const PRO_TABLE_PAGINATION = {
-  defaultCurrent: 1,
-  defaultPageSize: 10,
-  pageSizeOptions: ['10', '15', '20', '25', '30'],
+import { TablePaginationConfig } from 'antd';
+
+export const pagination: TablePaginationConfig = {
+  size: 'middle',
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`
+  defaultPageSize: 10
 };

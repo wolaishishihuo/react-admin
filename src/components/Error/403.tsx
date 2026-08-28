@@ -1,6 +1,7 @@
+import './index.less';
+
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import './index.less';
 
 const NotAuth = () => {
   const navigate = useNavigate();

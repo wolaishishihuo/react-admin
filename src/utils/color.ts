@@ -1,12 +1,15 @@
 import { message } from '@/hooks/useMessage';
 
-/** 将 3 位 HEX 颜色码转换为 6 位 */
-export function convertToSixDigitHexColor(str: string) {
-  if (str.length > 4) return str.toLocaleUpperCase();
-  else return (str[0] + str[1] + str[1] + str[2] + str[2] + str[3] + str[3]).toLocaleUpperCase();
+export function convertToSixDigitHexColor(value: string) {
+  if (value.length > 4) return value.toUpperCase();
+  return (value[0] + value[1] + value[1] + value[2] + value[2] + value[3] + value[3]).toUpperCase();
 }
 
-/** 十六进制颜色转 RGB */
+/**
+ * @description hex color to rgb color
+ * @param {String} str color value string
+ * @returns {String} Returns the processed color value
+ */
 export function hexToRgb(str: string) {
   let hexs: any = '';
   let reg = /^#?[0-9A-Fa-f]{6}$/;
@@ -17,7 +20,13 @@ export function hexToRgb(str: string) {
   return hexs;
 }
 
-/** RGB 颜色转十六进制 */
+/**
+ * @description RGB color to Hex color
+ * @param {*} r red
+ * @param {*} g green
+ * @param {*} b blue
+ * @returns {String} Returns the processed color value
+ */
 export function rgbToHex(r: any, g: any, b: any) {
   let reg = /^\d{1,3}$/;
   if (!reg.test(r) || !reg.test(g) || !reg.test(b)) return message.warning('Enter wrong rgb color value');
@@ -26,7 +35,12 @@ export function rgbToHex(r: any, g: any, b: any) {
   return `#${hexs.join('')}`;
 }
 
-/** 加深颜色值（level 0-1） */
+/**
+ * @description Darken the color value
+ * @param {String} color color value string
+ * @param {Number} level The degree of deepening, limited between 0-1
+ * @returns {String} Returns the processed color value
+ */
 export function getDarkColor(color: string, level: number) {
   let reg = /^#?[0-9A-Fa-f]{6}$/;
   if (!reg.test(color)) return message.warning('Enter wrong hex color value');
@@ -35,7 +49,12 @@ export function getDarkColor(color: string, level: number) {
   return rgbToHex(rgb[0], rgb[1], rgb[2]);
 }
 
-/** 变浅颜色值（level 0-1） */
+/**
+ * @description Lighten the color value
+ * @param {String} color color value string
+ * @param {Number} level The degree of deepening, limited between 0-1
+ * @returns {String} Returns the processed color value
+ */
 export function getLightColor(color: string, level: number) {
   let reg = /^#?[0-9A-Fa-f]{6}$/;
   if (!reg.test(color)) message.warning('Enter wrong hex color value');

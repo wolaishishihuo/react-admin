@@ -1,14 +1,16 @@
 import react from '@vitejs/plugin-react';
-import UnoCSS from 'unocss/vite';
+import { resolve } from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import type { PluginOption } from 'vite';
+import UnoCSS from 'unocss/vite';
+import { PluginOption } from 'vite';
 import checker from 'vite-plugin-checker';
 import viteCompression from 'vite-plugin-compression';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { VitePWA } from 'vite-plugin-pwa';
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
 /**
- * 创建 Vite 插件
+ * Create vite plugin
  * @param viteEnv
  */
 export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOption[])[] => {
@@ -16,28 +18,32 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
 
   return [
     react(),
-    // UnoCSS 原子化 CSS，配置见根目录 uno.config.ts
     UnoCSS(),
-    // 开发态 TypeScript 检查（生产构建已有 tsc，无需重复跑 checker）
-    { ...checker({ typescript: true }), apply: 'serve' },
-    // 创建打包压缩配置
+    // esLint error messages are displayed on the browser interface
+    checker({ typescript: true }),
+    // Create a packaged compression configuration
     createCompression(viteEnv),
-    // 向 HTML 文件注入变量
+    // Inject variable into html file
     createHtmlPlugin({
       minify: true,
       inject: {
         data: { title: VITE_GLOB_APP_TITLE }
       }
     }),
-    // Vite PWA
+    // Create svg icons
+    createSvgIconsPlugin({
+      iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
+      symbolId: 'icon-[dir]-[name]'
+    }),
+    // vitePWA
     VITE_PWA && createVitePwa(viteEnv),
-    // 是否生成打包预览，分析依赖包体积以优化
+    // Whether to generate package preview, analyze dependent package size for optimization
     VITE_REPORT && (visualizer({ filename: 'stats.html', gzipSize: true, brotliSize: true }) as PluginOption)
   ];
 };
 
 /**
- * 根据压缩配置生成不同的压缩规则
+ * Generate different compression rules according to the compress configuration
  * @param viteEnv
  */
 const createCompression = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
@@ -66,7 +72,7 @@ const createCompression = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
 };
 
 /**
- * @description Vite PWA 配置
+ * @description VitePwa
  * @param viteEnv
  */
 const createVitePwa = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {

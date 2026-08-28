@@ -12,7 +12,7 @@ dist
 dist-ssr
 stats.html
 *.local
-db
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -24,6 +24,3 @@ db
 *.njsproj
 *.sln
 *.sw?
-*superpowers
-superpowers
-.pnpm-store

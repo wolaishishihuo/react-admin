@@ -1,44 +1,52 @@
-import type React from 'react';
-import { useEffect } from 'react';
-import { Navigate, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config';
-import { type MetaProps } from '@/routers/interface';
-import { useUserStore, useAuthStore } from '@/stores';
+import React, { useEffect } from 'react';
+import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
-/** 路由守卫：登录态重定向 + document.title + window.$navigate */
+import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config';
+import { MetaProps } from '@/routers/interface';
+import { useAuthStore, useUserStore } from '@/stores';
+
+/**
+ * @description Route guard component
+ */
 interface RouterGuardProps {
   children: React.ReactNode;
 }
 
 const RouterGuard: React.FC<RouterGuardProps> = props => {
-  const meta = useLoaderData() as MetaProps;
+  const loader = useLoaderData();
   const navigate = useNavigate();
-  const { pathname, search } = useLocation();
+  const { pathname } = useLocation();
 
-  // 必须在首个请求发出前就绪，不能挪进 effect
+  // Mount navigate to provide non-React function components or calls in custom React Hook functions
   window.$navigate = navigate;
 
   const token = useUserStore(state => state.token);
   const authMenuList = useAuthStore(state => state.authMenuList);
 
   useEffect(() => {
-    const title = import.meta.env.VITE_GLOB_APP_TITLE;
-    document.title = meta?.title ? `${meta.title} - ${title}` : title;
-  }, [meta]);
+    const meta = loader as MetaProps;
+    if (meta) {
+      const title = import.meta.env.VITE_GLOB_APP_TITLE;
+      document.title = meta?.title ? `${meta.title} - ${title}` : title;
+    }
 
-  if (ROUTER_WHITE_LIST.includes(pathname)) return props.children;
+    // Routing whitelist
+    if (ROUTER_WHITE_LIST.includes(pathname)) return;
 
-  const isLoginPage = pathname === LOGIN_URL;
+    // Whether login page
+    const isLoginPage = pathname === LOGIN_URL;
 
-  // 渲染期判定，token 变化即刻生效，不等下一次导航
-  if (!token && !isLoginPage) {
-    const fullPath = pathname + search;
-    // 首页且无 query 时不带 redirect，避免 /login?redirect=/home/index 噪音
-    const query = fullPath === HOME_URL ? '' : `?redirect=${encodeURIComponent(fullPath)}`;
-    return <Navigate replace to={LOGIN_URL + query} />;
-  }
+    // If there is menu data, token, or login on the accessed page, redirect to the home page
+    if (authMenuList.length && token && isLoginPage) {
+      navigate(HOME_URL, { replace: true });
+      return;
+    }
 
-  if (token && authMenuList.length && isLoginPage) return <Navigate replace to={HOME_URL} />;
+    // If there is not menu data, no token && the accessed page is not login, redirect to the login page
+    if ((!token && !isLoginPage) || (!authMenuList.length && !token && !isLoginPage)) {
+      navigate(LOGIN_URL, { replace: true });
+    }
+  }, [loader, pathname, token, authMenuList, navigate]);
 
   return props.children;
 };

@@ -1,4 +1,4 @@
-import echarts, { getTooltipStyle, type ECOption } from '@/components/Echarts/config';
+import echarts, { ECOption } from '@/components/Echarts/config';
 
 export const overviewTabs = [
   { label: 'Today', key: '1' },
@@ -10,7 +10,7 @@ export const overviewOptionsFn = (isDark: boolean): ECOption => {
   return {
     grid: { top: 30, left: 75, right: 50, bottom: 60 },
     tooltip: {
-      ...getTooltipStyle(isDark),
+      trigger: 'axis',
       formatter: "<span class='title'>{b0}</span><br /><span class='value'>${c0}</span>"
     },
     xAxis: {

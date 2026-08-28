@@ -1,64 +1,79 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
+
 import { DEFAULT_PRIMARY } from '@/config';
-import { type GlobalState, type ThemeModeType } from '../interface';
+import { GlobalAction, GlobalState, ThemeModeType } from '@/stores/interface';
 
-export interface GlobalStore extends GlobalState {
-  setGlobalState: (payload: ObjToKeyValUnion<GlobalState>) => void;
-}
+export type GlobalStoreState = GlobalState & GlobalAction;
 
-const initialGlobalState: GlobalState = {
-  menuType: 'left', // left | top | top-left | dual-menu
-  menuThemeType: 'design', // design | dark | light（isDark 强制覆盖）
-  menuOpenWidth: 230,
-  compactAlgorithm: false,
-  borderRadius: 6,
-  maximize: false,
-  primary: DEFAULT_PRIMARY,
-  themeMode: 'auto', // light | dark | auto
-  isDark: false, // themeMode 解析后的生效值
-  isWeak: false,
-  isHappy: true,
-  dualMenuShowText: true, // Columns 第一列图标/文字形态
-  isCollapse: false,
-  accordion: true,
-  watermark: true,
-  breadcrumb: true,
-  breadcrumbIcon: false,
-  tabs: true,
-  themeDrawerVisible: false
-};
-
-export const useGlobalStore = create<GlobalStore>()(
-  persist(
-    set => ({
-      ...initialGlobalState,
-      setGlobalState: payload => set({ [payload.key]: payload.value } as Partial<GlobalStore>)
-    }),
-    {
-      name: 'global-state',
-      storage: createJSONStorage(() => localStorage)
-    }
-  )
+export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
+  immer(
+    persist(
+      set => ({
+        // Legacy layout contract used by the original HeaderBar/Sidebar/Tabs.
+        menuType: 'left',
+        menuThemeType: 'design',
+        menuOpenWidth: 230,
+        themeMode: 'auto' as ThemeModeType,
+        dualMenuShowText: true,
+        // Compatibility layout fields retained for existing copied screens.
+        layout: 'vertical',
+        // antd component size ("small" | "middle" | "large")
+        componentSize: 'middle',
+        // antd compact theme
+        compactAlgorithm: false,
+        // antd border radius
+        borderRadius: 6,
+        // Whether the current page is full screen
+        maximize: false,
+        // theme color
+        primary: DEFAULT_PRIMARY,
+        // dark mode
+        isDark: false,
+        // gray mode
+        isGrey: false,
+        // weakness mode
+        isWeak: false,
+        // happy mode
+        isHappy: true,
+        // menu splitting
+        menuSplit: true,
+        // sidebar Invert Color
+        siderInverted: false,
+        // head Inverted Color
+        headerInverted: false,
+        // menu collapse
+        isCollapse: false,
+        // menu accordion
+        accordion: true,
+        // water mark
+        watermark: true,
+        // breadcrumb
+        breadcrumb: true,
+        // breadcrumb icon
+        breadcrumbIcon: false,
+        // tabs
+        tabs: true,
+        // tabs icon
+        tabsIcon: true,
+        // tabs drag
+        tabsDrag: true,
+        // theme box display status
+        themeDrawerVisible: false,
+        setGlobalState: ((keyOrPayload: keyof GlobalState | { key: keyof GlobalState; value: unknown }, value?: unknown) =>
+          set((state: GlobalState) => {
+            const key = typeof keyOrPayload === 'object' ? keyOrPayload.key : keyOrPayload;
+            state[key] = (typeof keyOrPayload === 'object' ? keyOrPayload.value : value) as never;
+          })) as GlobalAction['setGlobalState']
+      }),
+      {
+        name: 'global-state',
+        version: 1,
+        migrate: persistedState => persistedState as GlobalState
+      }
+    )
+  ),
+  shallow
 );
-
-// 组件外独立 action
-export const setGlobalState = (payload: ObjToKeyValUnion<GlobalState>) => useGlobalStore.getState().setGlobalState(payload);
-
-/* themeMode 是用户选择，isDark 是解析后的生效值 */
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-export const setThemeMode = (mode: ThemeModeType) => {
-  setGlobalState({ key: 'themeMode', value: mode });
-  setGlobalState({ key: 'isDark', value: mode === 'auto' ? prefersDark.matches : mode === 'dark' });
-};
-
-// auto 跟随系统
-prefersDark.addEventListener('change', e => {
-  if (useGlobalStore.getState().themeMode === 'auto') setGlobalState({ key: 'isDark', value: e.matches });
-});
-
-// 启动校正：auto 档持久化 isDark 可能过期
-if (useGlobalStore.getState().themeMode === 'auto' && useGlobalStore.getState().isDark !== prefersDark.matches) {
-  setGlobalState({ key: 'isDark', value: prefersDark.matches });
-}

@@ -1,12 +1,14 @@
 import { Icon as SvgIcon } from '@iconify/react/offline';
-import { type MenuProps, Dropdown, Avatar } from 'antd';
+import { Avatar, Dropdown, type MenuProps } from 'antd';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { logoutApi } from '@/apis/modules/login';
 import avatar from '@/assets/images/avatar.png';
-import { HOME_URL } from '@/config';
-import { modal, message } from '@/hooks/useMessage';
-import { useUserStore } from '@/stores';
-import { clearAuth } from '@/utils/auth';
+import { HOME_URL, LOGIN_URL } from '@/config';
+import { message, modal } from '@/hooks/useMessage';
+import { useAuthStore, useUserStore } from '@/stores';
+
 import InfoModal, { type InfoModalRef } from './InfoModal';
 import PasswordModal, { type PasswordModalRef } from './PasswordModal';
 
@@ -14,6 +16,8 @@ const AvatarIcon: React.FC = () => {
   const navigate = useNavigate();
 
   const userInfo = useUserStore(state => state.userInfo);
+  const setToken = useUserStore(state => state.setToken);
+  const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
 
   const passRef = useRef<PasswordModalRef>(null);
   const infoRef = useRef<InfoModalRef>(null);
@@ -27,8 +31,10 @@ const AvatarIcon: React.FC = () => {
       cancelText: '取消',
       mask: { closable: true },
       onOk: async () => {
-        // 清理走统一入口，跳登录页由 RouterGuard 随 token 变化完成
-        await clearAuth();
+        await logoutApi();
+        setToken('');
+        setAuthMenuList([]);
+        navigate(LOGIN_URL, { replace: true });
         message.success('退出登录成功！');
       }
     });

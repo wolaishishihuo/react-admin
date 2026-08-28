@@ -1,4 +1,25 @@
-// 读取所有环境变量配置文件并写入 process.env
+import path from 'path';
+
+export function isDevFn(mode: string): boolean {
+  return mode === 'development';
+}
+
+export function isProdFn(mode: string): boolean {
+  return mode === 'production';
+}
+
+export function isTestFn(mode: string): boolean {
+  return mode === 'test';
+}
+
+/**
+ * Whether to generate package preview
+ */
+export function isReportMode(): boolean {
+  return process.env.VITE_REPORT === 'true';
+}
+
+// Read all environment variable configuration files to process.env
 export function wrapperEnv(envConf: Recordable): ViteEnv {
   const ret: any = {};
 
@@ -16,4 +37,12 @@ export function wrapperEnv(envConf: Recordable): ViteEnv {
     ret[envName] = realName;
   }
   return ret;
+}
+
+/**
+ * Get user root directory
+ * @param dir file path
+ */
+export function getRootPath(...dir: string[]) {
+  return path.resolve(process.cwd(), ...dir);
 }

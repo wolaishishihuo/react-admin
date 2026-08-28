@@ -1,17 +1,13 @@
-import { Activity, useContext, useLayoutEffect, useRef, type ReactNode } from 'react';
+import React, { Activity, useContext, useLayoutEffect, useRef } from 'react';
 import { useLocation, useMatches, useOutlet } from 'react-router-dom';
 
-import ErrorBoundary from '@/components/ErrorBoundary';
 import { RefreshContext } from '@/context/Refresh';
-import { type MetaProps } from '@/routers/interface';
+import { MetaProps } from '@/routers/interface';
 import { useGlobalStore, useTabsStore } from '@/stores';
-import { getTabId } from '@/utils';
-
-export { RefreshContext, RefreshProvider } from '@/context/Refresh';
 
 type CachePage = {
   id: string;
-  node: ReactNode;
+  node: React.ReactNode;
 };
 
 const replayEnter = (el: HTMLElement) => {
@@ -20,7 +16,11 @@ const replayEnter = (el: HTMLElement) => {
   el.classList.add('keep-alive-enter');
 };
 
-function KeepAlivePage({ cacheKey, active, children }: { cacheKey: string; active: boolean; children: ReactNode }) {
+const KeepAlivePage: React.FC<{
+  cacheKey: string;
+  active: boolean;
+  children: React.ReactNode;
+}> = ({ cacheKey, active, children }) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -40,10 +40,9 @@ function KeepAlivePage({ cacheKey, active, children }: { cacheKey: string; activ
       </Activity>
     </div>
   );
-}
+};
 
-/** 按 meta.isKeepAlive 缓存 outlet；关闭标签时从 tabsList 同步剔除 */
-function KeepAliveOutlet() {
+const KeepAliveOutlet: React.FC = () => {
   const outlet = useOutlet();
   const matches = useMatches();
   const liveRef = useRef<HTMLDivElement>(null);
@@ -56,9 +55,8 @@ function KeepAliveOutlet() {
   const tabs = useGlobalStore(state => state.tabs);
   const tabsList = useTabsStore(state => state.tabsList);
 
-  const cacheKey = getTabId(pathname + search);
-  const lastMatch = matches[matches.length - 1];
-  const meta = (lastMatch?.loaderData ?? lastMatch?.data) as (MetaProps & { redirect?: boolean }) | undefined;
+  const cacheKey = pathname + search;
+  const meta = matches[matches.length - 1]?.data as (MetaProps & { redirect?: boolean }) | undefined;
   const isKeepAlive = !!meta?.isKeepAlive && !meta.redirect;
 
   if (refreshNonce !== prevNonceRef.current) {
@@ -74,10 +72,7 @@ function KeepAliveOutlet() {
   }
 
   if (isKeepAlive && outlet && outletShow && !cacheRef.current.has(cacheKey)) {
-    cacheRef.current.set(cacheKey, {
-      id: `${cacheKey}:${refreshNonce}`,
-      node: <ErrorBoundary>{outlet}</ErrorBoundary>
-    });
+    cacheRef.current.set(cacheKey, { id: `${cacheKey}:${refreshNonce}`, node: outlet });
   }
 
   useLayoutEffect(() => {
@@ -95,11 +90,11 @@ function KeepAliveOutlet() {
       ))}
       {!isKeepAlive && (
         <div ref={liveRef} className='keep-alive-item is-active'>
-          {outletShow && <ErrorBoundary key={cacheKey}>{outlet}</ErrorBoundary>}
+          {outletShow && outlet}
         </div>
       )}
     </>
   );
-}
+};
 
 export default KeepAliveOutlet;

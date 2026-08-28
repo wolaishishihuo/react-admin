@@ -1,72 +1,89 @@
-import { Icon as SvgIcon } from '@iconify/react/offline';
-import { Col, Row, Tabs, Table } from 'antd';
+import './index.less';
+
+import { ArrowUpOutlined } from '@ant-design/icons';
+import { Col, Row, Statistic, Table, Tabs } from 'antd';
+import CountUpImport from 'react-countup';
+
 import ECharts from '@/components/Echarts';
-import StatCardGrid, { type StatCardItem } from '@/components/StatCardGrid';
 import { useGlobalStore } from '@/stores';
-import { overviewTabs, overviewOptionsFn } from './config/overview';
+
+import { overviewOptionsFn, overviewTabs } from './config/overview';
 import { pieOptionsFn } from './config/proportion';
 import { columns, data } from './config/table';
-import './index.less';
+import { trendOptionsFn } from './config/trend';
+
+// Vite 8 ESM interop: CJS default export may land as { default: Component }
+const CountUp = (CountUpImport as { default?: typeof CountUpImport }).default ?? CountUpImport;
+
+const formatter = (value: number | string) => <CountUp end={Number(value)} duration={2} separator=',' />;
 
 const Analysis: React.FC = () => {
   const isDark = useGlobalStore(state => state.isDark);
 
   return (
-    <Row gutter={[15, 15]} className='analysis px-5px py-8px'>
-      {/* 统计数量 */}
+    <Row gutter={[15, 15]} className='analysis'>
+      {/* analysis-count */}
       <Col span={24}>
-        <StatCardGrid
-          items={
-            [
-              {
-                key: 'newCustomers',
-                label: 'New Customers',
-                value: 132893,
-                icon: <SvgIcon icon='ri:user-3-line' />,
-                accent: 'primary',
-                extra: <span className='text-13px text-success'>+14.52%</span>
-              },
-              {
-                key: 'activeUsers',
-                label: 'Active Users',
-                value: 219456,
-                icon: <SvgIcon icon='ri:apps-line' />,
-                accent: 'success',
-                extra: <span className='text-13px text-success'>+58.36%</span>
-              },
-              {
-                key: 'totalProfit',
-                label: 'Total Profit',
-                value: 854972,
-                icon: <SvgIcon icon='ri:star-line' />,
-                accent: 'warning',
-                extra: <span className='text-13px text-success'>+36.28%</span>
-              },
-              {
-                key: 'salesVolume',
-                label: 'Sales Volume',
-                value: 654932,
-                icon: <SvgIcon icon='ri:table-line' />,
-                accent: 'danger',
-                extra: <span className='text-13px text-success'>+24.35%</span>
-              }
-            ] satisfies StatCardItem[]
-          }
-        />
+        <Row gutter={[20, 20]} className='analysis-count'>
+          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
+            <div className='count-item'>
+              <Statistic className='count-number' title='New Customers' value={132893} formatter={formatter} />
+              <div className='count-trend'>
+                <div className='count-echarts'>
+                  <ECharts option={trendOptionsFn([50, 40, 60, 20, 40, 30, 80, 70, 120, 60, 80, 50])} />
+                </div>
+                <Statistic className='count-percentage' value={14.52} prefix={<ArrowUpOutlined />} suffix='%' />
+              </div>
+            </div>
+          </Col>
+          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
+            <div className='count-item'>
+              <Statistic className='count-number' title='Active Users' value={219456} formatter={formatter} />
+              <div className='count-trend'>
+                <div className='count-echarts'>
+                  <ECharts option={trendOptionsFn([10, 50, 40, 100, 50, 120, 35, 40, 15, 80, 10, 20])} />
+                </div>
+                <Statistic className='count-percentage' value={58.36} prefix={<ArrowUpOutlined />} suffix='%' />
+              </div>
+            </div>
+          </Col>
+          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
+            <div className='count-item'>
+              <Statistic className='count-number' title='Total Profit' value={854972} formatter={formatter} />
+              <div className='count-trend'>
+                <div className='count-echarts'>
+                  <ECharts option={trendOptionsFn([30, 10, 40, 70, 40, 60, 20, 110, 40, 80, 40, 10])} />
+                </div>
+                <Statistic className='count-percentage' value={36.28} prefix={<ArrowUpOutlined />} suffix='%' />
+              </div>
+            </div>
+          </Col>
+          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
+            <div className='count-item'>
+              <Statistic className='count-number' title='Sales Volume' value={654932} formatter={formatter} />
+              <div className='count-trend'>
+                <div className='count-echarts'>
+                  <ECharts option={trendOptionsFn([25, 70, 50, 80, 120, 60, 90, 30, 45, 20, 90, 40])} />
+                </div>
+                <Statistic className='count-percentage' value={24.35} prefix={<ArrowUpOutlined />} suffix='%' />
+              </div>
+            </div>
+          </Col>
+        </Row>
       </Col>
 
-      {/* 数据概览 */}
+      {/* analysis-overview */}
       <Col span={24}>
         <Row gutter={[15, 15]} className='analysis-overview'>
           <Col xl={24} lg={24} md={24} sm={24} xs={24}>
-            <div className='overview-box app-card flex flex-col h-500px'>
-              <div className='overview-head px-38px pt-15px flex items-center justify-between'>
-                <span className='overview-title text-23px text-content-tertiary mt-6px'>Product Sale Overview</span>
+            <div className='card overview-box'>
+              <div className='overview-head'>
+                <span className='overview-title'>Product Sale Overview</span>
                 <div className='overview-tabs'>
                   <Tabs defaultActiveKey='1' size='middle' items={overviewTabs} />
                 </div>
               </div>
-              <div className='overview-echarts flex-1'>
+              <div className='overview-echarts'>
                 <ECharts option={overviewOptionsFn(isDark)} />
               </div>
             </div>
@@ -74,16 +91,16 @@ const Analysis: React.FC = () => {
         </Row>
       </Col>
 
-      {/* 数据记录 */}
+      {/* analysis-record */}
       <Col span={24}>
-        <Row gutter={[15, 15]}>
+        <Row gutter={[15, 15]} className='analysis-record'>
           <Col xl={16} lg={24} md={24} sm={24} xs={24}>
-            <div className='app-card p-24px flex h-440px w-full'>
+            <div className='card record-table'>
               <Table columns={columns} dataSource={data} pagination={false} size='middle' />
             </div>
           </Col>
           <Col xl={8} lg={24} md={24} sm={24} xs={24}>
-            <div className='app-card p-24px h-440px w-full'>
+            <div className='card record-proportion'>
               <ECharts option={pieOptionsFn(isDark)} />
             </div>
           </Col>

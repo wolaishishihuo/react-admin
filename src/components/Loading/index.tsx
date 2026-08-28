@@ -1,7 +1,9 @@
+import './index.less';
+
 import { Spin } from 'antd';
 import { useEffect } from 'react';
+
 import NProgress from '@/config/nprogress';
-import './index.less';
 
 export const Loading = () => {
   return (

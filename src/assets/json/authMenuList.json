@@ -6,54 +6,68 @@
       "element": "/home/index",
       "meta": {
         "key": "home",
-        "icon": "ri:home-smile-2-line",
+        "icon": "HomeOutlined",
         "title": "首页",
         "isLink": "",
         "isHide": false,
         "isFull": false,
-        "isAffix": true
+        "isAffix": true,
+        "isKeepAlive": true
       }
     },
     {
-      "path": "/list",
-      "redirect": "/list/useProTable",
+      "path": "/system",
+      "redirect": "/system/accountManage",
       "meta": {
-        "key": "list",
-        "icon": "ri:table-line",
-        "title": "列表页面",
+        "key": "system",
+        "icon": "SettingOutlined",
+        "title": "系统管理",
         "isLink": "",
         "isHide": false,
         "isFull": false,
-        "isAffix": false
+        "isAffix": false,
+        "isKeepAlive": true
       },
       "children": [
         {
-          "path": "/list/useProTable",
-          "element": "/list/useProTable/index",
+          "path": "/system/accountManage",
+          "element": "/system/accountManage/index",
           "meta": {
-            "key": "useProTable",
-            "icon": "ri:apps-line",
-            "title": "用户列表",
+            "key": "accountManage",
+            "icon": "AppstoreOutlined",
+            "title": "账号管理",
             "isLink": "",
             "isHide": false,
             "isFull": false,
             "isAffix": false,
-            "auths": ["add", "edit", "delete", "batchDelete", "status"],
             "isKeepAlive": true
           }
         },
         {
-          "path": "/list/useProTable/detail/:id",
-          "element": "/list/useProTable/detail/index",
+          "path": "/system/roleManage",
+          "element": "/system/roleManage/index",
           "meta": {
-            "key": "useProTableDetail",
-            "icon": "ri:file-list-3-line",
-            "title": "用户详情",
+            "key": "roleManage",
+            "icon": "AppstoreOutlined",
+            "title": "角色管理",
             "isLink": "",
-            "isHide": true,
+            "isHide": false,
             "isFull": false,
             "isAffix": false,
-            "activeMenu": "/list/useProTable",
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/system/menuMange",
+          "element": "/system/menuMange/index",
+          "meta": {
+            "key": "menuMange",
+            "icon": "AppstoreOutlined",
+            "title": "菜单管理",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
             "isKeepAlive": true
           }
         }

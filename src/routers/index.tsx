@@ -1,62 +1,98 @@
-import { useCallback, useMemo, useEffect, useState } from 'react';
-import { RouterProvider as Router, type RouteObject, createHashRouter, createBrowserRouter } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { createBrowserRouter, createHashRouter, RouteObject, RouterProvider as Router } from 'react-router-dom';
+
 import NotFound from '@/components/Error/404';
-import MenuLoadError from '@/components/Error/MenuLoadError';
 import { Loading } from '@/components/Loading';
-import useDelayedVisible from '@/hooks/useDelayedVisible';
+import { LOGIN_URL } from '@/config';
+import { RouterModeEnum } from '@/constants';
 import useMessage from '@/hooks/useMessage';
+import usePermissions from '@/hooks/usePermissions';
 import useTheme from '@/hooks/useTheme';
-import { useUserStore, useAuthStore } from '@/stores';
-import { initPermissions } from '@/utils/auth';
+import { useAuthStore, useUserStore } from '@/stores';
+
 import { convertToDynamicRouterFormat } from './helper/ConvertRouter';
-import { type RouteObjectType } from './interface';
+import RouterGuard from './helper/RouterGuard';
 import { wrappedStaticRouter } from './modules/staticRouter';
 
 const mode = import.meta.env.VITE_ROUTER_MODE;
 
-/** 路由入口：静态路由 + 后端菜单生成的动态路由 */
+const PUBLIC_PATHS = new Set([LOGIN_URL, '/403', '/404', '/500', '/']);
+
+const getLocationPath = () => {
+  if (mode === RouterModeEnum.HASH) {
+    const hash = window.location.hash.replace(/^#/, '');
+    return (hash || '/').split('?')[0] || '/';
+  }
+  return window.location.pathname;
+};
+
+const createAppRouter = (routerList: RouteObject[]) => {
+  const routes: RouteObject[] = [
+    {
+      hydrateFallbackElement: <Loading />,
+      children: routerList
+    }
+  ];
+  return mode === RouterModeEnum.HASH ? createHashRouter(routes) : createBrowserRouter(routes);
+};
+
+/**
+ * @description Route file entry
+ */
 const RouterProvider: React.FC = () => {
+  // useTheme && useMessage
   useTheme();
   useMessage();
 
+  const { initPermissions } = usePermissions();
+
   const token = useUserStore(state => state.token);
   const authMenuList = useAuthStore(state => state.authMenuList);
-  const [menuError, setMenuError] = useState(false);
+  const [pathname, setPathname] = useState(getLocationPath);
 
-  // 失败后 token 仍在 = 请求失败，显示重试；token 已被 clearAuth 清空 = 会话失效，交守卫跳登录
-  const runInit = useCallback(() => {
-    setMenuError(false);
-    initPermissions(token).catch(() => {
-      if (useUserStore.getState().token) setMenuError(true);
-    });
-  }, [token]);
-
-  // 已登录无菜单时拉权限
   useEffect(() => {
-    if (token && !authMenuList.length) runInit();
-  }, [authMenuList.length, token]);
+    if (token && !authMenuList.length) {
+      initPermissions(token);
+    }
+  }, [authMenuList, token]);
 
-  // 路由表仅随 authMenuList 变，token 续期不重建
-  const routerList = useMemo<RouteObjectType[]>(() => {
-    if (!authMenuList.length) return wrappedStaticRouter;
-    const staticPart = wrappedStaticRouter.map(route => (route.path === '*' ? { ...route, element: <NotFound /> } : route));
-    return [...staticPart, ...convertToDynamicRouterFormat(authMenuList)];
-  }, [authMenuList]);
+  // Keep the static router while still on /login so hydrating menus does not remount the login page
+  const useFullRouter = authMenuList.length > 0 && pathname !== LOGIN_URL;
 
-  const router = useMemo(() => {
-    const routes: RouteObject[] = [{ HydrateFallback: Loading, children: routerList as RouteObject[] }];
-    return mode === 'hash' ? createHashRouter(routes) : createBrowserRouter(routes);
-  }, [routerList]);
+  const routerList = useMemo(() => {
+    if (!useFullRouter) return wrappedStaticRouter;
 
-  const ready = !token || authMenuList.length > 0;
-  const showLoading = useDelayedVisible(!ready);
+    const dynamicRouter = convertToDynamicRouterFormat(authMenuList);
+    const staticRouter = wrappedStaticRouter.map(route =>
+      route.path === '*'
+        ? {
+            ...route,
+            element: (
+              <RouterGuard>
+                <NotFound />
+              </RouterGuard>
+            )
+          }
+        : route
+    );
 
-  // 菜单失败且 token 仍在：重试视图
-  if (token && !authMenuList.length && menuError) return <MenuLoadError onRetry={runInit} />;
+    return [...staticRouter, ...dynamicRouter];
+  }, [useFullRouter, authMenuList]);
 
-  // 权限就绪前不渲染业务内容；loading 防闪烁，快后端下不会一闪而过
-  if (showLoading) return <Loading />;
-  if (!ready) return null;
+  const router = useMemo(() => createAppRouter(routerList as RouteObject[]), [routerList]);
+
+  useEffect(() => {
+    return router.subscribe(() => {
+      setPathname(prev => {
+        const next = getLocationPath();
+        return prev === next ? prev : next;
+      });
+    });
+  }, [router]);
+
+  // Menu routes are not persisted; wait before matching protected URLs so RR7 does not flash the 404 page
+  const waitingAuthRoutes = Boolean(token) && !authMenuList.length && !PUBLIC_PATHS.has(getLocationPath());
+  if (waitingAuthRoutes) return <Loading />;
 
   return <Router router={router} />;
 };

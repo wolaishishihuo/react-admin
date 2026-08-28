@@ -1,66 +1,91 @@
-import { type RouteObjectType } from '@/routers/interface';
-import { type LoginUserInfo } from '@/types';
+import { RouteObjectType } from '@/routers/interface';
 
+export type SizeType = 'small' | 'middle' | 'large';
 export type MenuTypeType = 'left' | 'top' | 'top-left' | 'dual-menu';
-
 export type MenuThemeType = 'design' | 'dark' | 'light';
-
 export type ThemeModeType = 'light' | 'dark' | 'auto';
+export type LayoutType = 'vertical' | 'classic' | 'transverse' | 'columns';
 
-/* 全局状态 */
+/* GlobalState */
 export interface GlobalState {
-  /** 菜单类型 */
   menuType: MenuTypeType;
-  /** 菜单主题三档（isDark 强制覆盖） */
   menuThemeType: MenuThemeType;
-  /** 菜单展开宽度 px */
   menuOpenWidth: number;
+  themeMode: ThemeModeType;
+  dualMenuShowText: boolean;
+  // Compatibility fields retained for copied pages that still read the newer layout settings.
+  layout: LayoutType;
+  componentSize: SizeType;
   compactAlgorithm: boolean;
   borderRadius: number;
   maximize: boolean;
   primary: string;
-  /** 用户明暗档位（auto 跟随系统） */
-  themeMode: ThemeModeType;
-  /** 实际生效暗色（themeMode 解析结果） */
   isDark: boolean;
+  isGrey: boolean;
   isWeak: boolean;
   isHappy: boolean;
-  /** Columns 第一列是否显示文字 */
-  dualMenuShowText: boolean;
+  menuSplit: boolean;
+  siderInverted: boolean;
+  headerInverted: boolean;
   isCollapse: boolean;
   accordion: boolean;
   watermark: boolean;
   breadcrumb: boolean;
   breadcrumbIcon: boolean;
   tabs: boolean;
+  tabsIcon: boolean;
+  tabsDrag: boolean;
   themeDrawerVisible: boolean;
 }
 
-/* 标签页菜单属性 */
+export interface GlobalAction {
+  setGlobalState: <T extends keyof GlobalState>(key: T, value: GlobalState[T]) => void;
+}
+
+/* tabsMenuProps */
 export interface TabsListProp {
   title: string;
   path: string;
   closable: boolean;
 }
 
-/* 标签页状态 */
+/* TabsState */
 export interface TabsState {
   tabsList: TabsListProp[];
 }
 
-/* 用户状态 */
-export interface UserState {
-  token: string;
-  userInfo: LoginUserInfo;
-  searchHistory: string[]; // 菜单 path，最新在前
+export interface TabsAction {
+  setTabsList: (tabsList: TabsState['tabsList']) => void;
+  addTab: (tabs: TabsListProp) => void;
+  removeTab: (payload: { path: string; isCurrent: boolean }) => void;
+  closeTabsOnSide: (payload: { path: string; type: 'left' | 'right' }) => void;
+  closeMultipleTab: (payload: { path?: string }) => void;
+  validateTabs: () => void;
+  setTabTitle: (title: string) => void;
 }
 
-/* 权限状态 */
+/* UserState */
+export interface UserState {
+  token: string;
+  userInfo: { name: string };
+  searchHistory: string[];
+}
+
+export interface UserAction {
+  setToken: (token: UserState['token']) => void;
+  setUserInfo: (token: UserState['userInfo']) => void;
+  setSearchHistory: (searchHistory: string[]) => void;
+}
+
+/* AuthState */
 export interface AuthState {
   authMenuList: RouteObjectType[];
   showMenuList: RouteObjectType[];
   flatMenuList: RouteObjectType[];
-  authButtonList: {
-    [key: string]: string[];
-  };
+  authButtonList: Record<string, string[]>;
+}
+
+export interface AuthAction {
+  setAuthButtonList: (authButtonList: AuthState['authButtonList']) => void;
+  setAuthMenuList: (authMenuList: AuthState['authMenuList']) => void;
 }

@@ -1,9 +1,10 @@
 import { useDebounceFn, useTimeout } from 'ahooks';
-import { type ECElementEvent, type EChartsType } from 'echarts';
-import React, { type ForwardedRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { ECElementEvent, EChartsType } from 'echarts';
+import React, { ForwardedRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
 import { useGlobalStore } from '@/stores';
-import echarts, { type ECOption } from './config';
+
+import echarts, { ECOption } from './config';
 
 export interface EChartProps {
   option: ECOption | null | undefined;
@@ -25,13 +26,12 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
   const cInstance = useRef<EChartsType | undefined>(undefined);
   const [isFirstRun, setIsFirstRun] = useState(true);
 
-  const { tabs, maximize, isCollapse } = useGlobalStore(
-    useShallow(state => ({
-      tabs: state.tabs,
-      maximize: state.maximize,
-      isCollapse: state.isCollapse
-    }))
-  );
+  const { tabs, maximize, menuSplit, isCollapse } = useGlobalStore(state => ({
+    tabs: state.tabs,
+    maximize: state.maximize,
+    menuSplit: state.menuSplit,
+    isCollapse: state.isCollapse
+  }));
 
   const handleClick = (event: ECElementEvent) => onClick && onClick(event);
 
@@ -48,13 +48,6 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
     }
   }, [cRef, option]);
 
-  useEffect(() => {
-    return () => {
-      cInstance.current?.dispose();
-      cInstance.current = undefined;
-    };
-  }, []);
-
   const { run } = useDebounceFn(() => cInstance.current?.resize({ animation: { duration: 300 } }), {
     wait: 300
   });
@@ -65,7 +58,7 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
 
   useLayoutEffect(() => {
     if (isResize && !isFirstRun) run();
-  }, [width, height, run, isFirstRun, tabs, maximize, isCollapse]);
+  }, [width, height, run, isFirstRun, tabs, maximize, menuSplit, isCollapse]);
 
   useEffect(() => {
     if (!isResize) return;

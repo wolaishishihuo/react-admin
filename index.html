@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/react.svg" />
@@ -92,17 +92,12 @@
       </div>
     </div>
     <script>
-      // 首屏防闪：React 挂载前读 zustand persist 的 global store，预刷主题色与暗色底
-      const persisted = JSON.parse(window.localStorage.getItem('global-state'));
-      const globalState = persisted && persisted.state;
+      const globalState = JSON.parse(window.localStorage.getItem('hooks-global'));
       if (globalState) {
         const dot = document.querySelectorAll('.dot i');
         const html = document.querySelector('html');
-        if (globalState.primary) dot.forEach(item => (item.style.background = globalState.primary));
-        // auto 档持久化的 isDark 可能过期，以系统当前偏好为准
-        const isDark =
-          globalState.themeMode === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : globalState.isDark;
-        if (isDark) html.style.background = '#141414';
+        dot.forEach(item => (item.style.background = globalState.state.primary));
+        if (globalState.state.isDark) html.style.background = '#141414';
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>

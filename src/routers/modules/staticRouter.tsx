@@ -1,14 +1,18 @@
 import { Navigate } from 'react-router-dom';
+
 import NotAuth from '@/components/Error/403';
 import NotFound from '@/components/Error/404';
 import NotNetwork from '@/components/Error/500';
 import { Loading } from '@/components/Loading';
 import { HOME_URL, LOGIN_URL } from '@/config';
-import { type RouteObjectType } from '@/routers/interface';
+import { RouteObjectType } from '@/routers/interface';
 import Login from '@/views/login/index';
+
 import RouterGuard from '../helper/RouterGuard';
 
-/** 静态路由 */
+/**
+ * staticRouter
+ */
 export const staticRouter: RouteObjectType[] = [
   {
     path: '/',
@@ -21,6 +25,7 @@ export const staticRouter: RouteObjectType[] = [
       title: '登录'
     }
   },
+  // error pages
   {
     path: '/403',
     element: <NotAuth />,
@@ -42,14 +47,14 @@ export const staticRouter: RouteObjectType[] = [
       title: '500页面'
     }
   },
-  // 刷新防 404
+  // Set <Loading /> here first to prevent page refresh 404
   {
     path: '*',
     element: <Loading />
   }
 ];
 
-// RouterGuard 包裹每个 element
+// Wrap each element with a higher-order component
 export const wrappedStaticRouter = staticRouter.map(route => {
   return {
     ...route,

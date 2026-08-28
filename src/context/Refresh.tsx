@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useMemo, useState } from 'react';
 
 interface RefreshContextType {
   outletShow: boolean;
@@ -9,10 +9,10 @@ interface RefreshContextType {
 export const RefreshContext = createContext<RefreshContextType>({
   outletShow: true,
   refreshNonce: 0,
-  refresh: () => undefined
+  refresh: () => {}
 });
 
-export function RefreshProvider({ children }: { children: ReactNode }) {
+export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [outletShow, setOutletShow] = useState(true);
   const [refreshNonce, setRefreshNonce] = useState(0);
 
@@ -32,4 +32,4 @@ export function RefreshProvider({ children }: { children: ReactNode }) {
   );
 
   return <RefreshContext.Provider value={contextValue}>{children}</RefreshContext.Provider>;
-}
+};
