@@ -19,7 +19,7 @@ export const loginApi = (params: ReqLogin) => {
 
 // Get menu list
 export const getAuthMenuListApi = () => {
-  return http.get<AuthState["authMenuList"]>(PORT1 + `/menu/list`);
+  // return http.get<AuthState["authMenuList"]>(PORT1 + `/menu/list`);
   return authMenuList;
 };
 

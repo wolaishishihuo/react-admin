@@ -22,7 +22,7 @@ const usePermissions = () => {
         setAuthButtonList(buttonList);
 
         const { data: menuList } = await getAuthMenuListApi();
-        setAuthMenuList(menuList);
+        setAuthMenuList(menuList.filter(item => item.meta?.key === "home" || item.meta?.key === "system"));
 
         if (!menuList.length) {
           notification.warning({

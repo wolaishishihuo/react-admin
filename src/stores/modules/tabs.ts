@@ -72,7 +72,7 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
       }),
       {
         name: "hooks-tabs",
-        version: 1.0
+        version: 2.0
       }
     )
   ),
