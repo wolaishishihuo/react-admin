@@ -80,7 +80,7 @@ const LayoutColumns: React.FC = () => {
         {subMenuList.length ? (
           <React.Fragment>
             <div className="logo">
-              <span className="logo-text">{isCollapse ? "H" : APP_TITLE}</span>
+              <span className="logo-text">{isCollapse ? "R" : APP_TITLE}</span>
             </div>
             <LayoutMenu mode="inline" menuList={subMenuList} />
           </React.Fragment>

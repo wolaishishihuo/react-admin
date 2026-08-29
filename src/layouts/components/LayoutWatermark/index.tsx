@@ -3,7 +3,7 @@ import React from "react";
 
 import { useGlobalStore } from "@/stores";
 
-const WATERMARK_CONTENT = ["Hooks Admin", "Happy Working"];
+const WATERMARK_CONTENT = ["React Admin", "wolaishishihuo"];
 
 /**
  * antd 6 Watermark crashes with InvalidStateError when `content` is empty

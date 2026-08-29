@@ -44,7 +44,7 @@ const LoginForm: React.FC = () => {
       // prompt for successful login and redirect
       notification.success({
         title: getTimeState(),
-        description: "欢迎登录 Hooks-Admin",
+        description: `欢迎登录 ${import.meta.env.VITE_GLOB_APP_TITLE}`,
         icon: <CheckCircleFilled style={{ color: "#73d13d" }} />
       });
 

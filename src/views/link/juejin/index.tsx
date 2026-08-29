@@ -4,9 +4,9 @@ const JueJin: React.FC = () => {
   return (
     <Card>
       <span className="text">
-        JueJin 仓库：
-        <a href="https://juejin.cn/user/3263814531551816/posts" target="_blank">
-          https://juejin.cn/user/3263814531551816/posts
+        GitHub 仓库：
+        <a href="https://github.com/wolaishishihuo/react-admin" target="_blank">
+          https://github.com/wolaishishihuo/react-admin
         </a>
       </span>
     </Card>

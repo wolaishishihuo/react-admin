@@ -1,22 +1,22 @@
 {
-  "name": "hooks-admin",
+  "name": "react-admin",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "hooks-admin open source management system",
+  "description": "React Admin management system",
   "author": {
-    "name": "Hooks",
-    "email": "848130454@qq.com",
-    "url": "https://github.com/HalseySpicy"
+    "name": "wolaishishihuo",
+    "email": "2430250298@qq.com",
+    "url": "https://github.com/wolaishishihuo"
   },
   "license": "MIT",
-  "homepage": "https://github.com/HalseySpicy/Hooks-Admin",
+  "homepage": "https://github.com/wolaishishihuo/react-admin",
   "repository": {
     "type": "git",
-    "url": "git@github.com:HalseySpicy/Hooks-Admin.git"
+    "url": "git@github.com:wolaishishihuo/react-admin.git"
   },
   "bugs": {
-    "url": "https://github.com/HalseySpicy/Hooks-Admin/issues"
+    "url": "https://github.com/wolaishishihuo/react-admin/issues"
   },
   "scripts": {
     "dev": "vite",

@@ -19,11 +19,11 @@ for (const path in iconsImports) {
 
 const Notice: React.FC = () => {
   const noticeList = [
-    { title: "一键三连 Hooks-Admin 🧡", icon: "notice01.png", time: "一分钟前" },
-    { title: "一键三连 Hooks-Admin 💙", icon: "notice02.png", time: "一小时前" },
-    { title: "一键三连 Hooks-Admin 💚", icon: "notice03.png", time: "半天前" },
-    { title: "一键三连 Hooks-Admin 💜", icon: "notice04.png", time: "一星期前" },
-    { title: "一键三连 Hooks-Admin 💛", icon: "notice05.png", time: "一个月前" }
+    { title: "欢迎使用 React Admin 🧡", icon: "notice01.png", time: "一分钟前" },
+    { title: "欢迎使用 React Admin 💙", icon: "notice02.png", time: "一小时前" },
+    { title: "欢迎使用 React Admin 💚", icon: "notice03.png", time: "半天前" },
+    { title: "欢迎使用 React Admin 💜", icon: "notice04.png", time: "一星期前" },
+    { title: "欢迎使用 React Admin 💛", icon: "notice05.png", time: "一个月前" }
   ];
 
   return (

@@ -11,7 +11,7 @@ export const useUserStore = create<UserStoreState>()(
     persist(
       set => ({
         token: "",
-        userInfo: { name: "Hooks" },
+        userInfo: { name: "wolaishishihuo" },
         setToken: token =>
           set((state: UserState) => {
             state.token = token;

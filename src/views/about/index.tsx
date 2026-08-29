@@ -17,10 +17,10 @@ const About: React.FC = () => {
           关于
         </Title>
         <span className="text">
-          <Link href="https://github.com/HalseySpicy/Hooks-Admin" target="_blank">
-            Hooks-Admin{" "}
+          <Link href="https://github.com/wolaishishihuo/react-admin" target="_blank">
+            React Admin{" "}
           </Link>
-          一款基于 React 19、React-Router v7、React Hooks、Zustand、TypeScript、Vite 8、Ant Design 6 开源的后台管理框架。
+          一款基于 React 19、React-Router v7、React Hooks、Zustand、TypeScript、Vite 8、Ant Design 6 的后台管理框架。
         </span>
       </Card>
 
@@ -35,24 +35,24 @@ const About: React.FC = () => {
           <Descriptions.Item label="发布时间">
             <Tag color="processing">{lastBuildTime}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Gitee">
-            <Link href="https://gitee.com/HalseySpicy/Hooks-Admin" target="_blank">
-              Gitee
+          <Descriptions.Item label="作者">
+            <Link href="https://github.com/wolaishishihuo" target="_blank">
+              wolaishishihuo
             </Link>
           </Descriptions.Item>
           <Descriptions.Item label="Github">
-            <Link href="https://github.com/HalseySpicy/Hooks-Admin" target="_blank">
+            <Link href="https://github.com/wolaishishihuo/react-admin" target="_blank">
               Github
             </Link>
           </Descriptions.Item>
           <Descriptions.Item label="Issues">
-            <Link href="https://github.com/HalseySpicy/Hooks-Admin/issues" target="_blank">
+            <Link href="https://github.com/wolaishishihuo/react-admin/issues" target="_blank">
               Issues
             </Link>
           </Descriptions.Item>
-          <Descriptions.Item label="预览地址">
-            <Link href="https://hooks.spicyboy.cn" target="_blank">
-              预览地址
+          <Descriptions.Item label="仓库地址">
+            <Link href="https://github.com/wolaishishihuo/react-admin" target="_blank">
+              react-admin
             </Link>
           </Descriptions.Item>
         </Descriptions>
