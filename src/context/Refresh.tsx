@@ -1,5 +1,7 @@
 import { createContext, useCallback, useMemo, useState } from "react";
 
+import { queryClient } from "@/apis/query";
+
 interface RefreshContextType {
   outletShow: boolean;
   refreshNonce: number;
@@ -17,6 +19,7 @@ export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [refreshNonce, setRefreshNonce] = useState(0);
 
   const refresh = useCallback(() => {
+    queryClient.invalidateQueries();
     setRefreshNonce(n => n + 1);
     setOutletShow(false);
     window.setTimeout(() => setOutletShow(true));

@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ReqLogin } from "@/apis/interface";
-import { loginApi } from "@/apis/modules/login";
+import { fetchLogin } from "@/apis/modules/login";
 import { HOME_URL } from "@/config";
 import { message, notification } from "@/hooks/useMessage";
 import usePermissions from "@/hooks/usePermissions";
@@ -32,7 +32,7 @@ const LoginForm: React.FC = () => {
       message.open({ key, type: "loading", content: "登录中..." });
 
       // user login
-      const { data } = await loginApi({ ...values, password: md5(values.password) });
+      const data = await fetchLogin({ ...values, password: md5(values.password) });
       setToken(data.access_token);
 
       // clear last account tabs

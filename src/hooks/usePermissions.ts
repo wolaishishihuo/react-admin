@@ -1,4 +1,4 @@
-import { getAuthButtonListApi, getAuthMenuListApi } from "@/apis/modules/login";
+import { fetchGetAuthButtonList, fetchGetAuthMenuList } from "@/apis/modules/login";
 import { notification } from "@/hooks/useMessage";
 import { useAuthStore, useUserStore } from "@/stores";
 
@@ -18,10 +18,10 @@ const usePermissions = () => {
 
     const promise = (async () => {
       try {
-        const { data: buttonList } = await getAuthButtonListApi();
+        const buttonList = await fetchGetAuthButtonList();
         setAuthButtonList(buttonList);
 
-        const { data: menuList } = await getAuthMenuListApi();
+        const menuList = await fetchGetAuthMenuList();
         setAuthMenuList(menuList.filter(item => item.meta?.key === "home" || item.meta?.key === "system"));
 
         if (!menuList.length) {

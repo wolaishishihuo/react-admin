@@ -3,7 +3,8 @@ import { Avatar, Dropdown, type MenuProps } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { logoutApi } from "@/apis/modules/login";
+import { fetchLogout } from "@/apis/modules/login";
+import { queryClient } from "@/apis/query";
 import avatar from "@/assets/images/avatar.png";
 import { LOGIN_URL } from "@/config";
 import { message, modal } from "@/hooks/useMessage";
@@ -23,7 +24,8 @@ const AvatarIcon: React.FC = () => {
       cancelText: "取消",
       mask: { closable: true },
       onOk: async () => {
-        await logoutApi();
+        await fetchLogout();
+        queryClient.clear();
         setToken("");
         setAuthMenuList([]);
         navigate(LOGIN_URL, { replace: true });
