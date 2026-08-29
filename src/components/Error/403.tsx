@@ -11,10 +11,10 @@ const NotAuth = () => {
       className="error-page"
       status="403"
       title="403"
-      subTitle="Sorry, you are not authorized to access this page."
+      subTitle="抱歉，您没有权限访问该页面。"
       extra={
         <Button type="primary" onClick={() => navigate(-1)}>
-          Go Back
+          返回
         </Button>
       }
     />

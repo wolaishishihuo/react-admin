@@ -11,10 +11,10 @@ const NotNetwork = () => {
       className="error-page"
       status="500"
       title="500"
-      subTitle="Sorry, something went wrong."
+      subTitle="抱歉，服务器出了点问题。"
       extra={
         <Button type="primary" onClick={() => navigate(-1)}>
-          Go Back
+          返回
         </Button>
       }
     />

@@ -4,7 +4,6 @@ import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import { useUpdateEffect } from "ahooks";
 import { Dropdown } from "antd";
 import React, { useContext, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { useLocation, useMatches, useNavigate } from "react-router-dom";
 
 import { Icon } from "@/components/Icon";
@@ -19,7 +18,6 @@ const LayoutTabs: React.FC = () => {
   const matches = useMatches();
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const path = location.pathname + location.search;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -116,7 +114,7 @@ const LayoutTabs: React.FC = () => {
             const showClose = item.closable && tabsList.length > 1;
 
             return (
-              <Dropdown key={item.path} trigger={["contextMenu"]} menu={{ items: buildTabMenuItems(item.path, t, handlers) }}>
+              <Dropdown key={item.path} trigger={["contextMenu"]} menu={{ items: buildTabMenuItems(item.path, handlers) }}>
                 <li className={`work-tab-item${active ? " is-active" : ""}`} onClick={() => navigate(item.path)}>
                   {tabsIcon && item.icon && <Icon className="work-tab-icon" name={item.icon} />}
                   <span className="work-tab-title">{item.title}</span>
@@ -131,7 +129,7 @@ const LayoutTabs: React.FC = () => {
           })}
         </ul>
       </div>
-      <Dropdown trigger={["click"]} menu={{ items: buildTabMenuItems(path, t, handlers) }}>
+      <Dropdown trigger={["click"]} menu={{ items: buildTabMenuItems(path, handlers) }}>
         <button className="work-tab-more" type="button">
           <DownOutlined />
         </button>

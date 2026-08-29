@@ -6,15 +6,12 @@ export type SizeType = NonNullable<ConfigProviderProps["componentSize"]>;
 
 export type LayoutType = "vertical" | "classic" | "transverse" | "columns";
 
-export type LanguageType = "zh" | "en" | null;
-
 /* GlobalState */
 export interface GlobalState {
   layout: LayoutType;
   componentSize: SizeType;
   compactAlgorithm: boolean;
   borderRadius: number;
-  language: LanguageType;
   maximize: boolean;
   primary: string;
   isDark: boolean;

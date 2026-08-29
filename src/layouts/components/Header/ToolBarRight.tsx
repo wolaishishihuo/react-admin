@@ -3,7 +3,6 @@ import "./index.less";
 import AvatarIcon from "./components/AvatarIcon";
 import ComponentSize from "./components/ComponentSize";
 import Fullscreen from "./components/Fullscreen";
-import Language from "./components/Language";
 import Message from "./components/Message";
 import SearchMenu from "./components/SearchMenu";
 import ThemeSetting from "./components/ThemeSetting";
@@ -14,7 +13,6 @@ const ToolBarRight: React.FC = () => {
     <div className="tool-bar-ri">
       <div className="header-icon">
         <ComponentSize />
-        <Language />
         <SearchMenu />
         <ThemeSetting />
         <Message />

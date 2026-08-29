@@ -8,7 +8,6 @@ import {
   VerticalRightOutlined
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import type { TFunction } from "i18next";
 
 const iconStyle = { fontSize: 14 };
 
@@ -23,52 +22,52 @@ type TabMenuHandlers = {
   closeAll: () => void;
 };
 
-export const buildTabMenuItems = (targetPath: string, t: TFunction, handlers: TabMenuHandlers): MenuProps["items"] => {
+export const buildTabMenuItems = (targetPath: string, handlers: TabMenuHandlers): MenuProps["items"] => {
   const isCurrent = targetPath === handlers.currentPath;
 
   return [
     {
       key: "refresh",
-      label: <span>{t("tabs.refresh")}</span>,
+      label: <span>刷新</span>,
       icon: <ReloadOutlined style={iconStyle} />,
       disabled: !isCurrent,
       onClick: handlers.refresh
     },
     {
       key: "maximize",
-      label: <span>{t("tabs.maximize")}</span>,
+      label: <span>最大化</span>,
       icon: <ExpandOutlined style={iconStyle} />,
       onClick: handlers.maximize
     },
     { type: "divider" },
     {
       key: "closeCurrent",
-      label: <span>{t("tabs.closeCurrent")}</span>,
+      label: <span>关闭当前</span>,
       icon: <CloseCircleOutlined style={iconStyle} />,
       onClick: () => handlers.closeCurrent(targetPath)
     },
     {
       key: "closeLeft",
-      label: <span>{t("tabs.closeLeft")}</span>,
+      label: <span>关闭左侧</span>,
       icon: <VerticalRightOutlined style={iconStyle} />,
       onClick: () => handlers.closeLeft(targetPath)
     },
     {
       key: "closeRight",
-      label: <span>{t("tabs.closeRight")}</span>,
+      label: <span>关闭右侧</span>,
       icon: <VerticalLeftOutlined style={iconStyle} />,
       onClick: () => handlers.closeRight(targetPath)
     },
     { type: "divider" },
     {
       key: "closeOther",
-      label: <span>{t("tabs.closeOther")}</span>,
+      label: <span>关闭其它</span>,
       icon: <ColumnWidthOutlined style={iconStyle} />,
       onClick: () => handlers.closeOther(targetPath)
     },
     {
       key: "closeAll",
-      label: <span>{t("tabs.closeAll")}</span>,
+      label: <span>关闭所有</span>,
       icon: <SwitcherOutlined style={iconStyle} />,
       onClick: handlers.closeAll
     }

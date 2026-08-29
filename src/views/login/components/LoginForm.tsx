@@ -78,18 +78,18 @@ const LoginForm: React.FC = () => {
   return (
     <div className="login-form-content">
       <Form name="login" size="large" autoComplete="off" ref={formRef} onFinish={onFinish} onFinishFailed={onFinishFailed}>
-        <Form.Item name="username" rules={[{ required: true, message: "Please input your username!" }]}>
-          <Input prefix={<UserOutlined />} placeholder="User：admin / user" />
+        <Form.Item name="username" rules={[{ required: true, message: "请输入用户名" }]}>
+          <Input prefix={<UserOutlined />} placeholder="用户名：admin / user" />
         </Form.Item>
-        <Form.Item name="password" rules={[{ required: true, message: "Please input your password!" }]}>
-          <Input.Password prefix={<LockOutlined />} placeholder="Password：123456" />
+        <Form.Item name="password" rules={[{ required: true, message: "请输入密码" }]}>
+          <Input.Password prefix={<LockOutlined />} placeholder="密码：123456" />
         </Form.Item>
         <Form.Item className="login-form-button">
           <Button shape="round" icon={<CloseCircleOutlined />} onClick={onReset}>
-            Reset
+            重置
           </Button>
           <Button type="primary" shape="round" icon={<UserOutlined />} loading={loading} htmlType="submit">
-            Submit
+            登录
           </Button>
         </Form.Item>
       </Form>

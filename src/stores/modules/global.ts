@@ -20,8 +20,6 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         compactAlgorithm: false,
         // antd border radius
         borderRadius: 6,
-        // current system language
-        language: null,
         // Whether the current page is full screen
         maximize: false,
         // theme color
