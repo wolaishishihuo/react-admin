@@ -15,7 +15,7 @@ const LayoutFooter: React.FC = () => {
   return (
     <React.Fragment>
       {footer && (
-        <Footer className="ant-footer">
+        <Footer className="ant-footer flex-center">
           <a href="#" target="_blank" rel="noreferrer">
             2026 © {APP_TITLE}
           </a>

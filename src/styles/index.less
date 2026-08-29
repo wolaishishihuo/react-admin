@@ -1,4 +1,3 @@
-@import url("./common.less");
 @import url("./proTable.less");
 @import url("./transition.less");
 
@@ -40,4 +39,20 @@ body,
   box-shadow:
     0 0 10px var(--hooks-colorPrimary),
     0 0 5px var(--hooks-colorPrimary) !important;
+}
+
+/* page maximize — nested layout selectors, not a utility */
+.main-maximize {
+  .app-header,
+  .ant-layout-sider,
+  .ant-layout-header,
+  .ant-layout-footer,
+  .ant-footer,
+  .sider-split {
+    display: none !important;
+  }
+  .app-content {
+    width: 100%;
+    margin: 0;
+  }
 }

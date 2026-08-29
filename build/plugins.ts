@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
+import UnoCSS from "unocss/vite";
 import { PluginOption } from "vite";
 import checker from "vite-plugin-checker";
 import viteCompression from "vite-plugin-compression";
@@ -16,6 +17,8 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
   const { VITE_GLOB_APP_TITLE, VITE_REPORT, VITE_PWA } = viteEnv;
 
   return [
+    // Before React so attributify / JSX transforms stay available later
+    UnoCSS(),
     react(),
     // esLint error messages are displayed on the browser interface
     checker({ typescript: true }),

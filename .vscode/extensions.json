@@ -6,6 +6,7 @@
     "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
     "streetsidesoftware.code-spell-checker",
-    "mikestead.dotenv"
+    "mikestead.dotenv",
+    "antfu.unocss"
   ]
 }
