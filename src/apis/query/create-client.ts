@@ -1,7 +1,7 @@
-import type { DefaultOptions } from "@tanstack/react-query";
-import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import type { DefaultOptions } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 
-import { DEFAULT_MUTATION_CONFIG, DEFAULT_QUERY_CONFIG } from "./defaults";
+import { DEFAULT_MUTATION_CONFIG, DEFAULT_QUERY_CONFIG } from './defaults';
 
 type MutationCacheConfig = ConstructorParameters<typeof MutationCache>[0];
 type QueryCacheConfig = ConstructorParameters<typeof QueryCache>[0];

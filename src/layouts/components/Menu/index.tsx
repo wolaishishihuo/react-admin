@@ -1,16 +1,16 @@
-import "./index.less";
+import './index.less';
 
-import { Menu, MenuProps } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { useLocation, useMatches, useNavigate } from "react-router-dom";
+import { Menu, MenuProps } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 
-import { Icon } from "@/components/Icon";
-import { MetaProps, RouteObjectType } from "@/routers/interface";
-import { useAuthStore, useGlobalStore } from "@/stores";
-import { getOpenKeys } from "@/utils";
+import { Icon } from '@/components/Icon';
+import { MetaProps, RouteObjectType } from '@/routers/interface';
+import { useAuthStore, useGlobalStore } from '@/stores';
+import { getOpenKeys } from '@/utils';
 
 interface LayoutMenuProps {
-  mode: MenuProps["mode"];
+  mode: MenuProps['mode'];
   menuList?: RouteObjectType[];
   menuSplit?: boolean;
 }
@@ -35,14 +35,14 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [splitSelectedKeys, setSplitSelectedKeys] = useState<string[]>([]);
 
-  type MenuItem = Required<MenuProps>["items"][number];
+  type MenuItem = Required<MenuProps>['items'][number];
 
   function getItem(
     label: React.ReactNode,
     key?: React.Key | null,
     icon?: React.ReactNode,
     children?: MenuItem[],
-    type?: "group"
+    type?: 'group'
   ): MenuItem {
     return {
       key,
@@ -70,7 +70,7 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
     setSelectedKeys([path]);
 
     // Set Split Selected Keys (find can be found to represent children)
-    const splitPath = `/${path.split("/")[1]}`;
+    const splitPath = `/${path.split('/')[1]}`;
     const splitKeys = showMenuList.find(item => item.path === splitPath) ? splitPath : path;
     setSplitSelectedKeys([splitKeys]);
 
@@ -78,7 +78,7 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
     if (accordion) setTimeout(() => isCollapse || setOpenKeys(getOpenKeys(pathname)));
   }, [matches, isCollapse]);
 
-  const onOpenChange: MenuProps["onOpenChange"] = openKeys => {
+  const onOpenChange: MenuProps['onOpenChange'] = openKeys => {
     if (openKeys.length === 0 || openKeys.length === 1) return setOpenKeys(openKeys);
     const latestOpenKey = openKeys[openKeys.length - 1];
     if (latestOpenKey.includes(openKeys[0])) return setOpenKeys(openKeys);
@@ -87,11 +87,11 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
 
   const handleMenuNavigation = (path: string) => {
     const menuItem = flatMenuList.find(item => item.path === path);
-    if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, "_blank");
+    if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, '_blank');
     navigate(path);
   };
 
-  const clickMenu: MenuProps["onClick"] = ({ key }) => {
+  const clickMenu: MenuProps['onClick'] = ({ key }) => {
     // If not split menu
     if (!menuSplit) return handleMenuNavigation(key);
 
@@ -101,8 +101,8 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
     handleMenuNavigation(key);
   };
 
-  const isClassicLayout = useMemo(() => layout === "classic", [layout]);
-  const isTransverseLayout = useMemo(() => layout === "transverse", [layout]);
+  const isClassicLayout = useMemo(() => layout === 'classic', [layout]);
+  const isTransverseLayout = useMemo(() => layout === 'transverse', [layout]);
 
   const isDarkTheme = useMemo(() => {
     if (isDark) return true;
@@ -114,7 +114,7 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
 
   return (
     <Menu
-      theme={isDarkTheme ? "dark" : "light"}
+      theme={isDarkTheme ? 'dark' : 'light'}
       mode={mode}
       selectedKeys={menuSplit ? splitSelectedKeys : selectedKeys}
       onClick={clickMenu}

@@ -1,15 +1,15 @@
-import { lazy } from "react";
-import { Navigate } from "react-router-dom";
+import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
-import LazyComponent from "@/components/Lazy";
-import LayoutIndex from "@/layouts";
-import { getFlatMenuList } from "@/utils";
+import LazyComponent from '@/components/Lazy';
+import LayoutIndex from '@/layouts';
+import { getFlatMenuList } from '@/utils';
 
-import { RouteObjectType } from "../interface";
-import RouterGuard from "./RouterGuard";
+import { RouteObjectType } from '../interface';
+import RouterGuard from './RouterGuard';
 
 // Import all view files in the views directory
-const modules = import.meta.glob("@/views/**/*.tsx") as Record<string, Parameters<typeof lazy>[number]>;
+const modules = import.meta.glob('@/views/**/*.tsx') as Record<string, Parameters<typeof lazy>[number]>;
 
 /**
  * @description Convert menuList to the format required by react-router
@@ -28,8 +28,8 @@ export const convertToDynamicRouterFormat = (authMenuList: RouteObjectType[]) =>
     if (item.redirect) item.element = <Navigate to={item.redirect} />;
 
     // Convert element to antd component
-    if (item.element && typeof item.element == "string") {
-      const Component = LazyComponent(lazy(modules["/src/views" + item.element + ".tsx"]));
+    if (item.element && typeof item.element == 'string') {
+      const Component = LazyComponent(lazy(modules['/src/views' + item.element + '.tsx']));
       item.element = <RouterGuard>{Component}</RouterGuard>;
     }
 

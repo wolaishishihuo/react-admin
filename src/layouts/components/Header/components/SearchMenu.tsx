@@ -1,12 +1,12 @@
-import { EnterOutlined, SearchOutlined } from "@ant-design/icons";
-import { useDebounce } from "ahooks";
-import { Empty, Input, InputRef, Modal } from "antd";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { EnterOutlined, SearchOutlined } from '@ant-design/icons';
+import { useDebounce } from 'ahooks';
+import { Empty, Input, InputRef, Modal } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { Icon } from "@/components/Icon";
-import { RouteObjectType } from "@/routers/interface";
-import { useAuthStore } from "@/stores";
+import { Icon } from '@/components/Icon';
+import { RouteObjectType } from '@/routers/interface';
+import { useAuthStore } from '@/stores';
 
 const SearchMenu: React.FC = () => {
   const navigate = useNavigate();
@@ -17,8 +17,8 @@ const SearchMenu: React.FC = () => {
   const menuListRef = useRef<HTMLDivElement>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activePath, setActivePath] = useState("");
-  const [searchValue, setSearchValue] = useState("");
+  const [activePath, setActivePath] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
   const debouncedSearchValue = useDebounce(searchValue, { wait: 300 });
 
@@ -41,7 +41,7 @@ const SearchMenu: React.FC = () => {
   }, [debouncedSearchValue]);
 
   useEffect(() => {
-    searchList.length ? setActivePath(searchList[0].path!) : setActivePath("");
+    searchList.length ? setActivePath(searchList[0].path!) : setActivePath('');
   }, [searchList]);
 
   const mouseoverMenuItem = (item: RouteObjectType) => {
@@ -63,19 +63,19 @@ const SearchMenu: React.FC = () => {
   const selectMenuItem = () => {
     const menu = searchList.find(item => item.path === activePath);
     if (!menu) return;
-    if (menu.meta?.isLink) window.open(menu.meta.isLink, "_blank");
+    if (menu.meta?.isLink) window.open(menu.meta.isLink, '_blank');
     navigate(menu.path!);
     closeModal();
   };
 
   const keyboardOperation = (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp") {
+    if (event.key === 'ArrowUp') {
       event.preventDefault();
       keyPressUpOrDown(-1);
-    } else if (event.key === "ArrowDown") {
+    } else if (event.key === 'ArrowDown') {
       event.preventDefault();
       keyPressUpOrDown(1);
-    } else if (event.key === "Enter") {
+    } else if (event.key === 'Enter') {
       event.preventDefault();
       selectMenuItem();
     }
@@ -83,48 +83,48 @@ const SearchMenu: React.FC = () => {
 
   useEffect(() => {
     const handler = isModalOpen ? window.addEventListener : window.removeEventListener;
-    handler("keydown", keyboardOperation);
-    return () => window.removeEventListener("keydown", keyboardOperation);
+    handler('keydown', keyboardOperation);
+    return () => window.removeEventListener('keydown', keyboardOperation);
   }, [isModalOpen, keyboardOperation]);
 
   useEffect(() => {
     if (isModalOpen) {
-      setTimeout(() => inputRef.current?.focus({ cursor: "start" }), 10);
+      setTimeout(() => inputRef.current?.focus({ cursor: 'start' }), 10);
     } else {
-      setSearchValue("");
+      setSearchValue('');
     }
   }, [isModalOpen]);
 
   return (
     <React.Fragment>
-      <i className="iconfont icon-sousuo" onClick={showModal}></i>
-      <Modal className="search-modal" width={600} footer={null} closable={false} open={isModalOpen} onCancel={closeModal}>
+      <i className='iconfont icon-sousuo' onClick={showModal}></i>
+      <Modal className='search-modal' width={600} footer={null} closable={false} open={isModalOpen} onCancel={closeModal}>
         <Input
           ref={inputRef}
-          placeholder="菜单搜索：支持菜单名称、路径"
-          size="large"
-          prefix={<SearchOutlined style={{ fontSize: "18px" }} />}
+          placeholder='菜单搜索：支持菜单名称、路径'
+          size='large'
+          prefix={<SearchOutlined style={{ fontSize: '18px' }} />}
           allowClear={true}
           value={searchValue}
           onChange={handleInputChange}
         />
         {searchList.length ? (
-          <div className="menu-list" ref={menuListRef}>
+          <div className='menu-list' ref={menuListRef}>
             {searchList.map(item => (
               <div
                 key={item.path}
-                className={`menu-item ${item.path === activePath && "menu-active"}`}
+                className={`menu-item ${item.path === activePath && 'menu-active'}`}
                 onMouseEnter={() => mouseoverMenuItem(item)}
                 onClick={() => selectMenuItem()}
               >
-                <Icon className="menu-icon" name={item.meta!.icon!} />
-                <span className="menu-title">{item.meta?.title}</span>
-                <EnterOutlined className="menu-enter" />
+                <Icon className='menu-icon' name={item.meta!.icon!} />
+                <span className='menu-title'>{item.meta?.title}</span>
+                <EnterOutlined className='menu-enter' />
               </div>
             ))}
           </div>
         ) : (
-          <Empty className="mt40 mb30" description="暂无菜单" />
+          <Empty className='mb30 mt40' description='暂无菜单' />
         )}
       </Modal>
     </React.Fragment>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface EyeDropperResult {
   color: string;
@@ -11,7 +11,7 @@ interface EyeDropperResult {
  * @description  Use EyeDropper
  */
 const useEyeDropper = (): EyeDropperResult => {
-  const [color, setColor] = useState<string>("");
+  const [color, setColor] = useState<string>('');
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const useEyeDropper = (): EyeDropperResult => {
 
   const openEyeDropper = async () => {
     if (!window.EyeDropper) {
-      console.log("EyeDropper API is not supported in this browser.");
+      console.log('EyeDropper API is not supported in this browser.');
       return;
     }
     // Create a new EyeDropper instance

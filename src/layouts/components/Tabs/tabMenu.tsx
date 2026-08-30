@@ -6,8 +6,8 @@ import {
   SwitcherOutlined,
   VerticalLeftOutlined,
   VerticalRightOutlined
-} from "@ant-design/icons";
-import type { MenuProps } from "antd";
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
 
 const iconStyle = { fontSize: 14 };
 
@@ -22,51 +22,51 @@ type TabMenuHandlers = {
   closeAll: () => void;
 };
 
-export const buildTabMenuItems = (targetPath: string, handlers: TabMenuHandlers): MenuProps["items"] => {
+export const buildTabMenuItems = (targetPath: string, handlers: TabMenuHandlers): MenuProps['items'] => {
   const isCurrent = targetPath === handlers.currentPath;
 
   return [
     {
-      key: "refresh",
+      key: 'refresh',
       label: <span>刷新</span>,
       icon: <ReloadOutlined style={iconStyle} />,
       disabled: !isCurrent,
       onClick: handlers.refresh
     },
     {
-      key: "maximize",
+      key: 'maximize',
       label: <span>最大化</span>,
       icon: <ExpandOutlined style={iconStyle} />,
       onClick: handlers.maximize
     },
-    { type: "divider" },
+    { type: 'divider' },
     {
-      key: "closeCurrent",
+      key: 'closeCurrent',
       label: <span>关闭当前</span>,
       icon: <CloseCircleOutlined style={iconStyle} />,
       onClick: () => handlers.closeCurrent(targetPath)
     },
     {
-      key: "closeLeft",
+      key: 'closeLeft',
       label: <span>关闭左侧</span>,
       icon: <VerticalRightOutlined style={iconStyle} />,
       onClick: () => handlers.closeLeft(targetPath)
     },
     {
-      key: "closeRight",
+      key: 'closeRight',
       label: <span>关闭右侧</span>,
       icon: <VerticalLeftOutlined style={iconStyle} />,
       onClick: () => handlers.closeRight(targetPath)
     },
-    { type: "divider" },
+    { type: 'divider' },
     {
-      key: "closeOther",
+      key: 'closeOther',
       label: <span>关闭其它</span>,
       icon: <ColumnWidthOutlined style={iconStyle} />,
       onClick: () => handlers.closeOther(targetPath)
     },
     {
-      key: "closeAll",
+      key: 'closeAll',
       label: <span>关闭所有</span>,
       icon: <SwitcherOutlined style={iconStyle} />,
       onClick: handlers.closeAll

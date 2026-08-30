@@ -1,10 +1,10 @@
-import type { ConfigProviderProps } from "antd";
+import type { ConfigProviderProps } from 'antd';
 
-import { RouteObjectType } from "@/routers/interface";
+import { RouteObjectType } from '@/routers/interface';
 
-export type SizeType = NonNullable<ConfigProviderProps["componentSize"]>;
+export type SizeType = NonNullable<ConfigProviderProps['componentSize']>;
 
-export type LayoutType = "vertical" | "classic" | "transverse" | "columns";
+export type LayoutType = 'vertical' | 'classic' | 'transverse' | 'columns';
 
 /* GlobalState */
 export interface GlobalState {
@@ -51,10 +51,10 @@ export interface TabsState {
 }
 
 export interface TabsAction {
-  setTabsList: (tabsList: TabsState["tabsList"]) => void;
+  setTabsList: (tabsList: TabsState['tabsList']) => void;
   addTab: (tabs: TabsListProp) => void;
   removeTab: (path: string, isCurrent: boolean) => void;
-  closeTabsOnSide: (path: string, type: "left" | "right") => void;
+  closeTabsOnSide: (path: string, type: 'left' | 'right') => void;
   closeMultipleTab: (path?: string) => void;
   setTabTitle: (title: string) => void;
 }
@@ -67,9 +67,9 @@ export interface UserState {
 }
 
 export interface UserAction {
-  setToken: (token: UserState["token"]) => void;
-  setRefreshToken: (refreshToken: UserState["refreshToken"]) => void;
-  setUserInfo: (token: UserState["userInfo"]) => void;
+  setToken: (token: UserState['token']) => void;
+  setRefreshToken: (refreshToken: UserState['refreshToken']) => void;
+  setUserInfo: (token: UserState['userInfo']) => void;
 }
 
 /* AuthState */
@@ -81,6 +81,6 @@ export interface AuthState {
 }
 
 export interface AuthAction {
-  setAuthButtonList: (authButtonList: AuthState["authButtonList"]) => void;
-  setAuthMenuList: (authMenuList: AuthState["authMenuList"]) => void;
+  setAuthButtonList: (authButtonList: AuthState['authButtonList']) => void;
+  setAuthMenuList: (authMenuList: AuthState['authMenuList']) => void;
 }

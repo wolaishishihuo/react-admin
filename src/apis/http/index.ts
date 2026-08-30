@@ -1,17 +1,17 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
-import { ResultData } from "@/apis/interface";
-import { LOGIN_URLS } from "@/apis/modules/login/urls";
-import { queryClient } from "@/apis/query";
-import { showFullScreenLoading, tryHideFullScreenLoading } from "@/components/Loading/fullScreen";
-import { enableRefreshToken, LOGIN_URL } from "@/config";
-import { ResultEnum } from "@/constants";
-import { message } from "@/hooks/useMessage";
-import { useUserStore } from "@/stores";
+import { ResultData } from '@/apis/interface';
+import { LOGIN_URLS } from '@/apis/modules/login/urls';
+import { queryClient } from '@/apis/query';
+import { showFullScreenLoading, tryHideFullScreenLoading } from '@/components/Loading/fullScreen';
+import { enableRefreshToken, LOGIN_URL } from '@/config';
+import { ResultEnum } from '@/constants';
+import { message } from '@/hooks/useMessage';
+import { useUserStore } from '@/stores';
 
-import { checkStatus } from "./helper/checkStatus";
+import { checkStatus } from './helper/checkStatus';
 
-declare module "axios" {
+declare module 'axios' {
   interface AxiosRequestConfig {
     /** 续签后的重放标记：带此标记的 401 不再二次刷新 */
     __isRetryRequest?: boolean;
@@ -37,8 +37,8 @@ function formatToken(token: null | string) {
 
 async function doReAuthenticate() {
   queryClient.clear();
-  useUserStore.getState().setToken("");
-  useUserStore.getState().setRefreshToken("");
+  useUserStore.getState().setToken('');
+  useUserStore.getState().setRefreshToken('');
   window.$navigate(LOGIN_URL);
 }
 
@@ -48,7 +48,7 @@ async function doRefreshToken() {
   const payload = resp.data?.data ?? {};
   const newToken = payload.accessToken || payload.access_token;
   if (!newToken) {
-    throw new Error("Refresh token failed");
+    throw new Error('Refresh token failed');
   }
   useUserStore.getState().setToken(newToken);
   if (payload.refreshToken) {
@@ -68,8 +68,8 @@ class RequestHttp {
     this.service.interceptors.request.use(
       (config: CustomAxiosRequestConfig) => {
         config.loading && showFullScreenLoading();
-        if (config.headers && typeof config.headers.set === "function") {
-          config.headers.set("Authorization", formatToken(useUserStore.getState().token));
+        if (config.headers && typeof config.headers.set === 'function') {
+          config.headers.set('Authorization', formatToken(useUserStore.getState().token));
         }
         return config;
       },
@@ -94,10 +94,10 @@ class RequestHttp {
           return this.handleHttpUnauthorized(error, config);
         }
 
-        if (error.message.indexOf("timeout") !== -1) message.error("请求超时！请您稍后重试");
-        if (error.message.indexOf("Network Error") !== -1) message.error("网络错误！请您稍后重试");
+        if (error.message.indexOf('timeout') !== -1) message.error('请求超时！请您稍后重试');
+        if (error.message.indexOf('Network Error') !== -1) message.error('网络错误！请您稍后重试');
         if (response) checkStatus(response.status);
-        if (!window.navigator.onLine) window.$navigate("/500");
+        if (!window.navigator.onLine) window.$navigate('/500');
         return Promise.reject(error);
       }
     );
@@ -138,7 +138,7 @@ class RequestHttp {
       this.refreshTokenQueue = [];
       return this.service.request(config);
     } catch (refreshError) {
-      this.refreshTokenQueue.forEach(callback => callback(""));
+      this.refreshTokenQueue.forEach(callback => callback(''));
       this.refreshTokenQueue = [];
       await doReAuthenticate();
       throw refreshError;
@@ -160,7 +160,7 @@ class RequestHttp {
     return this.service.delete(url, { params, ..._object });
   }
   download(url: string, params?: object, _object = {}): Promise<BlobPart> {
-    return this.service.post(url, params, { ..._object, responseType: "blob" });
+    return this.service.post(url, params, { ..._object, responseType: 'blob' });
   }
 }
 

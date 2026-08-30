@@ -1,45 +1,49 @@
 // @see: https://eslint.org/docs/latest/use/configure/configuration-files
-import js from "@eslint/js";
-import { defineConfig } from "eslint/config";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import reactPlugin from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import js from '@eslint/js';
+import unocss from '@unocss/eslint-config/flat';
+import { defineConfig } from 'eslint/config';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig(
   {
     ignores: [
-      "dist/**",
-      "node_modules/**",
-      "public/**",
-      "docs/**",
-      "bin/**",
-      "stats.html",
-      "*.sh",
-      "**/*.md",
-      "**/*.woff",
-      "**/*.ttf",
-      ".vscode/**",
-      ".idea/**",
-      ".husky/**",
-      ".local/**"
+      'dist/**',
+      'node_modules/**',
+      'public/**',
+      'docs/**',
+      'bin/**',
+      'stats.html',
+      '*.sh',
+      '**/*.md',
+      '**/*.woff',
+      '**/*.ttf',
+      '.vscode/**',
+      '.idea/**',
+      '.husky/**',
+      '.local/**'
     ]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // UnoCSS class order (unocss/order). Must stay before prettier/recommended.
+  // Do not add prettier-plugin-tailwindcss — its sort order fights this rule.
+  unocss,
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
-    ...reactPlugin.configs.flat["jsx-runtime"],
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    ...reactPlugin.configs.flat['jsx-runtime'],
     settings: {
       react: {
-        version: "detect"
+        version: 'detect'
       }
     },
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
         ...globals.browser,
         ...globals.node
@@ -51,43 +55,45 @@ export default defineConfig(
       }
     },
     plugins: {
-      "react-hooks": reactHooks,
-      "simple-import-sort": simpleImportSort
+      'react-hooks': reactHooks,
+      'simple-import-sort': simpleImportSort
     },
     rules: {
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+
+      // Quotes live in Prettier (singleQuote / jsxSingleQuote). Never add quotes / jsx-quotes here.
+      'unocss/order': 'error',
 
       // eslint (http://eslint.cn/docs/rules)
-      "no-var": "error",
-      "no-multiple-empty-lines": ["error", { max: 1 }],
-      "no-use-before-define": "off",
-      "prefer-const": "off",
+      'no-var': 'error',
+      'no-use-before-define': 'off',
+      'prefer-const': 'off',
 
       // typeScript (https://typescript-eslint.io/rules)
-      "@typescript-eslint/no-unused-vars": [
-        "error",
+      '@typescript-eslint/no-unused-vars': [
+        'error',
         {
-          caughtErrors: "none"
+          caughtErrors: 'none'
         }
       ],
-      "@typescript-eslint/prefer-ts-expect-error": "error",
-      "@typescript-eslint/ban-ts-comment": "error",
-      "@typescript-eslint/no-inferrable-types": "off",
-      "@typescript-eslint/no-namespace": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unused-expressions": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-unsafe-function-type": "off",
+      '@typescript-eslint/prefer-ts-expect-error': 'error',
+      '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/no-inferrable-types': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
 
       // Newly stricter ESLint 10 defaults — keep original template style
-      "no-useless-assignment": "off",
+      'no-useless-assignment': 'off',
 
       // react (https://github.com/jsx-eslint/eslint-plugin-react)
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "off"
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'off'
     }
   },
   eslintPluginPrettierRecommended

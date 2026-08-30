@@ -1,7 +1,7 @@
-import { Button } from "antd";
+import { Button } from 'antd';
 
-import { IconFont } from "@/components/Icon";
-import { useGlobalStore } from "@/stores";
+import { IconFont } from '@/components/Icon';
+import { useGlobalStore } from '@/stores';
 
 const SwitchDark: React.FC = () => {
   const isDark = useGlobalStore(state => state.isDark);
@@ -9,11 +9,11 @@ const SwitchDark: React.FC = () => {
 
   return (
     <Button
-      type="text"
-      size="large"
-      className="switch-dark"
-      icon={<IconFont style={{ fontSize: 22 }} type={isDark ? "icon-sun" : "icon-moon"} />}
-      onClick={() => setGlobalState("isDark", !isDark)}
+      type='text'
+      size='large'
+      className='switch-dark'
+      icon={<IconFont style={{ fontSize: 22 }} type={isDark ? 'icon-sun' : 'icon-moon'} />}
+      onClick={() => setGlobalState('isDark', !isDark)}
     ></Button>
   );
 };

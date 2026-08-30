@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React, { Suspense } from 'react';
 
-import { PageLoader } from "../Loading";
+import { PageLoader } from '../Loading';
 
 /**
  * @description Routing lazy loading

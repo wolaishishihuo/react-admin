@@ -1,10 +1,10 @@
-import { useDebounceFn, useTimeout } from "ahooks";
-import { ECElementEvent, EChartsType } from "echarts";
-import React, { ForwardedRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useDebounceFn, useTimeout } from 'ahooks';
+import { ECElementEvent, EChartsType } from 'echarts';
+import React, { ForwardedRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useGlobalStore } from "@/stores";
+import { useGlobalStore } from '@/stores';
 
-import echarts, { ECOption } from "./config";
+import echarts, { ECOption } from './config';
 
 export interface EChartProps {
   option: ECOption | null | undefined;
@@ -38,12 +38,12 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
 
   useEffect(() => {
     if (cRef.current) {
-      cInstance.current = echarts.getInstanceByDom(cRef.current) as ReturnType<EChartsRef["instance"]>;
+      cInstance.current = echarts.getInstanceByDom(cRef.current) as ReturnType<EChartsRef['instance']>;
       if (!cInstance.current) {
-        cInstance.current = echarts.init(cRef.current, undefined, { renderer: "svg" }) as unknown as ReturnType<
-          EChartsRef["instance"]
+        cInstance.current = echarts.init(cRef.current, undefined, { renderer: 'svg' }) as unknown as ReturnType<
+          EChartsRef['instance']
         >;
-        cInstance.current?.on("click", handleClick);
+        cInstance.current?.on('click', handleClick);
       }
       option && cInstance.current?.setOption(option);
     }
@@ -63,9 +63,9 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
 
   useEffect(() => {
     if (!isResize) return;
-    window.addEventListener("resize", run);
+    window.addEventListener('resize', run);
     return () => {
-      window.removeEventListener("resize", run);
+      window.removeEventListener('resize', run);
     };
   }, [run]);
 
@@ -74,7 +74,7 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
   }));
 
   const echartsStyle = useMemo(
-    () => (width || height ? { height, width } : { height: "100%", width: "100%", flex: 1 }),
+    () => (width || height ? { height, width } : { height: '100%', width: '100%', flex: 1 }),
     [width, height]
   );
 

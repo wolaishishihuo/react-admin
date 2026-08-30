@@ -1,9 +1,9 @@
-import React, { Activity, useContext, useLayoutEffect, useRef } from "react";
-import { useLocation, useMatches, useOutlet } from "react-router-dom";
+import React, { Activity, useContext, useLayoutEffect, useRef } from 'react';
+import { useLocation, useMatches, useOutlet } from 'react-router-dom';
 
-import { RefreshContext } from "@/context/Refresh";
-import { MetaProps } from "@/routers/interface";
-import { useGlobalStore, useTabsStore } from "@/stores";
+import { RefreshContext } from '@/context/Refresh';
+import { MetaProps } from '@/routers/interface';
+import { useGlobalStore, useTabsStore } from '@/stores';
 
 type CachePage = {
   id: string;
@@ -11,9 +11,9 @@ type CachePage = {
 };
 
 const replayEnter = (el: HTMLElement) => {
-  el.classList.remove("keep-alive-enter");
+  el.classList.remove('keep-alive-enter');
   void el.offsetWidth;
-  el.classList.add("keep-alive-enter");
+  el.classList.add('keep-alive-enter');
 };
 
 const KeepAlivePage: React.FC<{
@@ -27,15 +27,15 @@ const KeepAlivePage: React.FC<{
     const el = nodeRef.current;
     if (!el) return;
     if (!active) {
-      el.classList.remove("keep-alive-enter");
+      el.classList.remove('keep-alive-enter');
       return;
     }
     replayEnter(el);
   }, [active]);
 
   return (
-    <div ref={nodeRef} className={`keep-alive-item${active ? " is-active" : ""}`}>
-      <Activity mode={active ? "visible" : "hidden"} name={cacheKey}>
+    <div ref={nodeRef} className={`keep-alive-item${active ? ' is-active' : ''}`}>
+      <Activity mode={active ? 'visible' : 'hidden'} name={cacheKey}>
         {children}
       </Activity>
     </div>
@@ -89,7 +89,7 @@ const KeepAliveOutlet: React.FC = () => {
         </KeepAlivePage>
       ))}
       {!isKeepAlive && (
-        <div ref={liveRef} className="keep-alive-item is-active">
+        <div ref={liveRef} className='keep-alive-item is-active'>
           {outletShow && outlet}
         </div>
       )}

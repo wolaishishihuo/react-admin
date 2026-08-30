@@ -1,10 +1,10 @@
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
-import { shallow } from "zustand/shallow";
-import { createWithEqualityFn } from "zustand/traditional";
+import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
 
-import { TabsAction, TabsState } from "@/stores/interface";
-import { getUrlWithParams } from "@/utils";
+import { TabsAction, TabsState } from '@/stores/interface';
+import { getUrlWithParams } from '@/utils';
 
 export type TabsStoreState = TabsState & TabsAction;
 
@@ -48,7 +48,7 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
           set((draft: TabsState) => {
             const currentIndex = draft.tabsList.findIndex(item => item.path === path);
             if (currentIndex !== -1) {
-              const range = type === "left" ? [0, currentIndex] : [currentIndex + 1, draft.tabsList.length];
+              const range = type === 'left' ? [0, currentIndex] : [currentIndex + 1, draft.tabsList.length];
               draft.tabsList = draft.tabsList.filter((item, index) => {
                 return index < range[0] || index >= range[1] || !item.closable;
               });
@@ -71,7 +71,7 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
           })
       }),
       {
-        name: "hooks-tabs",
+        name: 'hooks-tabs',
         version: 2.0
       }
     )

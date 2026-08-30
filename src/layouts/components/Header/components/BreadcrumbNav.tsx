@@ -1,13 +1,13 @@
-import { Breadcrumb } from "antd";
-import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useMatches } from "react-router-dom";
+import { Breadcrumb } from 'antd';
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useMatches } from 'react-router-dom';
 
-import { Icon } from "@/components/Icon";
-import { HOME_URL } from "@/config";
-import { MetaProps, RouteObjectType } from "@/routers/interface";
-import { useAuthStore, useGlobalStore } from "@/stores";
-import { getAllBreadcrumbList } from "@/utils";
+import { Icon } from '@/components/Icon';
+import { HOME_URL } from '@/config';
+import { MetaProps, RouteObjectType } from '@/routers/interface';
+import { useAuthStore, useGlobalStore } from '@/stores';
+import { getAllBreadcrumbList } from '@/utils';
 
 const BreadcrumbNav: React.FC = () => {
   const matches = useMatches();
@@ -27,7 +27,7 @@ const BreadcrumbNav: React.FC = () => {
     const content = (
       <React.Fragment>
         {breadcrumbIcon && icon && (
-          <span className="mr5">
+          <span className='mr5'>
             <Icon name={icon!} />
           </span>
         )}
@@ -45,7 +45,7 @@ const BreadcrumbNav: React.FC = () => {
 
     // You don’t need breadcrumbs on the home page, you can delete the following judgments
     if (breadcrumbList[0]?.path !== HOME_URL) {
-      breadcrumbList.unshift({ path: HOME_URL, meta: { icon: "HomeOutlined", title: "首页" } });
+      breadcrumbList.unshift({ path: HOME_URL, meta: { icon: 'HomeOutlined', title: '首页' } });
     }
 
     // Processed into the format required by antd breadcrumbs

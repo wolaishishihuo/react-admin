@@ -1,8 +1,8 @@
-import { createQueryClient } from "./create-client";
+import { createQueryClient } from './create-client';
 
 function handleError(error: unknown) {
   if (import.meta.env.DEV) {
-    console.error("Query/Mutation error:", error);
+    console.error('Query/Mutation error:', error);
   }
 }
 

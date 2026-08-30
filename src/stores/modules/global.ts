@@ -1,10 +1,10 @@
-import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
-import { shallow } from "zustand/shallow";
-import { createWithEqualityFn } from "zustand/traditional";
+import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
 
-import { DEFAULT_PRIMARY } from "@/config";
-import { GlobalAction, GlobalState } from "@/stores/interface";
+import { DEFAULT_PRIMARY } from '@/config';
+import { GlobalAction, GlobalState } from '@/stores/interface';
 
 export type GlobalStoreState = GlobalState & GlobalAction;
 
@@ -13,9 +13,9 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
     persist(
       set => ({
         // layout mode (vertical | classic | transverse | columns)
-        layout: "vertical",
+        layout: 'vertical',
         // antd component size ("small" | "middle" | "large")
-        componentSize: "middle",
+        componentSize: 'middle',
         // antd compact theme
         compactAlgorithm: false,
         // antd border radius
@@ -64,7 +64,7 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
           })
       }),
       {
-        name: "hooks-global",
+        name: 'hooks-global',
         version: 1.0
       }
     )

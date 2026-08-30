@@ -1,18 +1,18 @@
-import "./index.less";
+import './index.less';
 
-import { CloseOutlined, DownOutlined } from "@ant-design/icons";
-import { useUpdateEffect } from "ahooks";
-import { Dropdown } from "antd";
-import React, { useContext, useEffect, useRef } from "react";
-import { useLocation, useMatches, useNavigate } from "react-router-dom";
+import { CloseOutlined, DownOutlined } from '@ant-design/icons';
+import { useUpdateEffect } from 'ahooks';
+import { Dropdown } from 'antd';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 
-import { Icon } from "@/components/Icon";
-import { HOME_URL } from "@/config";
-import { RefreshContext } from "@/context/Refresh";
-import { MetaProps } from "@/routers/interface";
-import { useAuthStore, useGlobalStore, useTabsStore } from "@/stores";
+import { Icon } from '@/components/Icon';
+import { HOME_URL } from '@/config';
+import { RefreshContext } from '@/context/Refresh';
+import { MetaProps } from '@/routers/interface';
+import { useAuthStore, useGlobalStore, useTabsStore } from '@/stores';
 
-import { buildTabMenuItems } from "./tabMenu";
+import { buildTabMenuItems } from './tabMenu';
 
 const LayoutTabs: React.FC = () => {
   const matches = useMatches();
@@ -74,22 +74,22 @@ const LayoutTabs: React.FC = () => {
       scroller.scrollLeft += event.deltaY + event.deltaX;
     };
 
-    scroller.addEventListener("wheel", onWheel, { passive: false });
-    return () => scroller.removeEventListener("wheel", onWheel);
+    scroller.addEventListener('wheel', onWheel, { passive: false });
+    return () => scroller.removeEventListener('wheel', onWheel);
   }, [tabs]);
 
   useEffect(() => {
-    const active = scrollRef.current?.querySelector<HTMLElement>(".work-tab-item.is-active");
-    active?.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+    const active = scrollRef.current?.querySelector<HTMLElement>('.work-tab-item.is-active');
+    active?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
   }, [path, tabsList]);
 
   const handlers = {
     currentPath: path,
     refresh,
-    maximize: () => setGlobalState("maximize", true),
+    maximize: () => setGlobalState('maximize', true),
     closeCurrent: (tabPath: string) => removeTab(tabPath, tabPath === path),
-    closeLeft: (tabPath: string) => closeTabsOnSide(tabPath, "left"),
-    closeRight: (tabPath: string) => closeTabsOnSide(tabPath, "right"),
+    closeLeft: (tabPath: string) => closeTabsOnSide(tabPath, 'left'),
+    closeRight: (tabPath: string) => closeTabsOnSide(tabPath, 'right'),
     closeOther: (tabPath: string) => closeMultipleTab(tabPath),
     closeAll: () => {
       closeMultipleTab();
@@ -106,20 +106,20 @@ const LayoutTabs: React.FC = () => {
   if (!tabs) return null;
 
   return (
-    <div className="work-tab">
-      <div className="work-tab-scroll" ref={scrollRef}>
-        <ul className="work-tab-list">
+    <div className='work-tab'>
+      <div className='work-tab-scroll' ref={scrollRef}>
+        <ul className='work-tab-list'>
           {tabsList.map(item => {
             const active = item.path === path;
             const showClose = item.closable && tabsList.length > 1;
 
             return (
-              <Dropdown key={item.path} trigger={["contextMenu"]} menu={{ items: buildTabMenuItems(item.path, handlers) }}>
-                <li className={`work-tab-item${active ? " is-active" : ""}`} onClick={() => navigate(item.path)}>
-                  {tabsIcon && item.icon && <Icon className="work-tab-icon" name={item.icon} />}
-                  <span className="work-tab-title">{item.title}</span>
+              <Dropdown key={item.path} trigger={['contextMenu']} menu={{ items: buildTabMenuItems(item.path, handlers) }}>
+                <li className={`work-tab-item${active ? ' is-active' : ''}`} onClick={() => navigate(item.path)}>
+                  {tabsIcon && item.icon && <Icon className='work-tab-icon' name={item.icon} />}
+                  <span className='work-tab-title'>{item.title}</span>
                   {showClose && (
-                    <span className="work-tab-close" onClick={event => closeTab(event, item.path, item.closable)}>
+                    <span className='work-tab-close' onClick={event => closeTab(event, item.path, item.closable)}>
                       <CloseOutlined />
                     </span>
                   )}
@@ -129,8 +129,8 @@ const LayoutTabs: React.FC = () => {
           })}
         </ul>
       </div>
-      <Dropdown trigger={["click"]} menu={{ items: buildTabMenuItems(path, handlers) }}>
-        <button className="work-tab-more" type="button">
+      <Dropdown trigger={['click']} menu={{ items: buildTabMenuItems(path, handlers) }}>
+        <button className='work-tab-more' type='button'>
           <DownOutlined />
         </button>
       </Dropdown>

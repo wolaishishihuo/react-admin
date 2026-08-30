@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 
-import { AuthAction, AuthState } from "@/stores/interface";
-import { getFlatMenuList, getShowMenuList } from "@/utils";
+import { AuthAction, AuthState } from '@/stores/interface';
+import { getFlatMenuList, getShowMenuList } from '@/utils';
 
 export type AuthStoreState = AuthState & AuthAction;
 

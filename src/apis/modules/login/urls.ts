@@ -1,4 +1,4 @@
-import { PORT1 } from "@/apis/http/config/servicePort";
+import { PORT1 } from '@/apis/http/config/servicePort';
 
 export const LOGIN_URLS = {
   AUTH_BUTTONS: `${PORT1}/auth/buttons`,

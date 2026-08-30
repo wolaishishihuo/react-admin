@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import { useAuthStore } from "@/stores";
-import { getMenuByPath } from "@/utils";
+import { useAuthStore } from '@/stores';
+import { getMenuByPath } from '@/utils';
 
 type AuthButtonProps = {
   authority: string | string[];
@@ -15,7 +15,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ authority, children }) => {
 
   let isAuth = false;
 
-  if (typeof authority === "string") {
+  if (typeof authority === 'string') {
     authButtonList[meta.key!]?.includes(authority) && (isAuth = true);
   }
 

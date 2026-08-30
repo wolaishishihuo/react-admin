@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { useGlobalStore } from "@/stores";
+import { useGlobalStore } from '@/stores';
 
 const Maximize: React.FC = () => {
   const maximize = useGlobalStore(state => state.maximize);
@@ -9,8 +9,8 @@ const Maximize: React.FC = () => {
   return (
     <React.Fragment>
       {maximize && (
-        <div className="maximize-icon" onClick={() => setGlobalState("maximize", false)}>
-          <i className="iconfont icon-tuichu"></i>;
+        <div className='maximize-icon' onClick={() => setGlobalState('maximize', false)}>
+          <i className='iconfont icon-tuichu'></i>;
         </div>
       )}
     </React.Fragment>

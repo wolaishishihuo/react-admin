@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 
-import ThemeDrawer from "@/layouts/components/ThemeDrawer";
-import { useGlobalStore } from "@/stores";
+import ThemeDrawer from '@/layouts/components/ThemeDrawer';
+import { useGlobalStore } from '@/stores';
 
-import LayoutWatermark from "./components/LayoutWatermark";
-import LayoutClassic from "./LayoutClassic";
-import LayoutColumns from "./LayoutColumns";
-import LayoutTransverse from "./LayoutTransverse";
-import LayoutVertical from "./LayoutVertical";
+import LayoutWatermark from './components/LayoutWatermark';
+import LayoutClassic from './LayoutClassic';
+import LayoutColumns from './LayoutColumns';
+import LayoutTransverse from './LayoutTransverse';
+import LayoutVertical from './LayoutVertical';
 
 const LayoutIndex: React.FC = () => {
   const layout = useGlobalStore(state => state.layout);

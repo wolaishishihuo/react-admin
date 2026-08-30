@@ -72,6 +72,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@types/react-transition-group": "^4.4.12",
+    "@unocss/eslint-config": "66.8.1",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
     "cz-git": "^1.14.0",

@@ -1,6 +1,6 @@
-import { fetchGetAuthButtonList, fetchGetAuthMenuList } from "@/apis/modules/login";
-import { notification } from "@/hooks/useMessage";
-import { useAuthStore, useUserStore } from "@/stores";
+import { fetchGetAuthButtonList, fetchGetAuthMenuList } from '@/apis/modules/login';
+import { notification } from '@/hooks/useMessage';
+import { useAuthStore, useUserStore } from '@/stores';
 
 let inFlight: { token: string; promise: Promise<void> } | null = null;
 
@@ -23,20 +23,20 @@ const usePermissions = () => {
         setAuthButtonList(buttonList);
 
         const menuList = await fetchGetAuthMenuList();
-        setAuthMenuList(menuList.filter(item => item.meta?.key === "home" || item.meta?.key === "system"));
+        setAuthMenuList(menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system'));
 
         if (!menuList.length) {
           notification.warning({
-            title: "无权限访问",
-            description: "当前账号无任何菜单权限，请联系系统管理员！"
+            title: '无权限访问',
+            description: '当前账号无任何菜单权限，请联系系统管理员！'
           });
-          setToken("");
-          setRefreshToken("");
-          return Promise.reject("No permission");
+          setToken('');
+          setRefreshToken('');
+          return Promise.reject('No permission');
         }
       } catch (error) {
-        setToken("");
-        setRefreshToken("");
+        setToken('');
+        setRefreshToken('');
         return Promise.reject(error);
       } finally {
         if (inFlight?.token === token) inFlight = null;

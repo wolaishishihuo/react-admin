@@ -1,6 +1,6 @@
-import { createContext, useCallback, useMemo, useState } from "react";
+import { createContext, useCallback, useMemo, useState } from 'react';
 
-import { queryClient } from "@/apis/query";
+import { queryClient } from '@/apis/query';
 
 interface RefreshContextType {
   outletShow: boolean;

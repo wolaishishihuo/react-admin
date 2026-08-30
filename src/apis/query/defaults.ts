@@ -1,7 +1,7 @@
 /** Default Query config */
 export const DEFAULT_QUERY_CONFIG = {
   gcTime: 10 * 60 * 1000,
-  networkMode: "online" as const,
+  networkMode: 'online' as const,
   refetchOnMount: true,
   refetchOnReconnect: true,
   refetchOnWindowFocus: false,
@@ -15,7 +15,7 @@ export const DEFAULT_QUERY_CONFIG = {
 /** Default Mutation config */
 export const DEFAULT_MUTATION_CONFIG = {
   gcTime: 60 * 1000,
-  networkMode: "online" as const,
+  networkMode: 'online' as const,
   retry: 1,
   retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 10000),
   throwOnError: false

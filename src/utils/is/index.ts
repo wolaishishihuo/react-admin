@@ -9,14 +9,14 @@ export function is(val: unknown, type: string) {
  * @description:  Check if a value is a function.
  */
 export function isFunction<T = Function>(val: unknown): val is T {
-  return is(val, "Function");
+  return is(val, 'Function');
 }
 
 /**
  * @description: Check if a value is defined.
  */
 export const isDef = <T = unknown>(val?: T): val is T => {
-  return typeof val !== "undefined";
+  return typeof val !== 'undefined';
 };
 
 /**
@@ -30,49 +30,49 @@ export const isUnDef = <T = unknown>(val?: T): val is T => {
  * @description: Check if a value is an object.
  */
 export const isObject = (val: any): val is Record<any, any> => {
-  return val !== null && is(val, "Object");
+  return val !== null && is(val, 'Object');
 };
 
 /**
  * @description: Check if a value is a date.
  */
 export function isDate(val: unknown): val is Date {
-  return is(val, "Date");
+  return is(val, 'Date');
 }
 
 /**
  * @description: Check if a value is a number.
  */
 export function isNumber(val: unknown): val is number {
-  return is(val, "Number");
+  return is(val, 'Number');
 }
 
 /**
  * @description: Check if a value is an AsyncFunction.
  */
 export function isAsyncFunction<T = any>(val: unknown): val is Promise<T> {
-  return is(val, "AsyncFunction");
+  return is(val, 'AsyncFunction');
 }
 
 /**
  * @description: Check if a value is a promise.
  */
 export function isPromise<T = any>(val: unknown): val is Promise<T> {
-  return is(val, "Promise") && isObject(val) && isFunction(val.then) && isFunction(val.catch);
+  return is(val, 'Promise') && isObject(val) && isFunction(val.then) && isFunction(val.catch);
 }
 
 /**
  * @description: Check if a value is a string.
  */
 export function isString(val: unknown): val is string {
-  return is(val, "String");
+  return is(val, 'String');
 }
 
 /**
  * @description: Checks if the value is of boolean type.
  */
 export function isBoolean(val: unknown): val is boolean {
-  return is(val, "Boolean");
+  return is(val, 'Boolean');
 }
 
 /**
@@ -86,14 +86,14 @@ export function isArray(val: any): val is Array<any> {
  * @description: Checks if it's the client.
  */
 export const isClient = () => {
-  return typeof window !== "undefined";
+  return typeof window !== 'undefined';
 };
 
 /**
  * @description: Checks if it's a browser.
  */
 export const isWindow = (val: any): val is Window => {
-  return typeof window !== "undefined" && is(val, "Window");
+  return typeof window !== 'undefined' && is(val, 'Window');
 };
 
 /**

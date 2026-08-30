@@ -1,10 +1,10 @@
-import { defineConfig, presetWind4, transformerDirectives, transformerVariantGroup } from "unocss";
+import { defineConfig, presetWind4, transformerDirectives, transformerVariantGroup } from 'unocss';
 
 const spacingDir: Record<string, string> = {
-  t: "top",
-  r: "right",
-  b: "bottom",
-  l: "left"
+  t: 'top',
+  r: 'right',
+  b: 'bottom',
+  l: 'left'
 };
 
 /**
@@ -14,7 +14,7 @@ const spacingDir: Record<string, string> = {
 export default defineConfig({
   presets: [
     presetWind4({
-      dark: "class",
+      dark: 'class',
       preflights: {
         reset: false
       }
@@ -23,44 +23,44 @@ export default defineConfig({
   transformers: [transformerDirectives(), transformerVariantGroup()],
   theme: {
     colors: {
-      primary: "var(--hooks-colorPrimary)",
-      canvas: "var(--hooks-colorBgContent)",
-      surface: "var(--hooks-colorBgBox)",
-      regular: "var(--hooks-colorTextRegular)",
-      header: "var(--hooks-colorBgHeader)",
-      sider: "var(--hooks-colorBgSider)",
-      login: "var(--hooks-colorBgLoginContainer)"
+      primary: 'var(--hooks-colorPrimary)',
+      canvas: 'var(--hooks-colorBgContent)',
+      surface: 'var(--hooks-colorBgBox)',
+      regular: 'var(--hooks-colorTextRegular)',
+      header: 'var(--hooks-colorBgHeader)',
+      sider: 'var(--hooks-colorBgSider)',
+      login: 'var(--hooks-colorBgLoginContainer)'
     },
     shadow: {
-      analysis: "var(--hooks-boxShadowAnalysis)",
-      login: "var(--hooks-boxShadowLoginForm)"
+      analysis: 'var(--hooks-boxShadowAnalysis)',
+      login: 'var(--hooks-boxShadowLoginForm)'
     }
   },
   shortcuts: {
-    "flex-center": "flex items-center justify-center",
-    "flex-y-center": "flex items-center",
-    "flex-x-center": "flex justify-center",
-    "flx-center": "flex-center",
-    "flx-align-center": "flex items-center",
-    "flx-justify-between": "flex items-center justify-between",
-    sle: "truncate",
-    mle: "line-clamp-2",
-    "content-box": "flex flex-col items-center h-full",
-    card: "box-border p-24px text-14px bg-[var(--hooks-colorBgContainer)] border-solid border-1 border-[var(--hooks-colorBorderSecondary)] rounded-[calc(var(--hooks-borderRadiusLG)*1px)]"
+    'flex-center': 'flex items-center justify-center',
+    'flex-y-center': 'flex items-center',
+    'flex-x-center': 'flex justify-center',
+    'flx-center': 'flex-center',
+    'flx-align-center': 'flex items-center',
+    'flx-justify-between': 'flex items-center justify-between',
+    sle: 'truncate',
+    mle: 'line-clamp-2',
+    'content-box': 'flex flex-col items-center h-full',
+    card: 'box-border p-24px text-14px bg-[var(--hooks-colorBgContainer)] border-solid border-1 border-[var(--hooks-colorBorderSecondary)] rounded-[calc(var(--hooks-borderRadiusLG)*1px)]'
   },
   rules: [
     [
-      "mask-image",
+      'mask-image',
       {
-        "padding-right": "50px",
-        "mask-image": "linear-gradient(90deg, #000 0%, #000 calc(100% - 50px), transparent)"
+        'padding-right': '50px',
+        'mask-image': 'linear-gradient(90deg, #000 0%, #000 calc(100% - 50px), transparent)'
       }
     ],
     // Former common.less loop: mb20 / pt60 → 20px / 60px
     [
       /^([mp])([trbl])(\d+)$/,
       ([, kind, dir, n]) => ({
-        [`${kind === "m" ? "margin" : "padding"}-${spacingDir[dir]}`]: `${n}px !important`
+        [`${kind === 'm' ? 'margin' : 'padding'}-${spacingDir[dir]}`]: `${n}px !important`
       })
     ]
   ]

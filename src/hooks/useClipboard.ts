@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState } from 'react';
 
 interface ClipboardFunctions {
   copyToClipboard: (text: string) => void;
@@ -25,7 +25,7 @@ const useClipboard = (): ClipboardHook => {
       await navigator.clipboard.writeText(text);
       setIsCopied(true);
     } catch (err) {
-      console.error("复制操作不被支持或失败: ", err);
+      console.error('复制操作不被支持或失败: ', err);
     }
   };
 

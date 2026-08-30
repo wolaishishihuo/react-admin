@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
-import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from "@/config";
-import { MetaProps } from "@/routers/interface";
-import { useAuthStore, useUserStore } from "@/stores";
+import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config';
+import { MetaProps } from '@/routers/interface';
+import { useAuthStore, useUserStore } from '@/stores';
 
 /**
  * @description Route guard component

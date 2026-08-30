@@ -6,18 +6,18 @@ export enum ResultEnum {
   ERROR = 500,
   OVERDUE = 401,
   TIMEOUT = 30000,
-  TYPE = "success"
+  TYPE = 'success'
 }
 
 /**
  * @description：request method
  */
 export enum RequestEnum {
-  GET = "GET",
-  POST = "POST",
-  PATCH = "PATCH",
-  PUT = "PUT",
-  DELETE = "DELETE"
+  GET = 'GET',
+  POST = 'POST',
+  PATCH = 'PATCH',
+  PUT = 'PUT',
+  DELETE = 'DELETE'
 }
 
 /**
@@ -25,19 +25,19 @@ export enum RequestEnum {
  */
 export enum ContentTypeEnum {
   // json
-  JSON = "application/json;charset=UTF-8",
+  JSON = 'application/json;charset=UTF-8',
   // text
-  TEXT = "text/plain;charset=UTF-8",
+  TEXT = 'text/plain;charset=UTF-8',
   // form-urlencoded generally cooperates with qs
-  FORM_URLENCODED = "application/x-www-form-urlencoded;charset=UTF-8",
+  FORM_URLENCODED = 'application/x-www-form-urlencoded;charset=UTF-8',
   // form-data upload
-  FORM_DATA = "multipart/form-data;charset=UTF-8"
+  FORM_DATA = 'multipart/form-data;charset=UTF-8'
 }
 
 /**
  * @description：react-router mode
  */
 export enum RouterModeEnum {
-  HASH = "hash",
-  HISTORY = "history"
+  HASH = 'hash',
+  HISTORY = 'history'
 }

@@ -1,7 +1,7 @@
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import React from "react";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import React from 'react';
 
-import { useGlobalStore } from "@/stores";
+import { useGlobalStore } from '@/stores';
 
 const CollapseIcon: React.FC = () => {
   const isCollapse = useGlobalStore(state => state.isCollapse);
@@ -10,8 +10,8 @@ const CollapseIcon: React.FC = () => {
   return (
     <React.Fragment>
       {React.createElement(isCollapse ? MenuUnfoldOutlined : MenuFoldOutlined, {
-        className: "collapsed",
-        onClick: () => setGlobalState("isCollapse", !isCollapse)
+        className: 'collapsed',
+        onClick: () => setGlobalState('isCollapse', !isCollapse)
       })}
     </React.Fragment>
   );

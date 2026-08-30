@@ -1,14 +1,14 @@
-import { theme } from "antd";
-import { useEffect } from "react";
+import { theme } from 'antd';
+import { useEffect } from 'react';
 
-import { useGlobalStore } from "@/stores";
-import globalTheme from "@/styles/theme/global";
-import headerTheme from "@/styles/theme/header";
-import siderTheme from "@/styles/theme/sider";
-import { setStyleProperty } from "@/utils";
-import { getDarkColor, getLightColor } from "@/utils/color";
+import { useGlobalStore } from '@/stores';
+import globalTheme from '@/styles/theme/global';
+import headerTheme from '@/styles/theme/header';
+import siderTheme from '@/styles/theme/sider';
+import { setStyleProperty } from '@/utils';
+import { getDarkColor, getLightColor } from '@/utils/color';
 
-type ThemeType = "light" | "inverted" | "dark";
+type ThemeType = 'light' | 'inverted' | 'dark';
 
 /**
  * @description  Use global theme settings hook
@@ -35,7 +35,7 @@ const useTheme = () => {
   useEffect(() => switchDark(), [isDark]);
   const switchDark = () => {
     const html = document.documentElement;
-    html.setAttribute("class", isDark ? "dark" : "");
+    html.setAttribute('class', isDark ? 'dark' : '');
     changePrimary();
   };
 
@@ -44,7 +44,7 @@ const useTheme = () => {
    */
   useEffect(() => changePrimary(), [primary, borderRadius, compactAlgorithm]);
   const changePrimary = () => {
-    const type: ThemeType = isDark ? "dark" : "light";
+    const type: ThemeType = isDark ? 'dark' : 'light';
     // custom less variable
     Object.entries(globalTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
     // antd less variable
@@ -64,7 +64,7 @@ const useTheme = () => {
   useEffect(() => changeGreyOrWeak(), [isGrey, isWeak]);
   const changeGreyOrWeak = () => {
     const html = document.documentElement;
-    html.style.filter = isWeak ? "invert(80%)" : isGrey ? "grayscale(1)" : "";
+    html.style.filter = isWeak ? 'invert(80%)' : isGrey ? 'grayscale(1)' : '';
   };
 
   /**
@@ -72,7 +72,7 @@ const useTheme = () => {
    */
   useEffect(() => changeSiderTheme(), [isDark, siderInverted]);
   const changeSiderTheme = () => {
-    const type: ThemeType = isDark ? "dark" : siderInverted ? "inverted" : "light";
+    const type: ThemeType = isDark ? 'dark' : siderInverted ? 'inverted' : 'light';
     Object.entries(siderTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
   };
 
@@ -81,7 +81,7 @@ const useTheme = () => {
    */
   useEffect(() => changeHeaderTheme(), [isDark, headerInverted]);
   const changeHeaderTheme = () => {
-    const type: ThemeType = isDark ? "dark" : headerInverted ? "inverted" : "light";
+    const type: ThemeType = isDark ? 'dark' : headerInverted ? 'inverted' : 'light';
     Object.entries(headerTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
   };
 };

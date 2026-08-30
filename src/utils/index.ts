@@ -1,9 +1,9 @@
-import { RequestData } from "@ant-design/pro-components";
+import { RequestData } from '@ant-design/pro-components';
 
-import { ResPage } from "@/apis/interface";
-import { RouterModeEnum } from "@/constants";
-import { RouteObjectType } from "@/routers/interface";
-import { useAuthStore } from "@/stores";
+import { ResPage } from '@/apis/interface';
+import { RouterModeEnum } from '@/constants';
+import { RouteObjectType } from '@/routers/interface';
+import { useAuthStore } from '@/stores';
 
 const mode = import.meta.env.VITE_ROUTER_MODE;
 
@@ -96,7 +96,7 @@ export function getMenuByPath(
 ) {
   const menuItem = menulist.find(menu => {
     // Match Dynamic routing through regular
-    const regex = new RegExp(`^${menu.path?.replace(/:.[^/]*/, ".*")}$`);
+    const regex = new RegExp(`^${menu.path?.replace(/:.[^/]*/, '.*')}$`);
     return regex.test(path);
   });
   return menuItem || {};
@@ -139,9 +139,9 @@ export function getUrlWithParams() {
  * @returns {Array}
  */
 export function getOpenKeys(path: string): string[] {
-  let currentKey: string = "";
+  let currentKey: string = '';
   let openKeys: string[] = [];
-  let pathSegments: string[] = path.split("/").map((segment: string) => "/" + segment);
+  let pathSegments: string[] = path.split('/').map((segment: string) => '/' + segment);
   for (let i: number = 1; i < pathSegments.length - 1; i++) {
     currentKey += pathSegments[i];
     openKeys.push(currentKey);
@@ -173,10 +173,10 @@ export function blockDebugger() {
       (function () {
         return false;
       })
-        ["constructor"]("debugger")
-        ["call"]();
+        ['constructor']('debugger')
+        ['call']();
     } catch (err) {
-      console.log("Debugger is blocked");
+      console.log('Debugger is blocked');
     }
   }
   // Start the execution using setInterval and return the interval ID
