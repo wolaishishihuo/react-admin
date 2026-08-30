@@ -1,86 +1,102 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 import { ResultData } from "@/apis/interface";
+import { LOGIN_URLS } from "@/apis/modules/login/urls";
 import { queryClient } from "@/apis/query";
 import { showFullScreenLoading, tryHideFullScreenLoading } from "@/components/Loading/fullScreen";
-import { LOGIN_URL } from "@/config";
+import { enableRefreshToken, LOGIN_URL } from "@/config";
 import { ResultEnum } from "@/constants";
 import { message } from "@/hooks/useMessage";
 import { useUserStore } from "@/stores";
 
 import { checkStatus } from "./helper/checkStatus";
 
+declare module "axios" {
+  interface AxiosRequestConfig {
+    /** 续签后的重放标记：带此标记的 401 不再二次刷新 */
+    __isRetryRequest?: boolean;
+  }
+}
+
 export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   loading?: boolean;
 }
 
 const config = {
-  // The default address request address, which can be modified in the .env.** file
   baseURL: import.meta.env.VITE_API_URL as string,
-  // timeout
   timeout: ResultEnum.TIMEOUT as number,
-  // Credentials are allowed to be carried across domains
   withCredentials: false
 };
 
+/** 刷新接口单独实例，避免 401 再次走进续签 */
+const baseRequestClient = axios.create(config);
+
+function formatToken(token: null | string) {
+  return token ? `Bearer ${token}` : null;
+}
+
+async function doReAuthenticate() {
+  queryClient.clear();
+  useUserStore.getState().setToken("");
+  useUserStore.getState().setRefreshToken("");
+  window.$navigate(LOGIN_URL);
+}
+
+async function doRefreshToken() {
+  const refreshToken = useUserStore.getState().refreshToken;
+  const resp = await baseRequestClient.post(LOGIN_URLS.REFRESH, { refreshToken });
+  const payload = resp.data?.data ?? {};
+  const newToken = payload.accessToken || payload.access_token;
+  if (!newToken) {
+    throw new Error("Refresh token failed");
+  }
+  useUserStore.getState().setToken(newToken);
+  if (payload.refreshToken) {
+    useUserStore.getState().setRefreshToken(payload.refreshToken);
+  }
+  return newToken as string;
+}
+
 class RequestHttp {
   service: AxiosInstance;
-  public constructor(config: AxiosRequestConfig) {
-    // instantiation
-    this.service = axios.create(config);
+  public isRefreshing = false;
+  public refreshTokenQueue: ((token: string) => void)[] = [];
 
-    /**
-     * @description request interceptor
-     * Client sends request -> [request interceptor] -> server
-     * token verification (JWT): Accept the token returned by the server and store it in redux/local storage
-     */
+  public constructor(axiosConfig: AxiosRequestConfig) {
+    this.service = axios.create(axiosConfig);
+
     this.service.interceptors.request.use(
       (config: CustomAxiosRequestConfig) => {
-        // The current request needs to display loading, which is controlled by the third parameter specified in the API service: {loading: true}
         config.loading && showFullScreenLoading();
         if (config.headers && typeof config.headers.set === "function") {
-          config.headers.set("x-access-token", useUserStore.getState().token);
+          config.headers.set("Authorization", formatToken(useUserStore.getState().token));
         }
         return config;
       },
-      (error: AxiosError) => {
-        return Promise.reject(error);
-      }
+      (error: AxiosError) => Promise.reject(error)
     );
 
-    /**
-     * @description response interceptor
-     *  The server returns the information -> [intercept unified processing] -> the client JS gets the information
-     */
     this.service.interceptors.response.use(
       (response: AxiosResponse) => {
         const { data } = response;
         tryHideFullScreenLoading();
-        // login failure
-        if (data.code == ResultEnum.OVERDUE) {
-          queryClient.clear();
-          useUserStore.getState().setToken("");
-          message.error(data.msg);
-          window.$navigate(LOGIN_URL);
-          return Promise.reject(data);
-        }
-        // Global error information interception (to prevent data stream from being returned when downloading files, and report errors directly without code)
         if (data.code && data.code !== ResultEnum.SUCCESS) {
           message.error(data.msg);
           return Promise.reject(data);
         }
-        // Successful request (no need to handle failure logic on the page unless there are special circumstances)
         return data;
       },
       async (error: AxiosError) => {
-        const { response } = error;
         tryHideFullScreenLoading();
-        // Request timeout && network error judged separately, no response
+
+        const { config, response } = error;
+        if (response?.status === 401) {
+          return this.handleHttpUnauthorized(error, config);
+        }
+
         if (error.message.indexOf("timeout") !== -1) message.error("请求超时！请您稍后重试");
         if (error.message.indexOf("Network Error") !== -1) message.error("网络错误！请您稍后重试");
-        // Do different processing according to the error status code of the server response
         if (response) checkStatus(response.status);
-        // The server does not return any results (maybe the server is wrong or the client is disconnected from the network), disconnection processing: you can jump to the disconnection page
         if (!window.navigator.onLine) window.$navigate("/500");
         return Promise.reject(error);
       }
@@ -88,8 +104,49 @@ class RequestHttp {
   }
 
   /**
-   * @description Common request method encapsulation
+   * HTTP 401：刷新 access token，并发请求排队后重放。
+   * `__isRetryRequest` 只约束「这一次续签后的重放」，防止刷新死循环。
    */
+  private async handleHttpUnauthorized(error: AxiosError, config?: AxiosRequestConfig) {
+    if (!config) {
+      await doReAuthenticate();
+      throw error;
+    }
+
+    if (!enableRefreshToken || config.__isRetryRequest) {
+      await doReAuthenticate();
+      throw error;
+    }
+
+    if (this.isRefreshing) {
+      return new Promise(resolve => {
+        this.refreshTokenQueue.push((newToken: string) => {
+          if (config.headers) {
+            config.headers.Authorization = formatToken(newToken);
+          }
+          resolve(this.service.request(config));
+        });
+      });
+    }
+
+    this.isRefreshing = true;
+    config.__isRetryRequest = true;
+
+    try {
+      const newToken = await doRefreshToken();
+      this.refreshTokenQueue.forEach(callback => callback(newToken));
+      this.refreshTokenQueue = [];
+      return this.service.request(config);
+    } catch (refreshError) {
+      this.refreshTokenQueue.forEach(callback => callback(""));
+      this.refreshTokenQueue = [];
+      await doReAuthenticate();
+      throw refreshError;
+    } finally {
+      this.isRefreshing = false;
+    }
+  }
+
   get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
     return this.service.get(url, { params, ..._object });
   }

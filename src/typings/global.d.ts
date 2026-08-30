@@ -14,6 +14,7 @@ declare interface ViteEnv {
   VITE_PWA: boolean;
   VITE_PUBLIC_PATH: string;
   VITE_API_URL: string;
+  VITE_APP_ENABLE_REFRESH_TOKEN: string;
   VITE_PROXY: [string, string][];
 }
 

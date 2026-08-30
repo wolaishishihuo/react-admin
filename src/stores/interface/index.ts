@@ -62,11 +62,13 @@ export interface TabsAction {
 /* UserState */
 export interface UserState {
   token: string;
+  refreshToken: string;
   userInfo: { name: string };
 }
 
 export interface UserAction {
   setToken: (token: UserState["token"]) => void;
+  setRefreshToken: (refreshToken: UserState["refreshToken"]) => void;
   setUserInfo: (token: UserState["userInfo"]) => void;
 }
 

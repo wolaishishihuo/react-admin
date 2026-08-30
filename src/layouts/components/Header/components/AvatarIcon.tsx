@@ -13,6 +13,7 @@ import { useAuthStore, useUserStore } from "@/stores";
 const AvatarIcon: React.FC = () => {
   const navigate = useNavigate();
   const setToken = useUserStore(state => state.setToken);
+  const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
 
   const logout = () => {
@@ -27,6 +28,7 @@ const AvatarIcon: React.FC = () => {
         await fetchLogout();
         queryClient.clear();
         setToken("");
+        setRefreshToken("");
         setAuthMenuList([]);
         navigate(LOGIN_URL, { replace: true });
         message.success("退出登录成功！");

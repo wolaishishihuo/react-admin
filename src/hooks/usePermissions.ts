@@ -9,6 +9,7 @@ let inFlight: { token: string; promise: Promise<void> } | null = null;
  */
 const usePermissions = () => {
   const setToken = useUserStore(state => state.setToken);
+  const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
   const setAuthButtonList = useAuthStore(state => state.setAuthButtonList);
 
@@ -30,10 +31,12 @@ const usePermissions = () => {
             description: "当前账号无任何菜单权限，请联系系统管理员！"
           });
           setToken("");
+          setRefreshToken("");
           return Promise.reject("No permission");
         }
       } catch (error) {
         setToken("");
+        setRefreshToken("");
         return Promise.reject(error);
       } finally {
         if (inFlight?.token === token) inFlight = null;

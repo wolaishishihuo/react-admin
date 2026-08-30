@@ -16,6 +16,7 @@ import { getTimeState } from "@/utils";
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const setToken = useUserStore(state => state.setToken);
+  const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setTabsList = useTabsStore(state => state.setTabsList);
 
   const { initPermissions } = usePermissions();
@@ -33,7 +34,8 @@ const LoginForm: React.FC = () => {
 
       // user login
       const data = await fetchLogin({ ...values, password: md5(values.password) });
-      setToken(data.access_token);
+      setToken(data.access_token || data.accessToken || "");
+      setRefreshToken(data.refreshToken || "");
 
       // clear last account tabs
       setTabsList([]);

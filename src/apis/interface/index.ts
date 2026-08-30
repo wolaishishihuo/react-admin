@@ -30,6 +30,8 @@ export interface ReqLogin {
 
 export interface ResLogin {
   access_token: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 export interface UserList {

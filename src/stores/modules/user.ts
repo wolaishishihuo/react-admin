@@ -11,10 +11,15 @@ export const useUserStore = create<UserStoreState>()(
     persist(
       set => ({
         token: "",
+        refreshToken: "",
         userInfo: { name: "wolaishishihuo" },
         setToken: token =>
           set((state: UserState) => {
             state.token = token;
+          }),
+        setRefreshToken: refreshToken =>
+          set((state: UserState) => {
+            state.refreshToken = refreshToken;
           }),
         setUserInfo: userInfo =>
           set((state: UserState) => {
