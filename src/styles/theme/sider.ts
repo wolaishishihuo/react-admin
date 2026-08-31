@@ -17,8 +17,8 @@ const siderTheme = {
     '--hooks-colorBgSubMenuSider': '#000c17'
   },
   dark: {
-    '--hooks-colorTextSider': '#c7c7d1',
-    '--hooks-colorTextSecondarySider': '#8f8fa3',
+    '--hooks-colorTextSider': '#f1f1f1',
+    '--hooks-colorTextSecondarySider': '#a6adb4',
     '--hooks-colorBgSider': '#161618',
     '--hooks-colorBorderSider': 'rgba(255, 255, 255, 0.08)',
     '--hooks-colorBgSubMenuSider': '#161618'

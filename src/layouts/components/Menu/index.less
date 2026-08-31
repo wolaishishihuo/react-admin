@@ -1,4 +1,4 @@
-/* ant-menu-sub */
+/* 侧边栏菜单配色交给 antd Menu theme（light / dark），与 Hooks-Admin-Pro 一致 */
 .dark {
   .ant-menu-sub {
     background-color: var(--hooks-colorBgSubMenuSider) !important;
@@ -6,7 +6,6 @@
 }
 .ant-menu-inline,
 .ant-menu-vertical {
-  color: var(--hooks-colorTextSider);
   background: transparent !important;
   .ant-menu-item,
   .ant-menu-submenu-title {
@@ -15,29 +14,7 @@
     margin-inline: 8px !important;
     border-radius: 6px !important;
   }
-  .ant-menu-item-selected {
-    color: var(--hooks-colorPrimary) !important;
-    background-color: var(--hooks-colorPrimaryBg) !important;
-  }
-  .ant-menu-item:not(.ant-menu-item-selected):hover,
-  .ant-menu-submenu-title:hover {
-    background-color: var(--hooks-colorLayoutHover, var(--hooks-colorFillTertiary)) !important;
-  }
   .ant-menu-item::after {
     display: none !important;
-  }
-}
-.ant-menu-horizontal {
-  .ant-menu-item-selected,
-  .ant-menu-submenu-selected {
-    color: var(--hooks-colorPrimary) !important;
-    background-color: var(--hooks-colorPrimaryBg) !important;
-    .ant-menu-submenu-title {
-      color: var(--hooks-colorPrimary) !important;
-    }
-  }
-  .ant-menu-item:not(.ant-menu-item-selected):hover,
-  .ant-menu-submenu:not(.ant-menu-submenu-selected):hover .ant-menu-submenu-title {
-    background-color: var(--hooks-colorLayoutHover, var(--hooks-colorFillTertiary)) !important;
   }
 }
