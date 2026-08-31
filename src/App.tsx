@@ -39,7 +39,14 @@ const App: React.FC = () => {
         button={{ autoInsertSpace: true }}
         theme={{
           token: { colorPrimary: primary, borderRadius },
-          algorithm: algorithm()
+          algorithm: algorithm(),
+          components: {
+            Menu: {
+              iconSize: 20,
+              collapsedIconSize: 20,
+              collapsedWidth: 64
+            }
+          }
         }}
       >
         <HappyProvider disabled={!isHappy}>
