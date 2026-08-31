@@ -8,7 +8,7 @@
 
 - Vite 8 + React 19（**未启用 React Compiler**）+ TS strict + antd 6 / ProComponents + react-router v7 + TanStack Query v5 + Zustand 5 + UnoCSS / Less
 - 路由默认 **hash 模式**（`VITE_ROUTER_MODE`）
-- 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`），接口前缀 `PORT1 = '/hooks'`
+- 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`）；请求 baseURL 是 `VITE_API_URL`（开发为 `/api/hooks`）
 - JS / TS / JSX **单引号**（Prettier `singleQuote` / `jsxSingleQuote`）；不要开 ESLint `quotes`，否则和 Prettier 打架
 - UnoCSS 类名顺序由 ESLint `unocss/order` 管；不要装 `prettier-plugin-tailwindcss`
 - 单元 / 组件测试用 **Vitest 4**（`jsdom` + Testing Library）；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
@@ -60,7 +60,7 @@ pnpm build:pro      # 生产构建
 
 ```
 apis/modules/<module>/
-├── urls.ts     # USER_URLS 常量，路径拼 PORT 前缀（servicePort.ts）
+├── urls.ts     # USER_URLS 常量，路径相对 VITE_API_URL
 ├── api.ts      # fetchXxx：调 http 单例、解包 .data；新接口的 snake_case 在这层转 camelCase
 ├── keys.ts     # USER_QUERY_KEYS 工厂 —— 仅查询型模块需要
 ├── hooks.ts    # queryXxxOptions + useXxxQuery / useXxxMutation —— 同上
