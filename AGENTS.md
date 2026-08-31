@@ -81,7 +81,7 @@ apis/modules/<module>/
    「登记」= 后端菜单配置，前端不改 JSON
 3. `element` 是公共约定：形如 `/system/accountManage/index`——前导 `/`、以 `/index` 结尾
    （`ConvertRouter` 拼 `'/src/views' + element + '.tsx'`，格式错了路由找不到）
-4. `meta.icon` 的合法值以 `src/components/Icon` 的实现为准（当前按 antd 图标导出名动态创建；
+4. `meta.icon` 的合法值以 `src/components/Icon` 的实现为准（模板期按 antd 图标导出名动态创建；
    后端若下发其他图标体系，先改 Icon 组件再接入，不要写死图标名清单）
 5. 检查 `usePermissions` 是否有菜单过滤逻辑（模板期只放行部分 `meta.key`，以代码现状为准）：
    过滤存在时新增一级菜单必须同步；菜单改由后端权限控制后应删除这段模板期过滤
@@ -182,7 +182,8 @@ const UserPanel = (props: UserPanelProps) => {
 - 全局唯一 client：`import { queryClient } from '@/apis/query'`；
   `createQueryClient` 只用于构造这个单例，**业务代码禁止调用**
 - queryKey 一律出自 `MODULE_QUERY_KEYS` 工厂，禁止组件里手写 key 数组
-- 先 `queryXxxOptions` 再 `useXxxQuery`（范式见 `apis/modules/user/hooks.ts`），
+- 先 `queryXxxOptions` 再 `useXxxQuery`（写法范式见 `apis/modules/user/hooks.ts`——预埋范例，
+  暂无页面消费；新模块以当下实际在用的 query hooks 为准），
   options 独立导出供 `prefetchQuery` / 路由 loader 复用
 - 页面「刷新」按钮走 `src/context/Refresh.tsx`，内部已 `queryClient.invalidateQueries()`
 
