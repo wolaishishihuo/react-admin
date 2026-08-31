@@ -9,7 +9,7 @@ import { convertToSixDigitHexColor } from '@/utils';
 import { isHexColor } from '@/utils/is';
 
 const presetColors = [
-  '#1677FF',
+  '#B40006',
   '#00B96B',
   '#E0282E',
   '#DAA96E',

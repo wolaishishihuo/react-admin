@@ -2,7 +2,7 @@ import './index.less';
 
 import React from 'react';
 
-import logo from '@/assets/images/logo.svg';
+import logo from '@/assets/images/logo.png';
 import ToolBarRight from '@/layouts/components/Header/ToolBarRight';
 import LayoutMain from '@/layouts/components/Main';
 import LayoutMenu from '@/layouts/components/Menu';

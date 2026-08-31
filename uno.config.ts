@@ -23,7 +23,7 @@ export default defineConfig({
   transformers: [transformerDirectives(), transformerVariantGroup()],
   theme: {
     colors: {
-      primary: 'var(--hooks-colorPrimary)',
+      primary: 'var(--hooks-colorPrimary, #B40006)',
       canvas: 'var(--hooks-colorBgContent)',
       surface: 'var(--hooks-colorBgBox)',
       regular: 'var(--hooks-colorTextRegular)',

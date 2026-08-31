@@ -76,7 +76,7 @@ const createVitePwa = (viteEnv: ViteEnv): PluginOption | PluginOption[] => {
     manifest: {
       name: VITE_GLOB_APP_TITLE,
       short_name: VITE_GLOB_APP_TITLE,
-      theme_color: '#ffffff',
+      theme_color: '#B40006',
       icons: [
         {
           src: '/logo.png',

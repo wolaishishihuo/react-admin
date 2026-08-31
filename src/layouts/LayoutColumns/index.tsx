@@ -4,7 +4,7 @@ import { Layout } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import logo from '@/assets/images/logo.svg';
+import logo from '@/assets/images/logo.png';
 import { Icon } from '@/components/Icon';
 import ToolBarLeft from '@/layouts/components/Header/ToolBarLeft';
 import ToolBarRight from '@/layouts/components/Header/ToolBarRight';

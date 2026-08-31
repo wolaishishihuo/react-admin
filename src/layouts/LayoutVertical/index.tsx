@@ -3,7 +3,7 @@ import './index.less';
 import { Layout } from 'antd';
 import React from 'react';
 
-import logo from '@/assets/images/logo.svg';
+import logo from '@/assets/images/logo.png';
 import ToolBarLeft from '@/layouts/components/Header/ToolBarLeft';
 import ToolBarRight from '@/layouts/components/Header/ToolBarRight';
 import LayoutMain from '@/layouts/components/Main';

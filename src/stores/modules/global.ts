@@ -65,7 +65,17 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
       }),
       {
         name: 'hooks-global',
-        version: 1.0
+        version: 2,
+        migrate: (persisted, version) => {
+          const state = persisted as GlobalState;
+          if (version < 2) {
+            const old = String(state.primary ?? '').toLowerCase();
+            if (old === '#1677ff' || old === '#1890ff') {
+              return { ...state, primary: DEFAULT_PRIMARY };
+            }
+          }
+          return state;
+        }
       }
     )
   ),
