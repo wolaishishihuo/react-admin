@@ -46,3 +46,72 @@ export interface UserList {
   status: boolean;
   avatar: string;
 }
+
+export type EnableStatus = 0 | 1;
+
+export type MenuType = 'directory' | 'menu';
+
+export interface MenuItem {
+  id: string;
+  parentId: string;
+  title: string;
+  path: string;
+  icon: string;
+  type: MenuType;
+  redirect?: string;
+  element?: string;
+  isLink: string;
+  isHide: boolean;
+  isFull: boolean;
+  isAffix: boolean;
+  isKeepAlive: boolean;
+  status: EnableStatus;
+  sort: number;
+  children?: MenuItem[];
+}
+
+export interface RoleItem {
+  id: string;
+  roleName: string;
+  roleCode: string;
+  status: EnableStatus;
+  remark: string;
+  menuIds: string[];
+  createTime: string;
+}
+
+export interface AccountItem {
+  id: string;
+  username: string;
+  nickName: string;
+  gender: 1 | 2;
+  phone: string;
+  email: string;
+  roleIds: string[];
+  status: EnableStatus;
+  remark: string;
+  createTime: string;
+}
+
+export interface ReqAccountList extends ReqPage {
+  username?: string;
+  nickName?: string;
+  gender?: number | string;
+  status?: number | string;
+}
+
+export interface ReqRoleList extends ReqPage {
+  roleName?: string;
+  roleCode?: string;
+  status?: number | string;
+}
+
+export interface ReqMenuList extends ReqPage {
+  title?: string;
+}
+
+export type ReqCreateAccount = Omit<AccountItem, 'id' | 'createTime'>;
+
+export type ReqCreateRole = Omit<RoleItem, 'id' | 'createTime'>;
+
+export type ReqCreateMenu = Omit<MenuItem, 'id' | 'children'> & { id?: string };

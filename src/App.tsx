@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import React from 'react';
 
 import { queryClient } from '@/apis/query';
+import { tableConfig } from '@/config/proTable';
 import { RefreshProvider } from '@/context/Refresh';
 import RouterProvider from '@/routers';
 import { useGlobalStore } from '@/stores';
@@ -37,6 +38,7 @@ const App: React.FC = () => {
         locale={zhCN}
         componentSize={componentSize}
         button={{ autoInsertSpace: true }}
+        table={tableConfig}
         theme={{
           token: { colorPrimary: primary, borderRadius },
           algorithm: algorithm(),

@@ -1,3 +1,25 @@
+/* tree / expandable table: arrow instead of plus-minus box */
+.ant-table-wrapper .ant-table-row-expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  background: transparent !important;
+  border: 0 !important;
+  transform: none !important;
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--hooks-colorPrimary);
+    border: 0 !important;
+  }
+}
+
 /* ant-pro-table internal scrolling */
 
 /* 工具栏统一：操作按钮居左、设置图标居右（标准页与统计卡混合页一致） */
