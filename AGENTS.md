@@ -7,8 +7,9 @@
 ## 项目事实
 
 - Vite 8 + React 19（**未启用 React Compiler**）+ TS strict + antd 6 / ProComponents + react-router v7 + TanStack Query v5 + Zustand 5 + UnoCSS / Less
-- 路由默认 **hash 模式**（`VITE_ROUTER_MODE`）
-- 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`）；请求 baseURL 是 `VITE_API_URL`（开发为 `/api/hooks`）
+- 路由模式由 `VITE_ROUTER_MODE` 决定（hash | history）
+- 后端地址、代理、接口前缀全部由 `.env.*` 的 `VITE_API_URL` / `VITE_PROXY` 决定；
+  **环境事实（后端、菜单来源、图标体系、权限过滤）一律以 env / 代码现状为准**，本文档只维护公共规则
 - JS / TS / JSX **单引号**（Prettier `singleQuote` / `jsxSingleQuote`）；不要开 ESLint `quotes`，否则和 Prettier 打架
 - UnoCSS 类名顺序由 ESLint `unocss/order` 管；不要装 `prettier-plugin-tailwindcss`
 - 单元 / 组件测试用 **Vitest 4**（`jsdom` + Testing Library）；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
@@ -75,14 +76,17 @@ apis/modules/<module>/
 
 1. 建 `views/<domain>/<page>/index.tsx`，**必须 default export**（懒加载依赖）；
    页面私有组件放 `components/`，图表 option / 表格列放 `config/`
-2. 在 **`src/assets/json/authMenuList.json`** 登记菜单项：
-   `element` 形如 `/system/accountManage/index`——前导 `/`、以 `/index` 结尾
-   （`ConvertRouter` 拼 `'/src/views' + element + '.tsx'`，格式错了路由找不到）；
-   `meta.icon` 必须是 `@ant-design/icons` 的导出名（如 `HomeOutlined`），按名动态创建，写错直接报错
-3. `usePermissions` 目前**只放行** `meta.key === 'home' | 'system'` 的一级菜单，
-   新增一级菜单必须同步这个过滤，否则页面进不了路由
-4. `meta.isKeepAlive` 控制该页是否被 tabs 缓存（`KeepAlive` 组件）
-5. 登录等不走布局的全屏页放 `routers/modules/staticRouter.tsx`，不进菜单 JSON
+2. 在**菜单数据源**登记菜单项。数据源以 `fetchGetAuthMenuList`（`apis/modules/login/api.ts`）
+   的实现为准：模板期读 `src/assets/json/authMenuList.json`；接真实后端后由接口下发，
+   「登记」= 后端菜单配置，前端不改 JSON
+3. `element` 是公共约定：形如 `/system/accountManage/index`——前导 `/`、以 `/index` 结尾
+   （`ConvertRouter` 拼 `'/src/views' + element + '.tsx'`，格式错了路由找不到）
+4. `meta.icon` 的合法值以 `src/components/Icon` 的实现为准（当前按 antd 图标导出名动态创建；
+   后端若下发其他图标体系，先改 Icon 组件再接入，不要写死图标名清单）
+5. 检查 `usePermissions` 是否有菜单过滤逻辑（模板期只放行部分 `meta.key`，以代码现状为准）：
+   过滤存在时新增一级菜单必须同步；菜单改由后端权限控制后应删除这段模板期过滤
+6. `meta.isKeepAlive` 控制该页是否被 tabs 缓存（`KeepAlive` 组件）
+7. 登录等不走布局的全屏页放 `routers/modules/staticRouter.tsx`，不进菜单数据
 
 ## React 组件规范（新代码）
 
