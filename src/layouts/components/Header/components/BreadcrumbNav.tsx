@@ -3,7 +3,6 @@ import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useMatches } from 'react-router-dom';
 
-import { Icon } from '@/components/Icon';
 import { HOME_URL } from '@/config';
 import { MetaProps, RouteObjectType } from '@/routers/interface';
 import { useAuthStore, useGlobalStore } from '@/stores';
@@ -13,29 +12,15 @@ const BreadcrumbNav: React.FC = () => {
   const matches = useMatches();
 
   const authMenuList = useAuthStore(state => state.authMenuList);
-  const { breadcrumb, breadcrumbIcon } = useGlobalStore(state => ({
-    breadcrumb: state.breadcrumb,
-    breadcrumbIcon: state.breadcrumbIcon
-  }));
+  const breadcrumb = useGlobalStore(state => state.breadcrumb);
   const breadcrumbAllList = useMemo(() => getAllBreadcrumbList(authMenuList), [authMenuList]);
 
   const [curBreadcrumbList, setCurBreadcrumbList] = useState<ItemType[]>([]);
 
-  // Render Title
-  const renderTitle = (item: RouteObjectType, isLink: boolean) => {
-    const { icon, title } = item.meta || {};
-    const content = (
-      <React.Fragment>
-        {breadcrumbIcon && icon && (
-          <span className='mr5'>
-            <Icon icon={icon!} />
-          </span>
-        )}
-        <span>{title}</span>
-      </React.Fragment>
-    );
-    return isLink ? <Link to={item.path!}>{content}</Link> : content;
-  };
+  function renderTitle(item: RouteObjectType, isLink: boolean) {
+    const title = item.meta?.title;
+    return isLink ? <Link to={item.path!}>{title}</Link> : title;
+  }
 
   useEffect(() => {
     const meta = matches[matches.length - 1].data as MetaProps;
@@ -45,7 +30,7 @@ const BreadcrumbNav: React.FC = () => {
 
     // You don’t need breadcrumbs on the home page, you can delete the following judgments
     if (breadcrumbList[0]?.path !== HOME_URL) {
-      breadcrumbList.unshift({ path: HOME_URL, meta: { icon: 'ri:home-smile-2-line', title: '首页' } });
+      breadcrumbList.unshift({ path: HOME_URL, meta: { title: '首页' } });
     }
 
     // Processed into the format required by antd breadcrumbs
@@ -76,7 +61,7 @@ const BreadcrumbNav: React.FC = () => {
     });
 
     setCurBreadcrumbList(antdBreadcrumbList);
-  }, [matches, breadcrumbIcon]);
+  }, [matches]);
 
   return <React.Fragment>{breadcrumb && <Breadcrumb items={curBreadcrumbList}></Breadcrumb>}</React.Fragment>;
 };

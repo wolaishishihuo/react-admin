@@ -25,7 +25,6 @@ export interface GlobalState {
   accordion: boolean;
   watermark: boolean;
   breadcrumb: boolean;
-  breadcrumbIcon: boolean;
   tabs: boolean;
   tabsIcon: boolean;
   tabsDrag: boolean;

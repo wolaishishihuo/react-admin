@@ -46,8 +46,6 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         watermark: true,
         // breadcrumb
         breadcrumb: true,
-        // breadcrumb icon
-        breadcrumbIcon: true,
         // tabs
         tabs: true,
         // tabs icon

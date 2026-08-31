@@ -23,7 +23,6 @@ const ThemeDrawer: React.FC = () => {
     accordion,
     watermark,
     breadcrumb,
-    breadcrumbIcon,
     tabs,
     tabsIcon,
     footer,
@@ -44,7 +43,6 @@ const ThemeDrawer: React.FC = () => {
     accordion: state.accordion,
     watermark: state.watermark,
     breadcrumb: state.breadcrumb,
-    breadcrumbIcon: state.breadcrumbIcon,
     tabs: state.tabs,
     tabsIcon: state.tabsIcon,
     footer: state.footer,
@@ -229,10 +227,6 @@ const ThemeDrawer: React.FC = () => {
       <div className='theme-item'>
         <span>面包屑</span>
         <Switch checked={breadcrumb} onChange={value => setGlobalState('breadcrumb', value)} />
-      </div>
-      <div className='theme-item'>
-        <span>面包屑图标</span>
-        <Switch checked={breadcrumbIcon} onChange={value => setGlobalState('breadcrumbIcon', value)} />
       </div>
       <div className='theme-item'>
         <span>标签栏</span>
