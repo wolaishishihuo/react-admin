@@ -1,5 +1,15 @@
 /* ant-pro-table internal scrolling */
 
+/* 工具栏统一：操作按钮居左、设置图标居右（标准页与统计卡混合页一致） */
+.ant-pro-table-list-toolbar-right {
+  justify-content: space-between;
+
+  /* 无操作按钮时设置图标保持居右 */
+  > .ant-pro-table-list-toolbar-setting-items:only-child {
+    margin-left: auto;
+  }
+}
+
 /* antd 6 Spin: no .ant-spin-nested-loading; pagination is a sibling of .ant-table */
 .ant-pro-table-scroll {
   display: flex;
