@@ -30,9 +30,13 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.d.ts",
+    "tests/**/*.tsx",
     "build/**/*.ts",
     "build/**/*.d.ts",
     "vite.config.ts",
+    "vitest.config.ts",
     "uno.config.ts"
   ],
   "exclude": ["node_modules", "dist", "**/*.js"]

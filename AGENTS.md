@@ -11,13 +11,17 @@
 - 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`），接口前缀 `PORT1 = '/hooks'`
 - JS / TS / JSX **单引号**（Prettier `singleQuote` / `jsxSingleQuote`）；不要开 ESLint `quotes`，否则和 Prettier 打架
 - UnoCSS 类名顺序由 ESLint `unocss/order` 管；不要装 `prettier-plugin-tailwindcss`
-- 无测试框架；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
+- 单元 / 组件测试用 **Vitest 4**（`jsdom` + Testing Library）；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
+- 测试文件放仓库根 `tests/`（按 `src/` 相对路径镜像，如 `src/utils/is` → `tests/utils/is.test.ts`）；从 `vitest` **显式 import** `describe` / `it` / `expect` / `vi`，不要开 `globals`
+- 组件测试用 `@testing-library/react`；setup 在 `tests/setup.ts`。不要把 Vitest 配进 `vite.config.ts`（会把 PWA / checker 拖进测试）
 
 命令（pnpm，Node >= 20.19）：
 
 ```bash
 pnpm dev            # 开发
 pnpm type:check     # tsc --noEmit --skipLibCheck，改完代码必须跑
+pnpm test           # vitest watch
+pnpm test:run       # vitest 单次跑完（CI）
 pnpm lint:eslint    # eslint --fix .（含 vite.config 等根配置，不只 src）
 pnpm build:pro      # 生产构建
 ```
@@ -38,13 +42,14 @@ pnpm build:pro      # 生产构建
 
 ## 目录与文件放置
 
-| 问题                              | 是                          | 否                         |
-| --------------------------------- | --------------------------- | -------------------------- |
-| 组件被 ≥2 个页面使用？            | `src/components/`           | `views/<page>/components/` |
-| hook 与某个 API 模块绑定？        | `apis/modules/<m>/hooks.ts` | `src/hooks/`               |
-| 常量只服务于某个模块 / 页面？     | 就近放模块内                | `src/constants/`           |
-| 状态需要跨页面存活？              | Zustand store               | 组件 `useState`            |
-| 静态配置（图表 option、列定义）？ | 页面 `config/` 文件         | 不要写在组件体内           |
+| 问题                              | 是                             | 否                           |
+| --------------------------------- | ------------------------------ | ---------------------------- |
+| 组件被 ≥2 个页面使用？            | `src/components/`              | `views/<page>/components/`   |
+| hook 与某个 API 模块绑定？        | `apis/modules/<m>/hooks.ts`    | `src/hooks/`                 |
+| 常量只服务于某个模块 / 页面？     | 就近放模块内                   | `src/constants/`             |
+| 状态需要跨页面存活？              | Zustand store                  | 组件 `useState`              |
+| 静态配置（图表 option、列定义）？ | 页面 `config/` 文件            | 不要写在组件体内             |
+| 给模块 / 组件加单测？             | 仓库根 `tests/`（镜像 `src/`） | 不要和源码同目录 `*.test.ts` |
 
 - 命名：页面目录 camelCase（`accountManage`）；全局组件目录 PascalCase（`AuthButton`）；
   hook 文件 camelCase（`usePermissions.ts`）

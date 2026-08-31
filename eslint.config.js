@@ -13,6 +13,8 @@ export default defineConfig(
   {
     ignores: [
       'dist/**',
+      'coverage/**',
+      '.vitest/**',
       'node_modules/**',
       'public/**',
       'docs/**',
