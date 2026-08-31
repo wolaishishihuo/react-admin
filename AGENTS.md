@@ -8,7 +8,9 @@
 
 - Vite 8 + React 19（**未启用 React Compiler**）+ TS strict + antd 6 / ProComponents + react-router v7 + TanStack Query v5 + Zustand 5 + UnoCSS / Less
 - 路由默认 **hash 模式**（`VITE_ROUTER_MODE`）
-- 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`），接口前缀 `PORT1 = "/hooks"`
+- 开发后端是 Apifox mock（`.env.development` 的 `VITE_PROXY`），接口前缀 `PORT1 = '/hooks'`
+- JS / TS / JSX **单引号**（Prettier `singleQuote` / `jsxSingleQuote`）；不要开 ESLint `quotes`，否则和 Prettier 打架
+- UnoCSS 类名顺序由 ESLint `unocss/order` 管；不要装 `prettier-plugin-tailwindcss`
 - 无测试框架；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
 
 命令（pnpm，Node >= 20.19）：
@@ -16,7 +18,7 @@
 ```bash
 pnpm dev            # 开发
 pnpm type:check     # tsc --noEmit --skipLibCheck，改完代码必须跑
-pnpm lint:eslint    # eslint --fix ./src
+pnpm lint:eslint    # eslint --fix .（含 vite.config 等根配置，不只 src）
 pnpm build:pro      # 生产构建
 ```
 
@@ -70,9 +72,9 @@ apis/modules/<module>/
    页面私有组件放 `components/`，图表 option / 表格列放 `config/`
 2. 在 **`src/assets/json/authMenuList.json`** 登记菜单项：
    `element` 形如 `/system/accountManage/index`——前导 `/`、以 `/index` 结尾
-   （`ConvertRouter` 拼 `"/src/views" + element + ".tsx"`，格式错了路由找不到）；
+   （`ConvertRouter` 拼 `'/src/views' + element + '.tsx'`，格式错了路由找不到）；
    `meta.icon` 必须是 `@ant-design/icons` 的导出名（如 `HomeOutlined`），按名动态创建，写错直接报错
-3. `usePermissions` 目前**只放行** `meta.key === "home" | "system"` 的一级菜单，
+3. `usePermissions` 目前**只放行** `meta.key === 'home' | 'system'` 的一级菜单，
    新增一级菜单必须同步这个过滤，否则页面进不了路由
 4. `meta.isKeepAlive` 控制该页是否被 tabs 缓存（`KeepAlive` 组件）
 5. 登录等不走布局的全屏页放 `routers/modules/staticRouter.tsx`，不进菜单 JSON
@@ -149,7 +151,7 @@ const UserPanel = (props: UserPanelProps) => {
 - 调用侧不要对业务错误再 toast，catch 只做流程控制（如复位 loading）
 - 全屏 loading 传 `{ loading: true }`；下载用 `http.download`；组件外跳转用 `window.$navigate`
 - `message` / `notification` 必须从 `@/hooks/useMessage` 导入，
-  **禁止** `import { message } from "antd"`（静态方法不消费 ConfigProvider 主题）
+  **禁止** `import { message } from 'antd'`（静态方法不消费 ConfigProvider 主题）
 
 ### 何时用 TanStack Query
 
@@ -168,7 +170,7 @@ const UserPanel = (props: UserPanelProps) => {
 
 ### Query 书写规则
 
-- 全局唯一 client：`import { queryClient } from "@/apis/query"`；
+- 全局唯一 client：`import { queryClient } from '@/apis/query'`；
   `createQueryClient` 只用于构造这个单例，**业务代码禁止调用**
 - queryKey 一律出自 `MODULE_QUERY_KEYS` 工厂，禁止组件里手写 key 数组
 - 先 `queryXxxOptions` 再 `useXxxQuery`（范式见 `apis/modules/user/hooks.ts`），
@@ -194,6 +196,7 @@ const UserPanel = (props: UserPanelProps) => {
 ## 样式
 
 - UnoCSS 优先，先查 `uno.config.ts` 已有 shortcuts（`flx-center`、`card`、`sle`、`mt20` 式间距规则）
+- `className` 里的 utility 顺序交给 `unocss/order`，不要手排、不要引入 Tailwind 排序插件
 - 深嵌套 / 动画写同目录 `index.less`
 - 颜色禁止硬编码：用 uno theme 色名（`primary`、`surface` 等）或 `--hooks-*` CSS 变量，否则暗色模式失效
 - 非 CSS 场景（echarts）的暗色状态读 `useGlobalStore(s => s.isDark)`

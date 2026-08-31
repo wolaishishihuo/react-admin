@@ -1,14 +1,14 @@
-import { readFileSync } from "node:fs";
+import { readFileSync } from 'node:fs';
 
-import dayjs from "dayjs";
-import { resolve } from "path";
-import { ConfigEnv, defineConfig, loadEnv, UserConfig } from "vite";
+import dayjs from 'dayjs';
+import { resolve } from 'path';
+import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
 
-import { wrapperEnv } from "./build/getEnv.ts";
-import { createVitePlugins } from "./build/plugins.ts";
-import { createProxy } from "./build/proxy.ts";
+import { wrapperEnv } from './build/getEnv.ts';
+import { createVitePlugins } from './build/plugins.ts';
+import { createProxy } from './build/proxy.ts';
 
-const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, "package.json"), "utf-8")) as {
+const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, 'package.json'), 'utf-8')) as {
   name: string;
   version: string;
   dependencies: Record<string, string>;
@@ -18,7 +18,7 @@ const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, "package.json")
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
   pkg: { dependencies, devDependencies, name, version },
-  lastBuildTime: dayjs().format("YYYY-MM-DD HH:mm:ss")
+  lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
 };
 
 // @see: https://vitejs.dev/config/
@@ -32,14 +32,14 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     root,
     resolve: {
       alias: {
-        "@": resolve(import.meta.dirname, "./src")
+        '@': resolve(import.meta.dirname, './src')
       }
     },
     define: {
       __APP_INFO__: JSON.stringify(__APP_INFO__)
     },
     server: {
-      host: "0.0.0.0",
+      host: '0.0.0.0',
       port: viteEnv.VITE_PORT,
       open: viteEnv.VITE_OPEN,
       cors: true,
@@ -48,9 +48,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     },
     plugins: createVitePlugins(viteEnv),
     build: {
-      outDir: "dist",
+      outDir: 'dist',
       // Vite 8 default minifier; `esbuild` requires a separate esbuild install
-      minify: "oxc",
+      minify: 'oxc',
       sourcemap: false,
       // Disable gzip compressed size reporting, which slightly reduces pack time
       reportCompressedSize: false,
@@ -59,9 +59,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         output: {
           // Static resource classification and packaging
-          chunkFileNames: "assets/js/[name]-[hash].js",
-          entryFileNames: "assets/js/[name]-[hash].js",
-          assetFileNames: "assets/[ext]/[name]-[hash].[ext]"
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
         }
       }
     }
