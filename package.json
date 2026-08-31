@@ -115,13 +115,6 @@
   "engines": {
     "node": ">=20.19.0"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "eslint": "10"
-      }
-    }
-  },
   "browserslist": {
     "production": [
       "> 1%",
