@@ -1,5 +1,4 @@
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import UnoCSS from 'unocss/vite';
 import { PluginOption } from 'vite';
@@ -7,7 +6,6 @@ import checker from 'vite-plugin-checker';
 import viteCompression from 'vite-plugin-compression';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { VitePWA } from 'vite-plugin-pwa';
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 
 /**
  * Create vite plugin
@@ -30,11 +28,6 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
       inject: {
         data: { title: VITE_GLOB_APP_TITLE }
       }
-    }),
-    // Create svg icons
-    createSvgIconsPlugin({
-      iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
-      symbolId: 'icon-[dir]-[name]'
     }),
     // vitePWA
     VITE_PWA && createVitePwa(viteEnv),
