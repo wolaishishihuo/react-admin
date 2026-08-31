@@ -28,7 +28,7 @@ const BreadcrumbNav: React.FC = () => {
       <React.Fragment>
         {breadcrumbIcon && icon && (
           <span className='mr5'>
-            <Icon name={icon!} />
+            <Icon icon={icon!} />
           </span>
         )}
         <span>{title}</span>
@@ -45,7 +45,7 @@ const BreadcrumbNav: React.FC = () => {
 
     // You don’t need breadcrumbs on the home page, you can delete the following judgments
     if (breadcrumbList[0]?.path !== HOME_URL) {
-      breadcrumbList.unshift({ path: HOME_URL, meta: { icon: 'HomeOutlined', title: '首页' } });
+      breadcrumbList.unshift({ path: HOME_URL, meta: { icon: 'ri:home-smile-2-line', title: '首页' } });
     }
 
     // Processed into the format required by antd breadcrumbs

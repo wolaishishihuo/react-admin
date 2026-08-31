@@ -1,6 +1,6 @@
+import '@/assets/icons/register';
 import 'antd/dist/reset.css';
 import '@/styles/index.less';
-import '@/assets/iconfont/iconfont.less';
 import 'virtual:uno.css';
 
 import ReactDOM from 'react-dom/client';

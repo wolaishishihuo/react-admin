@@ -66,6 +66,23 @@ export default defineConfig(
 
       // Quotes live in Prettier (singleQuote / jsxSingleQuote). Never add quotes / jsx-quotes here.
       'unocss/order': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@ant-design/icons',
+              message: '图标只用 Remix Icon：<Icon icon="ri:xxx" />（@/components/Icon）'
+            }
+          ],
+          patterns: [
+            {
+              group: ['@iconify/react', '@iconify/react/*'],
+              message: '不要直接引 Iconify。用 <Icon icon="ri:xxx" />（@/components/Icon）'
+            }
+          ]
+        }
+      ],
 
       // eslint (http://eslint.cn/docs/rules)
       'no-var': 'error',
@@ -96,6 +113,12 @@ export default defineConfig(
       // react (https://github.com/jsx-eslint/eslint-plugin-react)
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off'
+    }
+  },
+  {
+    files: ['src/components/Icon/index.tsx', 'src/assets/icons/register.ts'],
+    rules: {
+      'no-restricted-imports': 'off'
     }
   },
   eslintPluginPrettierRecommended

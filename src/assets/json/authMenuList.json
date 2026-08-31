@@ -6,7 +6,7 @@
       "element": "/home/index",
       "meta": {
         "key": "home",
-        "icon": "HomeOutlined",
+        "icon": "ri:home-smile-2-line",
         "title": "首页",
         "isLink": "",
         "isHide": false,
@@ -20,7 +20,7 @@
       "redirect": "/system/accountManage",
       "meta": {
         "key": "system",
-        "icon": "SettingOutlined",
+        "icon": "ri:settings-line",
         "title": "系统管理",
         "isLink": "",
         "isHide": false,
@@ -34,7 +34,7 @@
           "element": "/system/accountManage/index",
           "meta": {
             "key": "accountManage",
-            "icon": "AppstoreOutlined",
+            "icon": "ri:apps-2-line",
             "title": "账号管理",
             "isLink": "",
             "isHide": false,
@@ -48,7 +48,7 @@
           "element": "/system/roleManage/index",
           "meta": {
             "key": "roleManage",
-            "icon": "AppstoreOutlined",
+            "icon": "ri:apps-2-line",
             "title": "角色管理",
             "isLink": "",
             "isHide": false,
@@ -62,7 +62,7 @@
           "element": "/system/menuMange/index",
           "meta": {
             "key": "menuMange",
-            "icon": "AppstoreOutlined",
+            "icon": "ri:apps-2-line",
             "title": "菜单管理",
             "isLink": "",
             "isHide": false,

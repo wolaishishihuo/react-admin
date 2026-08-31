@@ -1,6 +1,6 @@
-import { SettingOutlined } from '@ant-design/icons';
-
 import { useGlobalStore } from '@/stores';
+
+import IconButton from './IconButton';
 
 const ThemeSetting = () => {
   const setGlobalState = useGlobalStore(state => state.setGlobalState);
@@ -9,7 +9,7 @@ const ThemeSetting = () => {
     setGlobalState('themeDrawerVisible', true);
   }
 
-  return <SettingOutlined className='text-20px' onClick={setThemeDrawerVisible} />;
+  return <IconButton icon='ri:settings-line' className='setting-btn' onClick={setThemeDrawerVisible} />;
 };
 
 export default ThemeSetting;

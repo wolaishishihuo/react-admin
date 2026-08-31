@@ -1,8 +1,8 @@
 import './index.less';
 
-import { CheckCircleFilled, FireOutlined, LayoutOutlined, QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Divider, Drawer, InputNumber, Popover, Switch, Tooltip } from 'antd';
 
+import { Icon } from '@/components/Icon';
 import { useGlobalStore } from '@/stores';
 
 import ColorPicker from './components/ColorPicker';
@@ -65,7 +65,7 @@ const ThemeDrawer: React.FC = () => {
     >
       {/* layout switching */}
       <Divider className='divider'>
-        <LayoutOutlined />
+        <Icon className='anticon' icon='ri:layout-line' />
         布局样式
       </Divider>
       <div className='layout-box'>
@@ -79,7 +79,7 @@ const ThemeDrawer: React.FC = () => {
               <div className='layout-light'></div>
               <div className='layout-content'></div>
             </div>
-            {layout === 'vertical' && <CheckCircleFilled />}
+            {layout === 'vertical' && <Icon className='anticon' icon='ri:checkbox-circle-fill' />}
           </div>
         </Tooltip>
         <Tooltip placement='top' title='经典' arrow={true} mouseEnterDelay={0.2}>
@@ -92,7 +92,7 @@ const ThemeDrawer: React.FC = () => {
               <div className='layout-light'></div>
               <div className='layout-content'></div>
             </div>
-            {layout === 'classic' && <CheckCircleFilled />}
+            {layout === 'classic' && <Icon className='anticon' icon='ri:checkbox-circle-fill' />}
           </div>
         </Tooltip>
         <Tooltip placement='top' title='横向' arrow={true} mouseEnterDelay={0.2}>
@@ -102,7 +102,7 @@ const ThemeDrawer: React.FC = () => {
           >
             <div className='layout-dark'></div>
             <div className='layout-content'></div>
-            {layout === 'transverse' && <CheckCircleFilled />}
+            {layout === 'transverse' && <Icon className='anticon' icon='ri:checkbox-circle-fill' />}
           </div>
         </Tooltip>
         <Tooltip placement='top' title='分栏' arrow={true} mouseEnterDelay={0.2}>
@@ -113,7 +113,7 @@ const ThemeDrawer: React.FC = () => {
             <div className='layout-dark'></div>
             <div className='layout-light'></div>
             <div className='layout-content'></div>
-            {layout === 'columns' && <CheckCircleFilled />}
+            {layout === 'columns' && <Icon className='anticon' icon='ri:checkbox-circle-fill' />}
           </div>
         </Tooltip>
       </div>
@@ -121,7 +121,7 @@ const ThemeDrawer: React.FC = () => {
         <span>
           菜单分割
           <Tooltip title='经典模式下生效'>
-            <QuestionCircleOutlined />
+            <Icon className='anticon' icon='ri:question-line' />
           </Tooltip>
         </span>
         <Switch disabled={layout !== 'classic'} checked={menuSplit} onChange={value => setGlobalState('menuSplit', value)} />
@@ -130,7 +130,7 @@ const ThemeDrawer: React.FC = () => {
         <span>
           侧边栏反转色
           <Tooltip title='侧边栏颜色变为深色模式'>
-            <QuestionCircleOutlined />
+            <Icon className='anticon' icon='ri:question-line' />
           </Tooltip>
         </span>
         <Switch checked={siderInverted} onChange={value => setGlobalState('siderInverted', value)} />
@@ -139,7 +139,7 @@ const ThemeDrawer: React.FC = () => {
         <span>
           头部反转色
           <Tooltip title='头部颜色变为深色模式'>
-            <QuestionCircleOutlined />
+            <Icon className='anticon' icon='ri:question-line' />
           </Tooltip>
         </span>
         <Switch checked={headerInverted} onChange={value => setGlobalState('headerInverted', value)} />
@@ -147,7 +147,7 @@ const ThemeDrawer: React.FC = () => {
 
       {/* theme settings */}
       <Divider className='divider'>
-        <FireOutlined />
+        <Icon className='anticon' icon='ri:fire-line' />
         全局主题
       </Divider>
       <div className='theme-item'>
@@ -211,7 +211,7 @@ const ThemeDrawer: React.FC = () => {
 
       {/* interface settings */}
       <Divider className='divider'>
-        <SettingOutlined />
+        <Icon className='anticon' icon='ri:settings-line' />
         界面设置
       </Divider>
       <div className='theme-item'>

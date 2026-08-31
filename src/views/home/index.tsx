@@ -1,10 +1,10 @@
 import './index.less';
 
-import { ArrowUpOutlined } from '@ant-design/icons';
 import { Col, Row, Statistic, Table, Tabs } from 'antd';
 import CountUpImport from 'react-countup';
 
 import ECharts from '@/components/Echarts';
+import { Icon } from '@/components/Icon';
 import { useGlobalStore } from '@/stores';
 
 import { overviewOptionsFn, overviewTabs } from './config/overview';
@@ -32,7 +32,7 @@ const Analysis: React.FC = () => {
                 <div className='count-echarts'>
                   <ECharts option={trendOptionsFn([50, 40, 60, 20, 40, 30, 80, 70, 120, 60, 80, 50])} />
                 </div>
-                <Statistic className='count-percentage' value={14.52} prefix={<ArrowUpOutlined />} suffix='%' />
+                <Statistic className='count-percentage' value={14.52} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
               </div>
             </div>
           </Col>
@@ -43,7 +43,7 @@ const Analysis: React.FC = () => {
                 <div className='count-echarts'>
                   <ECharts option={trendOptionsFn([10, 50, 40, 100, 50, 120, 35, 40, 15, 80, 10, 20])} />
                 </div>
-                <Statistic className='count-percentage' value={58.36} prefix={<ArrowUpOutlined />} suffix='%' />
+                <Statistic className='count-percentage' value={58.36} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
               </div>
             </div>
           </Col>
@@ -54,7 +54,7 @@ const Analysis: React.FC = () => {
                 <div className='count-echarts'>
                   <ECharts option={trendOptionsFn([30, 10, 40, 70, 40, 60, 20, 110, 40, 80, 40, 10])} />
                 </div>
-                <Statistic className='count-percentage' value={36.28} prefix={<ArrowUpOutlined />} suffix='%' />
+                <Statistic className='count-percentage' value={36.28} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
               </div>
             </div>
           </Col>
@@ -65,7 +65,7 @@ const Analysis: React.FC = () => {
                 <div className='count-echarts'>
                   <ECharts option={trendOptionsFn([25, 70, 50, 80, 120, 60, 90, 30, 45, 20, 90, 40])} />
                 </div>
-                <Statistic className='count-percentage' value={24.35} prefix={<ArrowUpOutlined />} suffix='%' />
+                <Statistic className='count-percentage' value={24.35} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
               </div>
             </div>
           </Col>

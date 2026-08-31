@@ -1,4 +1,3 @@
-import { CheckCircleFilled, CloseCircleOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import type { FormInstance, FormProps } from 'antd/es/form';
 import md5 from 'md5';
@@ -7,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ReqLogin } from '@/apis/interface';
 import { fetchLogin } from '@/apis/modules/login';
+import { Icon } from '@/components/Icon';
 import { HOME_URL } from '@/config';
 import { message, notification } from '@/hooks/useMessage';
 import usePermissions from '@/hooks/usePermissions';
@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
       notification.success({
         title: getTimeState(),
         description: `欢迎登录 ${import.meta.env.VITE_GLOB_APP_TITLE}`,
-        icon: <CheckCircleFilled style={{ color: '#73d13d' }} />
+        icon: <Icon icon='ri:checkbox-circle-fill' className='text-success' />
       });
 
       // navigate to home
@@ -81,16 +81,16 @@ const LoginForm: React.FC = () => {
     <div className='login-form-content'>
       <Form name='login' size='large' autoComplete='off' ref={formRef} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         <Form.Item name='username' rules={[{ required: true, message: '请输入用户名' }]}>
-          <Input prefix={<UserOutlined />} placeholder='用户名：admin / user' />
+          <Input prefix={<Icon icon='ri:user-line' />} placeholder='用户名：admin / user' />
         </Form.Item>
         <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
-          <Input.Password prefix={<LockOutlined />} placeholder='密码：123456' />
+          <Input.Password prefix={<Icon icon='ri:lock-line' />} placeholder='密码：123456' />
         </Form.Item>
         <Form.Item className='login-form-button'>
-          <Button shape='round' icon={<CloseCircleOutlined />} onClick={onReset}>
+          <Button shape='round' icon={<Icon icon='ri:close-circle-line' />} onClick={onReset}>
             重置
           </Button>
-          <Button type='primary' shape='round' icon={<UserOutlined />} loading={loading} htmlType='submit'>
+          <Button type='primary' shape='round' icon={<Icon icon='ri:user-line' />} loading={loading} htmlType='submit'>
             登录
           </Button>
         </Form.Item>

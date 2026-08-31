@@ -1,6 +1,5 @@
 import './index.less';
 
-import { CloseOutlined, DownOutlined } from '@ant-design/icons';
 import { useUpdateEffect } from 'ahooks';
 import { Dropdown } from 'antd';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -116,11 +115,11 @@ const LayoutTabs: React.FC = () => {
             return (
               <Dropdown key={item.path} trigger={['contextMenu']} menu={{ items: buildTabMenuItems(item.path, handlers) }}>
                 <li className={`work-tab-item${active ? ' is-active' : ''}`} onClick={() => navigate(item.path)}>
-                  {tabsIcon && item.icon && <Icon className='work-tab-icon' name={item.icon} />}
+                  {tabsIcon && item.icon && <Icon className='work-tab-icon' icon={item.icon} />}
                   <span className='work-tab-title'>{item.title}</span>
                   {showClose && (
                     <span className='work-tab-close' onClick={event => closeTab(event, item.path, item.closable)}>
-                      <CloseOutlined />
+                      <Icon icon='ri:close-line' />
                     </span>
                   )}
                 </li>
@@ -131,7 +130,7 @@ const LayoutTabs: React.FC = () => {
       </div>
       <Dropdown trigger={['click']} menu={{ items: buildTabMenuItems(path, handlers) }}>
         <button className='work-tab-more' type='button'>
-          <DownOutlined />
+          <Icon icon='ri:arrow-down-s-line' />
         </button>
       </Dropdown>
     </div>

@@ -64,7 +64,7 @@ const LayoutColumns: React.FC = () => {
                 }`}
                 onClick={() => changeSubMenu(item)}
               >
-                <Icon name={item.meta!.icon!} />
+                <Icon icon={item.meta!.icon!} />
                 <span className='title sle'>{item.meta?.title}</span>
               </div>
             );

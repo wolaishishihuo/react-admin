@@ -9,7 +9,7 @@ import { RouteObjectType } from '../interface';
 import RouterGuard from './RouterGuard';
 
 // Import all view files in the views directory
-const modules = import.meta.glob('@/views/**/*.tsx') as Record<string, Parameters<typeof lazy>[number]>;
+const modules = import.meta.glob(['@/views/**/*.tsx', '!@/views/login/**']) as Record<string, Parameters<typeof lazy>[number]>;
 
 /**
  * @description Convert menuList to the format required by react-router

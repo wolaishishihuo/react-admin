@@ -5,25 +5,12 @@
   padding-right: 50px;
   overflow: hidden;
   .collapsed {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    margin-right: 8px;
-    font-size: 18px;
-    color: var(--hooks-colorTextHeader);
-    cursor: pointer;
-    border-radius: 8px;
-    transition:
-      color 0.2s,
-      background-color 0.2s;
-    &:hover {
-      color: var(--hooks-colorPrimaryText);
-      background-color: var(--hooks-colorLayoutHover, var(--hooks-colorTextHoverHeader));
-    }
+    margin-right: 4px;
   }
   .ant-breadcrumb {
+    margin-left: 8px;
+    font-size: 14px;
+    color: var(--hooks-colorTextSecondaryHeader);
     white-space: nowrap;
     ol {
       flex-wrap: nowrap;
@@ -57,38 +44,61 @@
 .tool-bar-ri {
   display: flex;
   flex-shrink: 0;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
   height: 60px;
-  line-height: 60px;
-  .header-icon {
-    display: flex;
-    align-items: center;
-    overflow: visible;
-    & > * {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      height: 34px;
-      margin-left: 4px;
-      overflow: visible;
-      color: var(--hooks-colorTextHeader);
-      cursor: pointer;
-      border-radius: 8px;
-      transition: background-color 0.2s;
-      &:hover {
-        background-color: var(--hooks-colorLayoutHover, var(--hooks-colorTextHoverHeader));
-      }
-    }
-  }
-  .username {
-    margin: 0 12px 0 16px;
-    font-size: 14px;
-    color: var(--hooks-colorTextHeader);
-  }
+  line-height: normal;
   .avatar {
     cursor: pointer;
+  }
+}
+
+@keyframes hooks-rotate180 {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes hooks-expand {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes hooks-shrink {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.setting-btn:hover svg {
+  animation: hooks-rotate180 0.5s;
+}
+.full-screen-btn:hover svg {
+  animation: hooks-expand 0.6s forwards;
+}
+.exit-full-screen-btn:hover svg {
+  animation: hooks-shrink 0.6s forwards;
+}
+
+@media screen and (max-width: 640px) {
+  .tool-bar-ri .ant-avatar {
+    width: 26px !important;
+    height: 26px !important;
   }
 }
 

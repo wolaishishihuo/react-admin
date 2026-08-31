@@ -1,4 +1,3 @@
-import { EnterOutlined, SearchOutlined } from '@ant-design/icons';
 import { useDebounce } from 'ahooks';
 import { Empty, Input, InputRef, Modal } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -21,6 +20,8 @@ const SearchMenu: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
 
   const debouncedSearchValue = useDebounce(searchValue, { wait: 300 });
+
+  const isMac = /mac/i.test(navigator.userAgent);
 
   const showModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -95,15 +96,35 @@ const SearchMenu: React.FC = () => {
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setIsModalOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onShortcut);
+    return () => window.removeEventListener('keydown', onShortcut);
+  }, []);
+
   return (
     <React.Fragment>
-      <i className='iconfont icon-sousuo' onClick={showModal}></i>
+      <div
+        className='text-13px text-content-pale px-10px border border-line-box rounded-[8px] border-solid flex gap-8px h-36px w-160px cursor-pointer transition-colors items-center box-border hover:border-primary max-md:hidden'
+        onClick={showModal}
+      >
+        <Icon className='text-16px text-icon' icon='ri:search-line' />
+        <span className='flex-1'>搜索</span>
+        <span className='text-12px text-icon leading-[18px] px-6px border border-line-box rounded-[4px] border-solid inline-flex h-20px items-center'>
+          {isMac ? '⌘ K' : 'Ctrl K'}
+        </span>
+      </div>
       <Modal className='search-modal' width={600} footer={null} closable={false} open={isModalOpen} onCancel={closeModal}>
         <Input
           ref={inputRef}
           placeholder='菜单搜索：支持菜单名称、路径'
           size='large'
-          prefix={<SearchOutlined style={{ fontSize: '18px' }} />}
+          prefix={<Icon className='text-18px' icon='ri:search-line' />}
           allowClear={true}
           value={searchValue}
           onChange={handleInputChange}
@@ -117,9 +138,9 @@ const SearchMenu: React.FC = () => {
                 onMouseEnter={() => mouseoverMenuItem(item)}
                 onClick={() => selectMenuItem()}
               >
-                <Icon className='menu-icon' name={item.meta!.icon!} />
+                <Icon className='menu-icon' icon={item.meta!.icon!} />
                 <span className='menu-title'>{item.meta?.title}</span>
-                <EnterOutlined className='menu-enter' />
+                <Icon className='menu-enter' icon='ri:corner-down-left-line' />
               </div>
             ))}
           </div>

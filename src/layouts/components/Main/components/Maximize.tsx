@@ -1,19 +1,16 @@
-import React from 'react';
-
+import { Icon } from '@/components/Icon';
 import { useGlobalStore } from '@/stores';
 
-const Maximize: React.FC = () => {
+const Maximize = () => {
   const maximize = useGlobalStore(state => state.maximize);
   const setGlobalState = useGlobalStore(state => state.setGlobalState);
 
+  if (!maximize) return null;
+
   return (
-    <React.Fragment>
-      {maximize && (
-        <div className='maximize-icon' onClick={() => setGlobalState('maximize', false)}>
-          <i className='iconfont icon-tuichu'></i>;
-        </div>
-      )}
-    </React.Fragment>
+    <div className='maximize-icon' onClick={() => setGlobalState('maximize', false)}>
+      <Icon className='text-14px text-white left-[19%] top-[48%] relative' icon='ri:fullscreen-exit-line' />
+    </div>
   );
 };
 

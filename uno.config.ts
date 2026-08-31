@@ -29,7 +29,13 @@ export default defineConfig({
       regular: 'var(--hooks-colorTextRegular)',
       header: 'var(--hooks-colorBgHeader)',
       sider: 'var(--hooks-colorBgSider)',
-      login: 'var(--hooks-colorBgLoginContainer)'
+      login: 'var(--hooks-colorBgLoginContainer)',
+      icon: 'var(--hooks-colorTextSecondaryHeader)',
+      'content-pale': 'var(--hooks-colorTextPale)',
+      hover: 'var(--hooks-colorTextHoverHeader, var(--hooks-colorLayoutHover))',
+      'line-box': 'var(--hooks-colorBorderBox)',
+      warning: 'var(--hooks-colorWarning)',
+      success: 'var(--hooks-colorSuccess)'
     },
     shadow: {
       analysis: 'var(--hooks-boxShadowAnalysis)',
@@ -46,7 +52,9 @@ export default defineConfig({
     sle: 'truncate',
     mle: 'line-clamp-2',
     'content-box': 'flex flex-col items-center h-full',
-    card: 'box-border p-24px text-14px bg-[var(--hooks-colorBgContainer)] border-solid border-1 border-[var(--hooks-colorBorderSecondary)] rounded-[calc(var(--hooks-borderRadiusLG)*1px)]'
+    card: 'box-border p-24px text-14px bg-[var(--hooks-colorBgContainer)] border-solid border-1 border-[var(--hooks-colorBorderSecondary)] rounded-[calc(var(--hooks-borderRadiusLG)*1px)]',
+    'icon-btn':
+      'text-icon relative flex-center h-34px w-34px shrink-0 cursor-pointer rounded-[8px] text-20px leading-none transition-colors hover:bg-hover'
   },
   rules: [
     [

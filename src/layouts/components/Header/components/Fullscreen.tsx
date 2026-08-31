@@ -1,9 +1,17 @@
 import { useFullscreen } from 'ahooks';
 
-const Fullscreen: React.FC = () => {
+import IconButton from './IconButton';
+
+const Fullscreen = () => {
   const [isFullscreen, { toggleFullscreen }] = useFullscreen(() => document.body);
 
-  return <i className={`iconfont ${isFullscreen ? 'icon-suoxiao' : 'icon-fangda'}`} onClick={toggleFullscreen}></i>;
+  return (
+    <IconButton
+      icon={isFullscreen ? 'ri:fullscreen-exit-line' : 'ri:fullscreen-fill'}
+      className={`${isFullscreen ? 'exit-full-screen-btn' : 'full-screen-btn'} max-md:hidden`}
+      onClick={toggleFullscreen}
+    />
+  );
 };
 
 export default Fullscreen;

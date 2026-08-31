@@ -56,8 +56,8 @@ const LayoutMenu: React.FC<LayoutMenuProps> = ({ mode, menuList, menuSplit }) =>
   const handleMenuAsAntdFormat = (list: RouteObjectType[]): MenuItem[] => {
     return list.map(item => {
       return !item?.children?.length
-        ? getItem(item.meta?.title, item.path, <Icon name={item.meta!.icon!} />)
-        : getItem(item.meta?.title, item.path, <Icon name={item.meta!.icon!} />, handleMenuAsAntdFormat(item.children!));
+        ? getItem(item.meta?.title, item.path, <Icon icon={item.meta!.icon!} />)
+        : getItem(item.meta?.title, item.path, <Icon icon={item.meta!.icon!} />, handleMenuAsAntdFormat(item.children!));
     });
   };
 

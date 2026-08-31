@@ -81,8 +81,7 @@ apis/modules/<module>/
    「登记」= 后端菜单配置，前端不改 JSON
 3. `element` 是公共约定：形如 `/system/accountManage/index`——前导 `/`、以 `/index` 结尾
    （`ConvertRouter` 拼 `'/src/views' + element + '.tsx'`，格式错了路由找不到）
-4. `meta.icon` 的合法值以 `src/components/Icon` 的实现为准（模板期按 antd 图标导出名动态创建；
-   后端若下发其他图标体系，先改 Icon 组件再接入，不要写死图标名清单）
+4. `meta.icon` 与业务图标一律 Remix Icon（Iconify 名 `ri:home-line`）。全项目只走 `<Icon icon="ri:xxx" />`（`@/components/Icon`），大小 / 颜色用 className。不要引 `@ant-design/icons` 或 `@iconify/react`，不要混其他图标集
 5. 检查 `usePermissions` 是否有菜单过滤逻辑（模板期只放行部分 `meta.key`，以代码现状为准）：
    过滤存在时新增一级菜单必须同步；菜单改由后端权限控制后应删除这段模板期过滤
 6. `meta.isKeepAlive` 控制该页是否被 tabs 缓存（`KeepAlive` 组件）
