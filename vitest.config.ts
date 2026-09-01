@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
 
 /**
- * Standalone on purpose: merging `vite.config.ts` would pull PWA, compression,
+ * Standalone on purpose: merging `vite.config.ts` would pull compression,
  * html inject, and vite-plugin-checker into every test run.
  *
  * Vitest's default Vite mode is `test`, so `.env.test` is loaded. That file is
