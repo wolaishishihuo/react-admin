@@ -3,18 +3,20 @@ import { Button, Space, Switch, Tag } from 'antd';
 
 import { RoleItem } from '@/apis/interface';
 import { BUILTIN_ROLE_CODES } from '@/apis/modules/system';
+import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
 
-import { STATUS_ENUM } from '../../constants';
+import { ROLE_PERMS, STATUS_ENUM } from '../../constants';
 
 export interface RoleColumnHandlers {
+  canUpdate: boolean;
   onEdit: (record: RoleItem) => void;
   onDelete: (ids: string[], names: string[]) => void;
   onToggleStatus: (record: RoleItem, checked: boolean) => void;
 }
 
 export function getRoleColumns(handlers: RoleColumnHandlers): ProColumns<RoleItem>[] {
-  const { onEdit, onDelete, onToggleStatus } = handlers;
+  const { canUpdate, onEdit, onDelete, onToggleStatus } = handlers;
 
   return [
     { title: '角色名称', dataIndex: 'roleName', width: 160, ellipsis: true },
@@ -26,7 +28,7 @@ export function getRoleColumns(handlers: RoleColumnHandlers): ProColumns<RoleIte
       valueEnum: STATUS_ENUM,
       render: (_, record) => (
         <Switch
-          disabled={BUILTIN_ROLE_CODES.includes(record.roleCode)}
+          disabled={!canUpdate || BUILTIN_ROLE_CODES.includes(record.roleCode)}
           checked={record.status === 1}
           onChange={checked => onToggleStatus(record, checked)}
         />
@@ -49,24 +51,28 @@ export function getRoleColumns(handlers: RoleColumnHandlers): ProColumns<RoleIte
       search: false,
       render: (_, record) => (
         <Space>
-          <Button
-            type='link'
-            size='small'
-            icon={<Icon className='text-14px' icon='ri:edit-line' />}
-            onClick={() => onEdit(record)}
-          >
-            编辑
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            danger
-            icon={<Icon className='text-14px' icon='ri:delete-bin-line' />}
-            disabled={BUILTIN_ROLE_CODES.includes(record.roleCode)}
-            onClick={() => onDelete([record.id], [record.roleName])}
-          >
-            删除
-          </Button>
+          <AuthButton authority={ROLE_PERMS.UPDATE}>
+            <Button
+              type='link'
+              size='small'
+              icon={<Icon className='text-14px' icon='ri:edit-line' />}
+              onClick={() => onEdit(record)}
+            >
+              编辑
+            </Button>
+          </AuthButton>
+          <AuthButton authority={ROLE_PERMS.DELETE}>
+            <Button
+              type='link'
+              size='small'
+              danger
+              icon={<Icon className='text-14px' icon='ri:delete-bin-line' />}
+              disabled={BUILTIN_ROLE_CODES.includes(record.roleCode)}
+              onClick={() => onDelete([record.id], [record.roleName])}
+            >
+              删除
+            </Button>
+          </AuthButton>
         </Space>
       )
     }

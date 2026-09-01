@@ -5,10 +5,13 @@ import { useRef, useState } from 'react';
 
 import { MenuItem, ReqCreateMenu, ReqMenuList } from '@/apis/interface';
 import { fetchCreateMenu, fetchDeleteMenu, fetchGetMenuList, fetchUpdateMenu, findMenu } from '@/apis/modules/system';
+import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
+import useAuthButton from '@/hooks/useAuthButton';
 import { message, modal } from '@/hooks/useMessage';
 import { formatDataForProTable } from '@/utils';
 
+import { MENU_PERMS } from '../constants';
 import MenuFormModal from './components/MenuFormModal';
 import { getMenuColumns } from './config/columns';
 
@@ -30,6 +33,7 @@ const MenuMange = () => {
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState<MenuItem | null>(null);
   const [initialValues, setInitialValues] = useState<Partial<MenuItem>>(defaultFormValues);
+  const { hasPerm } = useAuthButton();
 
   function reload() {
     actionRef.current?.reload();
@@ -42,6 +46,7 @@ const MenuMange = () => {
   }
 
   async function handleSubmit(values: ReqCreateMenu) {
+    if (!hasPerm(current ? MENU_PERMS.UPDATE : MENU_PERMS.CREATE)) return;
     setSaving(true);
     try {
       if (current) await fetchUpdateMenu({ ...current, ...values });
@@ -55,6 +60,7 @@ const MenuMange = () => {
   }
 
   function handleDelete(record: MenuItem) {
+    if (!hasPerm(MENU_PERMS.DELETE)) return;
     modal.confirm({
       title: '温馨提示',
       content: record.children?.length
@@ -71,6 +77,7 @@ const MenuMange = () => {
   }
 
   async function handleToggleStatus(record: MenuItem, checked: boolean) {
+    if (!hasPerm(MENU_PERMS.UPDATE)) return;
     await fetchUpdateMenu({ ...record, status: checked ? 1 : 0 });
     reload();
   }
@@ -80,6 +87,7 @@ const MenuMange = () => {
   }
 
   const columns = getMenuColumns({
+    canUpdate: hasPerm(MENU_PERMS.UPDATE),
     onAddChild: record => openModal({ parentId: record.id, type: 'menu' }),
     onEdit: openModal,
     onDelete: handleDelete,
@@ -102,9 +110,11 @@ const MenuMange = () => {
         expandable={{ defaultExpandAllRows: true }}
         request={requestMenus}
         toolBarRender={() => [
-          <Button key='add' type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
-            新增菜单
-          </Button>
+          <AuthButton key='add' authority={MENU_PERMS.CREATE}>
+            <Button type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
+              新增菜单
+            </Button>
+          </AuthButton>
         ]}
       />
       <MenuFormModal

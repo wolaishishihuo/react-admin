@@ -6,9 +6,6 @@ declare global {
   }
   interface Window {
     $navigate: NavigateFunction;
-    EyeDropper: new () => {
-      open(options?: { signal: AbortSignal }): Promise<{ sRGBHex: string }>;
-    };
   }
 }
 

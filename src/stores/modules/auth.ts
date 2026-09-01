@@ -14,11 +14,11 @@ export const useAuthStore = create<AuthStoreState>()(
     showMenuList: [],
     // Menu permission list ==> flattened one-dimensional array menu, mainly used to add dynamic routing
     flatMenuList: [],
-    // List of button permissions
-    authButtonList: {},
-    setAuthButtonList: authButtonList =>
+    // Flat button codes from GET /users/me
+    authButtons: [],
+    setAuthButtons: authButtons =>
       set((state: AuthState) => {
-        state.authButtonList = authButtonList;
+        state.authButtons = authButtons;
       }),
     setAuthMenuList: authMenuList =>
       set((state: AuthState) => {

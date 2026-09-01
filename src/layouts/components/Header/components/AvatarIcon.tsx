@@ -14,6 +14,7 @@ const AvatarIcon = () => {
   const setToken = useUserStore(state => state.setToken);
   const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
+  const setAuthButtons = useAuthStore(state => state.setAuthButtons);
 
   const logout = () => {
     modal.confirm({
@@ -29,6 +30,7 @@ const AvatarIcon = () => {
         setToken('');
         setRefreshToken('');
         setAuthMenuList([]);
+        setAuthButtons([]);
         navigate(LOGIN_URL, { replace: true });
         message.success('退出登录成功！');
       }

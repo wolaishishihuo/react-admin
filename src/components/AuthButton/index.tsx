@@ -1,30 +1,19 @@
-import React from 'react';
+import { memo, type ReactNode } from 'react';
 
-import { useAuthStore } from '@/stores';
-import { getMenuByPath } from '@/utils';
+import useAuthButton from '@/hooks/useAuthButton';
 
-type AuthButtonProps = {
+interface AuthButtonProps {
+  /** 按钮权限码，数组为 AND */
   authority: string | string[];
-  children: React.ReactNode;
+  children: ReactNode;
+}
+
+const AuthButton = (props: AuthButtonProps) => {
+  const { authority, children } = props;
+  const { hasPerm } = useAuthButton();
+
+  if (!hasPerm(authority)) return null;
+  return children;
 };
 
-const AuthButton: React.FC<AuthButtonProps> = ({ authority, children }) => {
-  const authButtonList = useAuthStore(state => state.authButtonList) ?? [];
-
-  const meta = getMenuByPath()?.meta ?? {};
-
-  let isAuth = false;
-
-  if (typeof authority === 'string') {
-    authButtonList[meta.key!]?.includes(authority) && (isAuth = true);
-  }
-
-  if (authority instanceof Array && authority.length) {
-    const hasPermission = authority.every(item => authButtonList[meta.key!]?.includes(item));
-    hasPermission && (isAuth = true);
-  }
-
-  return <React.Fragment>{isAuth && children}</React.Fragment>;
-};
-
-export default React.memo(AuthButton);
+export default memo(AuthButton);

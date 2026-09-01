@@ -1,21 +1,21 @@
 import { useAuthStore } from '@/stores';
-import { getMenuByPath } from '@/utils';
+
+function matchAuthButtons(buttons: string[], code: string | string[]) {
+  const codes = typeof code === 'string' ? [code] : code;
+  return codes.length > 0 && codes.every(item => buttons.includes(item));
+}
 
 /**
- * @description  Use auth button hook
+ * @description Button permission checks against authStore.authButtons
  */
 const useAuthButton = () => {
-  const authButtonList = useAuthStore(state => state.authButtonList);
+  const authButtons = useAuthStore(state => state.authButtons);
 
-  const meta = getMenuByPath()?.meta ?? {};
+  function hasPerm(code: string | string[]) {
+    return matchAuthButtons(authButtons, code);
+  }
 
-  let currentPageAuthButton: { [key: string]: boolean } = {};
-
-  authButtonList[meta.key!]?.forEach(item => (currentPageAuthButton[item] = true));
-
-  return {
-    BUTTONS: currentPageAuthButton
-  };
+  return { hasPerm };
 };
 
 export default useAuthButton;

@@ -2,11 +2,13 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { Button, Switch, Tag } from 'antd';
 
 import { MenuItem } from '@/apis/interface';
+import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
 
-import { STATUS_ENUM } from '../../constants';
+import { MENU_PERMS, STATUS_ENUM } from '../../constants';
 
 export interface MenuColumnHandlers {
+  canUpdate: boolean;
   onAddChild: (record: MenuItem) => void;
   onEdit: (record: MenuItem) => void;
   onDelete: (record: MenuItem) => void;
@@ -14,7 +16,7 @@ export interface MenuColumnHandlers {
 }
 
 export function getMenuColumns(handlers: MenuColumnHandlers): ProColumns<MenuItem>[] {
-  const { onAddChild, onEdit, onDelete, onToggleStatus } = handlers;
+  const { canUpdate, onAddChild, onEdit, onDelete, onToggleStatus } = handlers;
 
   return [
     {
@@ -62,7 +64,9 @@ export function getMenuColumns(handlers: MenuColumnHandlers): ProColumns<MenuIte
       dataIndex: 'status',
       width: 90,
       valueEnum: STATUS_ENUM,
-      render: (_, record) => <Switch checked={record.status === 1} onChange={checked => onToggleStatus(record, checked)} />
+      render: (_, record) => (
+        <Switch disabled={!canUpdate} checked={record.status === 1} onChange={checked => onToggleStatus(record, checked)} />
+      )
     },
     {
       title: '操作',
@@ -72,31 +76,37 @@ export function getMenuColumns(handlers: MenuColumnHandlers): ProColumns<MenuIte
       search: false,
       render: (_, record) => (
         <>
-          <Button
-            type='link'
-            size='small'
-            icon={<Icon className='text-14px' icon='ri:add-line' />}
-            onClick={() => onAddChild(record)}
-          >
-            新增
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            icon={<Icon className='text-14px' icon='ri:edit-line' />}
-            onClick={() => onEdit(record)}
-          >
-            编辑
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            danger
-            icon={<Icon className='text-14px' icon='ri:delete-bin-line' />}
-            onClick={() => onDelete(record)}
-          >
-            删除
-          </Button>
+          <AuthButton authority={MENU_PERMS.CREATE}>
+            <Button
+              type='link'
+              size='small'
+              icon={<Icon className='text-14px' icon='ri:add-line' />}
+              onClick={() => onAddChild(record)}
+            >
+              新增
+            </Button>
+          </AuthButton>
+          <AuthButton authority={MENU_PERMS.UPDATE}>
+            <Button
+              type='link'
+              size='small'
+              icon={<Icon className='text-14px' icon='ri:edit-line' />}
+              onClick={() => onEdit(record)}
+            >
+              编辑
+            </Button>
+          </AuthButton>
+          <AuthButton authority={MENU_PERMS.DELETE}>
+            <Button
+              type='link'
+              size='small'
+              danger
+              icon={<Icon className='text-14px' icon='ri:delete-bin-line' />}
+              onClick={() => onDelete(record)}
+            >
+              删除
+            </Button>
+          </AuthButton>
         </>
       )
     }

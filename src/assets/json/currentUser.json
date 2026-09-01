@@ -1,0 +1,19 @@
+{
+  "code": 200,
+  "data": {
+    "name": "admin",
+    "buttons": [
+      "sys:user:create",
+      "sys:user:update",
+      "sys:user:delete",
+      "sys:user:reset",
+      "sys:role:create",
+      "sys:role:update",
+      "sys:role:delete",
+      "sys:menu:create",
+      "sys:menu:update",
+      "sys:menu:delete"
+    ]
+  },
+  "msg": "成功"
+}

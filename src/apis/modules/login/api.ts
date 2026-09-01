@@ -14,11 +14,6 @@ export async function fetchGetAuthMenuList() {
   return authMenuList.data as AuthState['authMenuList'];
 }
 
-export async function fetchGetAuthButtonList() {
-  const { data } = await http.get<AuthState['authButtonList']>(LOGIN_URLS.AUTH_BUTTONS);
-  return data;
-}
-
 export async function fetchLogout() {
   await http.post(LOGIN_URLS.LOGOUT, {}, { loading: true });
 }

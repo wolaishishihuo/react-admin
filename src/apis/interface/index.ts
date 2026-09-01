@@ -34,6 +34,11 @@ export interface ResLogin {
   refreshToken?: string;
 }
 
+export interface ResCurrentUser {
+  name?: string;
+  buttons: string[];
+}
+
 export interface UserList {
   id: string;
   username: string;

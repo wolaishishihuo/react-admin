@@ -87,6 +87,13 @@ apis/modules/<module>/
 6. `meta.isKeepAlive` 控制该页是否被 tabs 缓存（`KeepAlive` 组件）
 7. 登录等不走布局的全屏页放 `routers/modules/staticRouter.tsx`，不进菜单数据
 
+## 按钮权限
+
+- 数据只来自 `GET /users/me` 的 `buttons: string[]`，写入 `authStore.authButtons`；不要从菜单 `authList` / 路由 key 再抽一份
+- UI 显隐用 `<AuthButton authority='sys:user:create'>`（数组为 AND）；只包入口操作（工具栏按钮、表格操作），不要包 Modal / Drawer / 业务弹窗
+- 权限参与 `disabled`、数据过滤、提交守卫时用 `useAuthButton().hasPerm(code)`
+- 禁止 `hasRoutePerm`、禁止按当前页菜单 key 取按钮码
+
 ## React 组件规范（新代码）
 
 ```tsx

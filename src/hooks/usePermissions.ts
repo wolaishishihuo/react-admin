@@ -1,4 +1,5 @@
-import { fetchGetAuthButtonList, fetchGetAuthMenuList } from '@/apis/modules/login';
+import { fetchGetAuthMenuList } from '@/apis/modules/login';
+import { fetchGetCurrentUser } from '@/apis/modules/user';
 import { notification } from '@/hooks/useMessage';
 import { useAuthStore, useUserStore } from '@/stores';
 
@@ -11,7 +12,7 @@ const usePermissions = () => {
   const setToken = useUserStore(state => state.setToken);
   const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
-  const setAuthButtonList = useAuthStore(state => state.setAuthButtonList);
+  const setAuthButtons = useAuthStore(state => state.setAuthButtons);
 
   const initPermissions = (token: string) => {
     if (!token) return Promise.resolve();
@@ -19,10 +20,9 @@ const usePermissions = () => {
 
     const promise = (async () => {
       try {
-        const buttonList = await fetchGetAuthButtonList();
-        setAuthButtonList(buttonList);
+        const [currentUser, menuList] = await Promise.all([fetchGetCurrentUser(), fetchGetAuthMenuList()]);
+        setAuthButtons(currentUser.buttons ?? []);
 
-        const menuList = await fetchGetAuthMenuList();
         setAuthMenuList(menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system'));
 
         if (!menuList.length) {
@@ -30,11 +30,13 @@ const usePermissions = () => {
             title: '无权限访问',
             description: '当前账号无任何菜单权限，请联系系统管理员！'
           });
+          setAuthButtons([]);
           setToken('');
           setRefreshToken('');
           return Promise.reject('No permission');
         }
       } catch (error) {
+        setAuthButtons([]);
         setToken('');
         setRefreshToken('');
         return Promise.reject(error);

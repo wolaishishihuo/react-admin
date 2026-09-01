@@ -76,10 +76,10 @@ export interface AuthState {
   authMenuList: RouteObjectType[];
   showMenuList: RouteObjectType[];
   flatMenuList: RouteObjectType[];
-  authButtonList: Record<string, string[]>;
+  authButtons: string[];
 }
 
 export interface AuthAction {
-  setAuthButtonList: (authButtonList: AuthState['authButtonList']) => void;
+  setAuthButtons: (authButtons: AuthState['authButtons']) => void;
   setAuthMenuList: (authMenuList: AuthState['authMenuList']) => void;
 }

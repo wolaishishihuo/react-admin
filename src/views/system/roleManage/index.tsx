@@ -12,11 +12,14 @@ import {
   fetchUpdateRole,
   getRoles
 } from '@/apis/modules/system';
+import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
 import { pagination } from '@/config/proTable';
+import useAuthButton from '@/hooks/useAuthButton';
 import { message, modal } from '@/hooks/useMessage';
 import { formatDataForProTable } from '@/utils';
 
+import { ROLE_PERMS } from '../constants';
 import RoleFormModal from './components/RoleFormModal';
 import { getRoleColumns } from './config/columns';
 
@@ -26,6 +29,7 @@ const RoleManage = () => {
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState<RoleItem | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const { hasPerm } = useAuthButton();
 
   function reload() {
     setSelectedRowKeys([]);
@@ -38,6 +42,7 @@ const RoleManage = () => {
   }
 
   async function handleSubmit(values: ReqCreateRole) {
+    if (!hasPerm(current ? ROLE_PERMS.UPDATE : ROLE_PERMS.CREATE)) return;
     setSaving(true);
     try {
       if (current) await fetchUpdateRole({ ...current, ...values });
@@ -51,6 +56,7 @@ const RoleManage = () => {
   }
 
   function handleDelete(ids: string[], names: string[]) {
+    if (!hasPerm(ROLE_PERMS.DELETE)) return;
     const builtin = ids.some(id => BUILTIN_ROLE_CODES.includes(getRoles().find(item => item.id === id)?.roleCode || ''));
     if (builtin) {
       message.warning('系统内置角色不可删除');
@@ -70,6 +76,7 @@ const RoleManage = () => {
   }
 
   async function handleToggleStatus(record: RoleItem, checked: boolean) {
+    if (!hasPerm(ROLE_PERMS.UPDATE)) return;
     await fetchUpdateRole({ ...record, status: checked ? 1 : 0 });
     reload();
   }
@@ -87,6 +94,7 @@ const RoleManage = () => {
   }
 
   const columns = getRoleColumns({
+    canUpdate: hasPerm(ROLE_PERMS.UPDATE),
     onEdit: openModal,
     onDelete: handleDelete,
     onToggleStatus: handleToggleStatus
@@ -108,18 +116,21 @@ const RoleManage = () => {
         rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
         request={requestRoles}
         toolBarRender={() => [
-          <Button key='add' type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
-            新增角色
-          </Button>,
-          <Button
-            key='delete'
-            danger
-            disabled={!selectedRowKeys.length}
-            icon={<Icon icon='ri:delete-bin-line' />}
-            onClick={handleBatchDelete}
-          >
-            批量删除
-          </Button>
+          <AuthButton key='add' authority={ROLE_PERMS.CREATE}>
+            <Button type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
+              新增角色
+            </Button>
+          </AuthButton>,
+          <AuthButton key='delete' authority={ROLE_PERMS.DELETE}>
+            <Button
+              danger
+              disabled={!selectedRowKeys.length}
+              icon={<Icon icon='ri:delete-bin-line' />}
+              onClick={handleBatchDelete}
+            >
+              批量删除
+            </Button>
+          </AuthButton>
         ]}
       />
       <RoleFormModal open={open} saving={saving} current={current} onSubmit={handleSubmit} onCancel={() => setOpen(false)} />

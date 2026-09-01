@@ -13,11 +13,14 @@ import {
   fetchUpdateAccount,
   getAccounts
 } from '@/apis/modules/system';
+import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
 import { pagination } from '@/config/proTable';
+import useAuthButton from '@/hooks/useAuthButton';
 import { message, modal } from '@/hooks/useMessage';
 import { formatDataForProTable } from '@/utils';
 
+import { ACCOUNT_PERMS } from '../constants';
 import AccountFormModal, { AccountFormValues } from './components/AccountFormModal';
 import { getAccountColumns } from './config/columns';
 
@@ -27,6 +30,7 @@ const AccountManage = () => {
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState<AccountItem | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const { hasPerm } = useAuthButton();
 
   function reload() {
     setSelectedRowKeys([]);
@@ -39,6 +43,7 @@ const AccountManage = () => {
   }
 
   async function handleSubmit(values: AccountFormValues) {
+    if (!hasPerm(current ? ACCOUNT_PERMS.UPDATE : ACCOUNT_PERMS.CREATE)) return;
     setSaving(true);
     try {
       const payload = {
@@ -62,6 +67,7 @@ const AccountManage = () => {
   }
 
   function handleDelete(ids: string[], names: string[]) {
+    if (!hasPerm(ACCOUNT_PERMS.DELETE)) return;
     const builtin = ids.some(id => BUILTIN_USERNAMES.includes(getAccounts().find(item => item.id === id)?.username || ''));
     if (builtin) {
       message.warning('系统内置账号不可删除');
@@ -81,6 +87,7 @@ const AccountManage = () => {
   }
 
   function handleResetPassword(record: AccountItem) {
+    if (!hasPerm(ACCOUNT_PERMS.RESET)) return;
     modal.confirm({
       title: '温馨提示',
       content: `确认将「${record.username}」的密码重置为 123456 ？`,
@@ -94,6 +101,7 @@ const AccountManage = () => {
   }
 
   async function handleToggleStatus(record: AccountItem, checked: boolean) {
+    if (!hasPerm(ACCOUNT_PERMS.UPDATE)) return;
     await fetchUpdateAccount({ ...record, status: checked ? 1 : 0 });
     reload();
   }
@@ -111,6 +119,7 @@ const AccountManage = () => {
   }
 
   const columns = getAccountColumns({
+    canUpdate: hasPerm(ACCOUNT_PERMS.UPDATE),
     onEdit: openModal,
     onResetPassword: handleResetPassword,
     onDelete: handleDelete,
@@ -133,18 +142,21 @@ const AccountManage = () => {
         rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
         request={requestAccounts}
         toolBarRender={() => [
-          <Button key='add' type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
-            新增账号
-          </Button>,
-          <Button
-            key='delete'
-            danger
-            disabled={!selectedRowKeys.length}
-            icon={<Icon icon='ri:delete-bin-line' />}
-            onClick={handleBatchDelete}
-          >
-            批量删除
-          </Button>
+          <AuthButton key='add' authority={ACCOUNT_PERMS.CREATE}>
+            <Button type='primary' icon={<Icon icon='ri:add-line' />} onClick={() => openModal()}>
+              新增账号
+            </Button>
+          </AuthButton>,
+          <AuthButton key='delete' authority={ACCOUNT_PERMS.DELETE}>
+            <Button
+              danger
+              disabled={!selectedRowKeys.length}
+              icon={<Icon icon='ri:delete-bin-line' />}
+              onClick={handleBatchDelete}
+            >
+              批量删除
+            </Button>
+          </AuthButton>
         ]}
       />
       <AccountFormModal open={open} saving={saving} current={current} onSubmit={handleSubmit} onCancel={() => setOpen(false)} />
