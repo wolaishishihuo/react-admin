@@ -11,20 +11,24 @@
   font-size: 20px;
   line-height: 1;
 }
-.ant-menu-inline,
-.ant-menu-vertical {
-  background: transparent !important;
-  .ant-menu-item::after {
-    display: none !important;
+
+/* 只作用侧栏：横向 / 经典顶栏的 popup 也是 .ant-menu-vertical，不能透明 */
+.ant-layout-sider {
+  .ant-menu-inline,
+  .ant-menu-vertical {
+    background: transparent !important;
+    .ant-menu-item::after {
+      display: none !important;
+    }
   }
-}
-.ant-menu-inline:not(.ant-menu-inline-collapsed),
-.ant-menu-vertical:not(.ant-menu-inline-collapsed) {
-  .ant-menu-item,
-  .ant-menu-submenu-title {
-    width: calc(100% - 16px) !important;
-    margin-block: 4px !important;
-    margin-inline: 8px !important;
-    border-radius: 6px !important;
+  .ant-menu-inline:not(.ant-menu-inline-collapsed),
+  .ant-menu-vertical:not(.ant-menu-inline-collapsed) {
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      width: calc(100% - 16px) !important;
+      margin-block: 4px !important;
+      margin-inline: 8px !important;
+      border-radius: 6px !important;
+    }
   }
 }

@@ -7,7 +7,7 @@ const headerTheme = {
     '--hooks-colorTextSecondaryHeader': '#7987a1',
     '--hooks-colorTextHoverHeader': '#edeff0',
     '--hooks-colorBgHeader': '#fafbfc',
-    '--hooks-colorBorderHeader': 'transparent'
+    '--hooks-colorBorderHeader': '#f0f0f0'
   },
   inverted: {
     '--hooks-colorTextHeader': '#f1f1f1',
@@ -21,7 +21,7 @@ const headerTheme = {
     '--hooks-colorTextSecondaryHeader': '#8f8fa3',
     '--hooks-colorTextHoverHeader': '#252530',
     '--hooks-colorBgHeader': '#070707',
-    '--hooks-colorBorderHeader': 'transparent'
+    '--hooks-colorBorderHeader': '#303030'
   }
 };
 
