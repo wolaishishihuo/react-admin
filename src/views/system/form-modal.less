@@ -1,5 +1,53 @@
 .system-form-modal {
-  height: 80%;
-  max-height: 80vh;
-  padding-bottom: 0;
+  .ant-modal-body {
+    overflow: hidden;
+  }
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+  .system-form-radios {
+    display: flex;
+    width: 100%;
+    .ant-radio-button-wrapper {
+      flex: 1;
+      text-align: center;
+    }
+  }
+  .ant-form-item-control-input-content:has(> .ant-switch) {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  .system-form-tree {
+    padding: 8px 4px;
+    background: var(--hooks-colorFillTertiary);
+    border: 1px solid var(--hooks-colorBorderSecondary);
+    border-radius: calc(var(--hooks-borderRadius) * 1px);
+  }
+  .system-form-section {
+    margin: 4px 0 8px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--hooks-colorTextSecondary);
+  }
+  .system-form-flags {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .system-form-flag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--hooks-colorFillTertiary);
+    border: 1px solid var(--hooks-colorBorderSecondary);
+    border-radius: calc(var(--hooks-borderRadius) * 1px);
+    span {
+      font-size: 13px;
+      color: var(--hooks-colorText);
+    }
+  }
 }
