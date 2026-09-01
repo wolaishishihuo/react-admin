@@ -27,7 +27,13 @@ body,
   background-color: transparent;
 }
 
-/* nprogress */
+/* nprogress：1031 与 nprogress.css 里 .bar 同一层。
+   done() 把 opacity 打在 #nprogress 上，父节点必须自己带 position/z-index，
+   否则淡出 stacking context 为 auto，会被 header(50)/水印(1001) 盖住。 */
+#nprogress {
+  position: relative;
+  z-index: 1031;
+}
 #nprogress .bar {
   background: var(--hooks-colorPrimary) !important;
 }
