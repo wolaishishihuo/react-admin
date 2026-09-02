@@ -14,7 +14,7 @@
 - UnoCSS 类名顺序由 ESLint `unocss/order` 管；不要装 `prettier-plugin-tailwindcss`
 - 单元 / 组件测试用 **Vitest 4**（`jsdom` + Testing Library）；通用交互 hooks（debounce、fullscreen 等）**优先用 ahooks**，不要自研
 - 测试文件放仓库根 `tests/`（按 `src/` 相对路径镜像，如 `src/utils/is` → `tests/utils/is.test.ts`）；从 `vitest` **显式 import** `describe` / `it` / `expect` / `vi`，不要开 `globals`
-- 组件测试用 `@testing-library/react`；setup 在 `tests/setup.ts`。不要把 Vitest 配进 `vite.config.ts`（会把 compression / checker 拖进测试）
+- 组件测试用 `@testing-library/react`；setup 在 `tests/setup.ts`。不要把 Vitest 配进 `vite.config.ts`（会把 PWA / checker 拖进测试）
 
 命令（pnpm，Node >= 20.19）：
 
@@ -173,12 +173,12 @@ const UserPanel = (props: UserPanelProps) => {
 先问：这份数据是否需要**生命周期管理**——缓存复用、多处共享、mutation 后失效重取、预取、轮询？
 满足任一才用 `useQuery`，否则：
 
-| 场景                           | 正确做法                                                                             |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| 一次性命令（登录、登出、导出） | 直接 `await fetchXxx`（范例：`LoginForm`）                                           |
-| ProTable 的 `request`          | 直接传 `fetchXxx`（配 `utils` 的 `formatDataForProTable`），别套 useQuery 造双份缓存 |
-| 启动期权限菜单 / 按钮          | 既定走 `usePermissions` → `authStore`（路由同步依赖），不搬进 Query                  |
-| 纯客户端状态                   | `useState` / Zustand                                                                 |
+| 场景                           | 正确做法                                                                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 一次性命令（登录、登出、导出） | 直接 `await fetchXxx`（范例：`LoginForm`）                                                                                                     |
+| ProTable 的 `request`          | 直接传 `fetchXxx`（配 `utils` 的 `formatDataForProTable`），别套 useQuery 造双份缓存；不要 `useCallback` 稳住引用，重取只看搜索表单和 `params` |
+| 启动期权限菜单 / 按钮          | 既定走 `usePermissions` → `authStore`（路由同步依赖），不搬进 Query                                                                            |
+| 纯客户端状态                   | `useState` / Zustand                                                                                                                           |
 
 写操作：需要 `isPending` / 失效联动 → `useXxxMutation`（`onSuccess` 里 `invalidateQueries`）；
 简单一次性命令直接 `fetchXxx`。
