@@ -5,10 +5,12 @@
   min-width: 0;
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
   background-color: var(--hooks-colorBgContent);
 }
 .app-header {
+  position: sticky;
+  top: 0;
   z-index: 50;
   flex-shrink: 0;
   background-color: var(--hooks-colorBgHeader);
@@ -25,21 +27,18 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 0 auto;
   flex-direction: column;
   width: calc(100% - 40px);
   min-width: 0;
-  min-height: 0;
   margin: 0 auto 16px;
-  overflow: hidden auto;
 }
 .keep-alive-item {
   display: flex;
-  flex: 1 1 0%;
+  flex: 1 0 auto;
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  min-height: 0;
   &:not(.is-active) {
     position: absolute;
     inset: 0;
@@ -51,12 +50,18 @@
   &.is-active {
     position: relative;
     z-index: 1;
-    overflow: hidden auto;
   }
 }
-.app-content:has(.keep-alive-item.is-active .ant-pro-table-scroll) {
+.app-main:has(.keep-alive-item.is-active .ant-pro-table-scroll) {
   overflow: hidden;
+  .app-content {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+  }
   .keep-alive-item.is-active {
+    flex: 1 1 0%;
+    min-height: 0;
     overflow: hidden;
   }
 }
