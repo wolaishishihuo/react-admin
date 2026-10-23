@@ -40,14 +40,20 @@ const EChartInner: React.ForwardRefRenderFunction<EChartsRef, EChartProps> = (
     if (cRef.current) {
       cInstance.current = echarts.getInstanceByDom(cRef.current) as ReturnType<EChartsRef['instance']>;
       if (!cInstance.current) {
-        cInstance.current = echarts.init(cRef.current, undefined, { renderer: 'svg' }) as unknown as ReturnType<
-          EChartsRef['instance']
-        >;
+        cInstance.current = echarts.init(cRef.current) as unknown as ReturnType<EChartsRef['instance']>;
         cInstance.current?.on('click', handleClick);
       }
-      option && cInstance.current?.setOption(option);
+      if (option) cInstance.current?.setOption(option, true);
+      else cInstance.current?.clear();
     }
   }, [cRef, option]);
+
+  useEffect(() => {
+    return () => {
+      cInstance.current?.dispose();
+      cInstance.current = undefined;
+    };
+  }, []);
 
   const { run } = useDebounceFn(() => cInstance.current?.resize({ animation: { duration: 300 } }), {
     wait: 300

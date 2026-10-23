@@ -72,6 +72,50 @@
           }
         }
       ]
+    },
+    {
+      "path": "/template",
+      "redirect": "/template/cards",
+      "meta": {
+        "key": "template",
+        "icon": "ri:layout-grid-line",
+        "title": "组件示例",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": false,
+        "isKeepAlive": true
+      },
+      "children": [
+        {
+          "path": "/template/cards",
+          "element": "/template/cards/index",
+          "meta": {
+            "key": "templateCards",
+            "icon": "ri:bank-card-line",
+            "title": "卡片",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "path": "/template/charts",
+          "element": "/template/charts/index",
+          "meta": {
+            "key": "templateCharts",
+            "icon": "ri:bar-chart-box-line",
+            "title": "图表",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        }
+      ]
     }
   ],
   "msg": "成功"

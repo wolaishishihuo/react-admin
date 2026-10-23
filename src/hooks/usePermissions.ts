@@ -23,7 +23,9 @@ const usePermissions = () => {
         const [currentUser, menuList] = await Promise.all([fetchGetCurrentUser(), fetchGetAuthMenuList()]);
         setAuthButtons(currentUser.buttons ?? []);
 
-        setAuthMenuList(menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system'));
+        setAuthMenuList(
+          menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system' || item.meta?.key === 'template')
+        );
 
         if (!menuList.length) {
           notification.warning({

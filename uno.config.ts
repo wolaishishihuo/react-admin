@@ -52,7 +52,7 @@ export default defineConfig({
     sle: 'truncate',
     mle: 'line-clamp-2',
     'content-box': 'flex flex-col items-center h-full',
-    card: 'box-border p-24px text-14px bg-[var(--hooks-colorBgContainer)] border-solid border-1 border-[var(--hooks-colorBorderSecondary)] rounded-[calc(var(--hooks-borderRadiusLG)*1px)]',
+    card: 'box-border p-24px text-14px bg-surface border-solid border-1 border-[var(--hooks-colorCardBorder)] rounded-[calc(var(--hooks-borderRadius)*1px_+_4px)]',
     'icon-btn':
       'text-icon relative flex-center h-34px w-34px shrink-0 cursor-pointer rounded-[8px] text-20px leading-none transition-colors hover:bg-hover'
   },
