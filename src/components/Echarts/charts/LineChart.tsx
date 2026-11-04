@@ -2,11 +2,11 @@ import { useThemedOption } from '@/components/Echarts/useChartTheme';
 
 import ChartFrame from './ChartFrame';
 import { buildLineOption } from './options';
-import { type AxisChartProps, isBarLikeEmpty, type LineSeries } from './types';
+import { type AxisChartProps, isSeriesEmpty, type LineSeries } from './types';
 
 const EMPTY_AXIS: string[] = [];
 
-interface LineChartProps extends AxisChartProps {
+export interface LineChartProps extends AxisChartProps {
   data: number[] | LineSeries[];
   xAxisData?: string[];
   smooth?: boolean;
@@ -14,13 +14,18 @@ interface LineChartProps extends AxisChartProps {
   symbol?: LineSeries['symbol'];
   symbolSize?: number;
   showAreaColor?: boolean;
+  animationDelay?: number;
 }
 
 const LineChart = (props: LineChartProps) => {
   const {
+    animationDelay = 200,
     data,
     xAxisData = EMPTY_AXIS,
     height = '16rem',
+    loading = false,
+    isEmpty = false,
+    onClick,
     smooth = true,
     lineWidth = 2.5,
     symbol = 'none',
@@ -66,7 +71,17 @@ const LineChart = (props: LineChartProps) => {
     ]
   );
 
-  return <ChartFrame option={option} height={height} empty={isBarLikeEmpty(data)} />;
+  return (
+    <ChartFrame
+      loading={loading}
+      onClick={onClick}
+      option={option}
+      height={height}
+      width='calc(100% + 10px)'
+      seriesDelay={animationDelay}
+      empty={isEmpty || isSeriesEmpty(data)}
+    />
+  );
 };
 
 export default LineChart;

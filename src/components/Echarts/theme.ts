@@ -1,21 +1,24 @@
 export type LegendPosition = 'bottom' | 'top' | 'left' | 'right';
 
 export interface ChartTheme {
-  /** 轴线、虚线网格 */
   axis: string;
-  /** 轴标签 */
   label: string;
-  /** 图例、tooltip 正文 */
   text: string;
   tooltipBg: string;
   tooltipBorder: string;
   primary: string;
-  /** 单系列柱体渐变的浅端 */
   primaryLight: string;
-  /** 环形图的对比扇区、雷达底 */
   track: string;
-  /** 扇区之间的缝，跟卡片底一致 */
   surface: string;
+  centerText: string;
+  pieLabel: string;
+  radarLabel: string;
+  radarGrid: string;
+  contrast: string;
+  shadow: string;
+  empty: string;
+  loadingMask: string;
+  map: { border: string; shadow: string; label: string };
   colors: string[];
   fontSize: number;
 }
@@ -28,81 +31,138 @@ export interface ChartGrid {
   containLabel: boolean;
 }
 
-/** art 色板从第二格起是固定色。第一格用 useTheme 已经写好的 `--hooks-colorPrimary1`。 */
-const ART_SERIES_COLORS = ['#4ABEFF', '#EDF2FF', '#14DEBA', '#FFAF20', '#FA8A6C', '#FFAF20'] as const;
-
-function seriesColors(seriesPrimary: string) {
-  return [seriesPrimary, ...ART_SERIES_COLORS];
-}
-
-const LIGHT_FALLBACK: ChartTheme = {
-  axis: '#EDEDED',
-  label: '#999999',
-  text: '#333333',
-  tooltipBg: 'rgba(255, 255, 255, 0.9)',
-  tooltipBorder: '#dddddd',
-  primary: '#1677ff',
-  primaryLight: '#91caff',
-  track: '#dbdfe1',
-  surface: '#ffffff',
-  colors: seriesColors('#1677ff'),
-  fontSize: 13
+/** Art 的固定辅助色，集中管理，页面不再单独拼色。 */
+const ART_SERIES_COLORS = ['#4ABEFF', '#EDF2FF', '#14DEBA', '#FFAF20', '#FA8A6C', '#FFAF20'];
+export const MAP_COLORS = {
+  white: '#ffffff',
+  border: 'rgba(147,235,248,0.8)',
+  start: 'rgba(147,235,248,0.3)',
+  end: 'rgba(32,120,207,0.9)',
+  shadow: 'rgba(32,120,207,1)',
+  hover: 'rgba(82,180,255,0.9)',
+  selected: '#4FAEFB',
+  pin: '#F99020',
+  pinShadow: '#333333'
 };
 
-const DARK_FALLBACK: ChartTheme = {
-  axis: '#444444',
-  label: '#999999',
-  text: '#ffffff',
-  tooltipBg: 'rgba(0, 0, 0, 0.8)',
-  tooltipBorder: '#333333',
-  primary: '#1677ff',
-  primaryLight: '#3c89e8',
-  track: '#505062',
-  surface: '#161618',
-  colors: seriesColors('#1677ff'),
-  fontSize: 13
+/** 图表的语义 token 独立于 antd 轴线/文字色，避免全局 token 覆盖 Art 的效果。 */
+export const CHART_TOKENS = {
+  light: {
+    '--hooks-chartAxis': '#EDEDED',
+    '--hooks-chartLabel': '#999999',
+    '--hooks-chartText': '#333333',
+    '--hooks-chartTooltipBg': 'rgba(255, 255, 255, 0.9)',
+    '--hooks-chartTooltipBorder': '#dddddd',
+    '--hooks-chartTrack': '#e6e8f7',
+    '--hooks-chartCenterText': '#ADB0BC',
+    '--hooks-chartPieLabel': '#999999',
+    '--hooks-chartRadarLabel': '#666666',
+    '--hooks-chartRadarGrid': '#e6e6e6',
+    '--hooks-chartContrast': '#000000',
+    '--hooks-chartEmpty': '#B3B2B2',
+    '--hooks-chartLoadingMask': 'rgba(255, 255, 255, 0.9)',
+    '--hooks-chartMapBorder': 'rgba(147,235,248,1)',
+    '--hooks-chartMapShadow': 'rgba(128,217,248,1)',
+    '--hooks-chartMapLabel': '#333333',
+    '--hooks-chartCardText': '#323251',
+    '--hooks-chartCardSecondary': '#7987a1',
+    '--hooks-chartPositive': 'oklch(0.78 0.17 166.1)',
+    '--hooks-chartNegative': 'oklch(0.68 0.22 25.3)'
+  },
+  dark: {
+    '--hooks-chartAxis': '#444444',
+    '--hooks-chartLabel': '#999999',
+    '--hooks-chartText': '#ffffff',
+    '--hooks-chartTooltipBg': 'rgba(0, 0, 0, 0.8)',
+    '--hooks-chartTooltipBorder': '#333333',
+    '--hooks-chartTrack': '#e6e8f7',
+    '--hooks-chartCenterText': '#999999',
+    '--hooks-chartPieLabel': '#cccccc',
+    '--hooks-chartRadarLabel': '#cccccc',
+    '--hooks-chartRadarGrid': '#444444',
+    '--hooks-chartContrast': '#ffffff',
+    '--hooks-chartEmpty': '#555555',
+    '--hooks-chartLoadingMask': 'rgba(0, 0, 0, 0.8)',
+    '--hooks-chartMapBorder': 'rgba(255,255,255,0.6)',
+    '--hooks-chartMapShadow': 'rgba(0,0,0,0.8)',
+    '--hooks-chartMapLabel': '#ffffff',
+    '--hooks-chartCardText': '#e3e3e8',
+    '--hooks-chartCardSecondary': '#8f8fa3',
+    '--hooks-chartPositive': 'oklch(0.78 0.17 166.1)',
+    '--hooks-chartNegative': 'oklch(0.68 0.22 25.3)'
+  }
 };
 
 function cssVar(name: string, fallback: string) {
   if (typeof document === 'undefined') return fallback;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value || fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 }
 
-/** 把 hex / rgb 收成 ECharts 能画的 rgba。失败时原样返回，不弹提示。 */
+/** 支持主题十六进制和 CSS rgb(a) token，不能识别时保留原值。 */
 export function withAlpha(color: string, alpha: number) {
-  const hex = color.trim().match(/^#([0-9a-f]{6})$/i);
+  const hex = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
   if (hex) {
-    const value = Number.parseInt(hex[1], 16);
-    const red = (value >> 16) & 255;
-    const green = (value >> 8) & 255;
-    const blue = value & 255;
-    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+    const expanded = hex[1].length === 3 ? [...hex[1]].map(char => char + char).join('') : hex[1];
+    const value = Number.parseInt(expanded, 16);
+    return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${alpha})`;
   }
-
   const rgb = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
   if (rgb) return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${alpha})`;
   return color;
 }
 
-/** 在调用时读 CSS 变量。ECharts 画不出 var()。传了 `colors` 的图不走这套色板。 */
-export function readChartTheme(isDark: boolean): ChartTheme {
-  const fallback = isDark ? DARK_FALLBACK : LIGHT_FALLBACK;
-  const primary = cssVar('--hooks-colorPrimary', fallback.primary);
-  const primaryLight = cssVar('--hooks-colorPrimary4', fallback.primaryLight);
+/** Art 的色阶向下取整；暗色直接降低亮度，与 antd 的混色算法不同。 */
+export function chartPrimaryTokens(primary: string, isDark: boolean) {
+  function shade(level: number) {
+    const hex = primary.replace('#', '');
+    if (!/^[0-9a-f]{6}$/i.test(hex)) return primary;
+    return (
+      '#' +
+      [0, 2, 4]
+        .map(offset => {
+          const value = Number.parseInt(hex.slice(offset, offset + 2), 16);
+          return Math.floor(isDark ? value * (1 - level) : (255 - value) * level + value)
+            .toString(16)
+            .padStart(2, '0');
+        })
+        .join('')
+    );
+  }
+  return { '--hooks-chartPrimary': primary, '--hooks-chartPrimaryLight': shade(0.4), '--hooks-chartSeriesPrimary': shade(0.1) };
+}
 
+export function readChartTheme(isDark: boolean): ChartTheme {
+  const tokens = CHART_TOKENS[isDark ? 'dark' : 'light'];
+  function token(name: keyof typeof tokens) {
+    return cssVar(name, tokens[name]);
+  }
+  const primary = cssVar('--hooks-chartPrimary', cssVar('--hooks-colorPrimary', '#1677ff'));
+  const primaryTokens = chartPrimaryTokens(primary, isDark);
   return {
-    axis: cssVar('--hooks-colorBorderSecondary', fallback.axis),
-    label: cssVar('--hooks-colorTextTertiary', fallback.label),
-    text: cssVar('--hooks-colorText', fallback.text),
-    tooltipBg: withAlpha(cssVar('--hooks-colorBgElevated', isDark ? '#000000' : '#ffffff'), isDark ? 0.8 : 0.9),
-    tooltipBorder: cssVar('--hooks-colorBorderSecondary', fallback.tooltipBorder),
+    axis: token('--hooks-chartAxis'),
+    label: token('--hooks-chartLabel'),
+    text: token('--hooks-chartText'),
+    tooltipBg: token('--hooks-chartTooltipBg'),
+    tooltipBorder: token('--hooks-chartTooltipBorder'),
     primary,
-    primaryLight,
-    track: cssVar('--hooks-colorBorderBox', fallback.track),
-    surface: cssVar('--hooks-colorBgBox', fallback.surface),
-    colors: seriesColors(cssVar('--hooks-colorPrimary1', primary)),
-    fontSize: fallback.fontSize
+    primaryLight: cssVar('--hooks-chartPrimaryLight', primaryTokens['--hooks-chartPrimaryLight']),
+    track: token('--hooks-chartTrack'),
+    surface: cssVar('--hooks-colorBgBox', isDark ? '#161618' : '#ffffff'),
+    centerText: token('--hooks-chartCenterText'),
+    pieLabel: token('--hooks-chartPieLabel'),
+    radarLabel: token('--hooks-chartRadarLabel'),
+    radarGrid: token('--hooks-chartRadarGrid'),
+    contrast: token('--hooks-chartContrast'),
+    shadow: '#000000',
+    empty: token('--hooks-chartEmpty'),
+    loadingMask: token('--hooks-chartLoadingMask'),
+    map: {
+      border: token('--hooks-chartMapBorder'),
+      shadow: token('--hooks-chartMapShadow'),
+      label: token('--hooks-chartMapLabel')
+    },
+    colors: [cssVar('--hooks-chartSeriesPrimary', primaryTokens['--hooks-chartSeriesPrimary']), ...ART_SERIES_COLORS],
+    fontSize: 13
   };
 }
 
@@ -124,6 +184,7 @@ export function axisTick() {
 
 export function tooltipStyle(theme: ChartTheme, trigger: 'item' | 'axis' = 'axis') {
   return {
+    show: true,
     trigger,
     backgroundColor: theme.tooltipBg,
     borderColor: theme.tooltipBorder,

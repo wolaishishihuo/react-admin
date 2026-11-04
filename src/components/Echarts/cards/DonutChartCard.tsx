@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
 
-import ECharts from '@/components/Echarts';
+import ChartFrame from '@/components/Echarts/charts/ChartFrame';
 import { buildMiniDonutOption } from '@/components/Echarts/charts/options';
 import useChartTheme from '@/components/Echarts/useChartTheme';
-
-import PercentText from './PercentText';
+import PercentText from '@/components/PercentText';
 
 const DEFAULT_RADIUS: [string, string] = ['70%', '90%'];
 
-interface DonutChartCardProps {
+export interface DonutChartCardProps {
   value: number;
   title: string;
   percentage: number;
@@ -37,23 +36,26 @@ const DonutChartCard = (props: DonutChartCardProps) => {
   } = props;
   const theme = useChartTheme();
   const empty = data.every(item => item === 0);
-  const option = useMemo(() => buildMiniDonutOption(theme, data, radius, color), [theme, data, radius, color]);
+  const option = useMemo(
+    () => buildMiniDonutOption(theme, data, radius, color, [currentValue, previousValue]),
+    [theme, data, radius, color, currentValue, previousValue]
+  );
 
   return (
-    <div className='card overflow-hidden' style={{ height: `${height}rem` }}>
-      <div className='flex gap-5 h-full items-start'>
+    <div className='chart-card card overflow-hidden' style={{ height: `${height}rem`, padding: 0 }}>
+      <div className='p-5 pr-2 flex gap-5 h-full items-start box-border'>
         <div className='flex flex-1 flex-col h-full justify-between'>
           <p className='text-xl leading-tight font-medium m-0'>{title}</p>
           <div>
-            <p className='text-xl leading-tight font-medium m-0'>{value.toLocaleString()}</p>
+            <p className='text-xl leading-tight font-medium m-0 mt-2.5'>{value.toLocaleString()}</p>
             <div className='mt-1.5'>
-              <PercentText value={percentage} className='text-xs' suffix={percentageLabel ? ` ${percentageLabel}` : ''} />
+              <PercentText value={percentage} className='text-xs' suffix={percentageLabel ? percentageLabel : ''} />
             </div>
           </div>
-          <div className='text-xs text-content-pale mt-2 flex gap-4'>
+          <div className='chart-card-secondary text-xs mt-2 flex gap-4'>
             {currentValue ? (
               <div className='flex items-center'>
-                <span className='mr-2 rounded-full size-2' style={{ background: color || 'var(--hooks-colorPrimary1)' }} />
+                <span className='mr-2 rounded-full size-2' style={{ background: color || 'var(--hooks-chartSeriesPrimary)' }} />
                 {currentValue}
               </div>
             ) : null}
@@ -65,7 +67,9 @@ const DonutChartCard = (props: DonutChartCardProps) => {
             ) : null}
           </div>
         </div>
-        <div className='flex-1 h-[7.5rem] max-w-40'>{empty ? null : <ECharts option={option} />}</div>
+        <div className='flex flex-1 h-full max-w-40 items-center'>
+          <ChartFrame option={option} height='7.5rem' empty={empty} />
+        </div>
       </div>
     </div>
   );

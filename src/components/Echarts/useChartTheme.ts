@@ -7,7 +7,7 @@ import { type ChartTheme, readChartTheme } from './theme';
 
 /**
  * `primary` 只用来在设置改色后重读。
- * useTheme 在 effect 里写 `--hooks-colorPrimary1`，所以等一帧再读。
+ * useTheme 在 effect 里写 `--hooks-chartPrimary*`，所以等一帧再读。
  */
 const useChartTheme = () => {
   const isDark = useGlobalStore(state => state.isDark);

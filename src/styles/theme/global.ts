@@ -1,8 +1,11 @@
+import { CHART_TOKENS } from '@/components/Echarts/theme';
+
 /**
  * @description Global theme config
  */
 const globalTheme = {
   light: {
+    ...CHART_TOKENS.light,
     // Customize global CSS variables
     '--hooks-colorBgContent': '#fafbfc',
     '--hooks-colorBgBox': '#ffffff',
@@ -22,6 +25,7 @@ const globalTheme = {
     '--hooks-boxShadowLoginForm': '0 2px 10px 2px rgb(0 0 0 / 10%)'
   },
   dark: {
+    ...CHART_TOKENS.dark,
     // Customize global CSS variables
     '--hooks-colorBgContent': '#070707',
     '--hooks-colorBgBox': '#161618',

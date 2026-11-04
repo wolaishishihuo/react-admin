@@ -1,11 +1,11 @@
 import { Col, Row } from 'antd';
 import type { ReactNode } from 'react';
 
+import DonutChartCard from '@/components/Echarts/cards/DonutChartCard';
+import MetricChartCard from '@/components/Echarts/cards/MetricChartCard';
 import { message } from '@/hooks/useMessage';
 
 import DataListCard from './components/DataListCard';
-import DonutChartCard from './components/DonutChartCard';
-import MetricChartCard from './components/MetricChartCard';
 import ProgressCard from './components/ProgressCard';
 import StatsCard from './components/StatsCard';
 import TimelineListCard from './components/TimelineListCard';

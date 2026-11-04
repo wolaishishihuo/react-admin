@@ -7,7 +7,7 @@ interface PercentTextProps {
 
 const PercentText = (props: PercentTextProps) => {
   const { value, className = '', suffix = '' } = props;
-  const tone = value > 0 ? 'text-success' : 'text-[var(--hooks-colorError)]';
+  const tone = value > 0 ? 'text-[var(--hooks-chartPositive)]' : 'text-[var(--hooks-chartNegative)]';
 
   return (
     <span className={`font-medium ${tone}  ${className}`}>

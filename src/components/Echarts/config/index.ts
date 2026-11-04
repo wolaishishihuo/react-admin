@@ -1,68 +1,35 @@
-import type {
-  BarSeriesOption,
-  GaugeSeriesOption,
-  LineSeriesOption,
-  LinesSeriesOption,
-  PieSeriesOption,
-  RadarSeriesOption,
-  ScatterSeriesOption
-} from 'echarts/charts';
-import { BarChart, GaugeChart, LineChart, LinesChart, PieChart, RadarChart, ScatterChart } from 'echarts/charts';
-import type {
-  DatasetComponentOption,
-  GridComponentOption,
-  TitleComponentOption,
-  TooltipComponentOption
-} from 'echarts/components';
+import { BarChart, CandlestickChart, LineChart, MapChart, PieChart, RadarChart, ScatterChart } from 'echarts/charts';
 import {
-  DatasetComponent,
+  DataZoomComponent,
   GeoComponent,
+  GraphicComponent,
   GridComponent,
   LegendComponent,
-  PolarComponent,
   TitleComponent,
-  ToolboxComponent,
-  TooltipComponent,
-  TransformComponent
+  TooltipComponent
 } from 'echarts/components';
-import type { ComposeOption } from 'echarts/core';
 import * as echarts from 'echarts/core';
-import { LabelLayout, UniversalTransition } from 'echarts/features';
+import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
-export type ECOption = ComposeOption<
-  | BarSeriesOption
-  | LineSeriesOption
-  | LinesSeriesOption
-  | PieSeriesOption
-  | RadarSeriesOption
-  | GaugeSeriesOption
-  | TitleComponentOption
-  | TooltipComponentOption
-  | GridComponentOption
-  | DatasetComponentOption
-  | ScatterSeriesOption
->;
+export type { EChartsOption as ECOption } from 'echarts';
 
 echarts.use([
   TitleComponent,
   TooltipComponent,
   GridComponent,
-  DatasetComponent,
-  TransformComponent,
   LegendComponent,
-  PolarComponent,
   GeoComponent,
-  ToolboxComponent,
+  GraphicComponent,
+  DataZoomComponent,
   BarChart,
   LineChart,
-  LinesChart,
   PieChart,
   ScatterChart,
   RadarChart,
-  GaugeChart,
+  CandlestickChart,
+  MapChart,
   LabelLayout,
-  UniversalTransition,
   CanvasRenderer
 ]);
 

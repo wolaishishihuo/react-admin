@@ -3,13 +3,12 @@ import { useThemedOption } from '@/components/Echarts/useChartTheme';
 
 import ChartFrame from './ChartFrame';
 import { buildRingOption } from './options';
-import type { PieDatum } from './types';
+import type { BaseChartProps, PieDatum } from './types';
 
 const DEFAULT_RADIUS: [string, string] = ['50%', '80%'];
 
-interface RingChartProps {
+export interface RingChartProps extends BaseChartProps {
   data: PieDatum[];
-  height?: string;
   radius?: [string, string];
   borderRadius?: number;
   centerText?: string;
@@ -18,13 +17,15 @@ interface RingChartProps {
   showLegend?: boolean;
   legendPosition?: LegendPosition;
   /** 不传则用主题色板。传入后整盘按这个数组循环取色 */
-  colors?: string[];
 }
 
 const RingChart = (props: RingChartProps) => {
   const {
     data,
     height = '16rem',
+    loading = false,
+    isEmpty = false,
+    onClick,
     radius = DEFAULT_RADIUS,
     borderRadius = 10,
     centerText,
@@ -52,7 +53,7 @@ const RingChart = (props: RingChartProps) => {
   );
   const empty = !data.length || data.every(item => item.value === 0);
 
-  return <ChartFrame option={option} height={height} empty={empty} />;
+  return <ChartFrame loading={loading} onClick={onClick} option={option} height={height} empty={isEmpty || empty} />;
 };
 
 export default RingChart;

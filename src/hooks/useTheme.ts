@@ -1,6 +1,7 @@
 import { theme } from 'antd';
 import { useEffect } from 'react';
 
+import { chartPrimaryTokens } from '@/components/Echarts/theme';
 import { useGlobalStore } from '@/stores';
 import globalTheme from '@/styles/theme/global';
 import headerTheme from '@/styles/theme/header';
@@ -56,6 +57,7 @@ const useTheme = () => {
         isDark ? `${getDarkColor(primary, i / 10)}` : `${getLightColor(primary, i / 10)}`
       );
     }
+    Object.entries(chartPrimaryTokens(primary, isDark)).forEach(([key, val]) => setStyleProperty(key, val));
   };
 
   /**

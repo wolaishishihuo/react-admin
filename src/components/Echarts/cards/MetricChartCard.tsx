@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 
-import ECharts from '@/components/Echarts';
+import ChartFrame from '@/components/Echarts/charts/ChartFrame';
 import { buildSparkBarOption, buildSparkLineOption } from '@/components/Echarts/charts/options';
 import useChartTheme from '@/components/Echarts/useChartTheme';
+import PercentText from '@/components/PercentText';
 
-import PercentText from './PercentText';
-
-interface MetricChartCardProps {
+export interface MetricChartCardProps {
   value: number;
   label: string;
   percentage: number;
@@ -37,7 +36,7 @@ const MetricChartCard = (props: MetricChartCardProps) => {
     color
   } = props;
   const theme = useChartTheme();
-  const empty = !data.length || data.every(item => item === 0);
+  const empty = !data.length;
   const option = useMemo(
     () =>
       chart === 'line' ? buildSparkLineOption(theme, data, showArea, color) : buildSparkBarOption(theme, data, barWidth, color),
@@ -46,17 +45,25 @@ const MetricChartCard = (props: MetricChartCardProps) => {
   const plotHeight = mini ? '60px' : `calc(${height}rem - 5rem)`;
 
   return (
-    <div className='card relative overflow-hidden' style={{ height: `${height}rem` }}>
-      <div className='flex items-start justify-between'>
+    <div className='chart-card card relative overflow-hidden' style={{ height: `${height}rem`, padding: 0 }}>
+      <div
+        className={
+          chart === 'line' ? 'mb-2.5 p-5 flex items-start justify-between' : 'mb-5 px-5 pt-5 flex items-start justify-between'
+        }
+      >
         <div>
-          <p className='text-2xl leading-none font-medium m-0'>{value.toLocaleString()}</p>
-          <p className='text-sm text-content-pale m-0 mt-1'>{label}</p>
+          <p className={`text-2xl font-medium m-0 ${chart === 'line' ? 'leading-none' : 'leading-tight'}`}>{value}</p>
+          <p className={`text-sm m-0 mt-1 ${chart === 'line' ? 'text-content-pale' : 'chart-card-secondary'}`}>{label}</p>
         </div>
-        <PercentText value={percentage} className={mini ? 'absolute bottom-6 left-6 text-sm' : 'text-sm'} />
+        <PercentText value={percentage} className={mini ? 'absolute bottom-5 left-5 text-sm' : 'text-sm'} />
       </div>
-      {date ? <div className='text-xs text-content-pale bottom-6 right-6 absolute'>{date}</div> : null}
+      {date ? (
+        <div className={`text-xs bottom-5 right-5 absolute ${chart === 'line' ? 'text-content-pale' : 'chart-card-secondary'}`}>
+          {date}
+        </div>
+      ) : null}
       <div className={mini ? 'absolute top-5 right-5 w-2/5' : 'absolute right-0 bottom-0 left-0'} style={{ height: plotHeight }}>
-        {empty ? null : <ECharts option={option} />}
+        <ChartFrame option={option} height='100%' empty={empty} />
       </div>
     </div>
   );

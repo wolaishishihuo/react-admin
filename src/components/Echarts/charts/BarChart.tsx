@@ -2,16 +2,16 @@ import { useThemedOption } from '@/components/Echarts/useChartTheme';
 
 import ChartFrame from './ChartFrame';
 import { buildBarOption } from './options';
-import { type AxisChartProps, type BarSeries, isBarLikeEmpty } from './types';
+import { type AxisChartProps, type BarSeries, isSeriesEmpty } from './types';
 
 const EMPTY_AXIS: string[] = [];
 
-interface BarChartProps extends AxisChartProps {
+export interface BarChartProps extends AxisChartProps {
   data: number[] | BarSeries[];
   xAxisData?: string[];
   barWidth?: string | number;
   stack?: boolean;
-  borderRadius?: number;
+  borderRadius?: number | number[];
   horizontal?: boolean;
 }
 
@@ -20,7 +20,10 @@ const BarChart = (props: BarChartProps) => {
     data,
     xAxisData = EMPTY_AXIS,
     height = '16rem',
-    barWidth = '40%',
+    loading = false,
+    isEmpty = false,
+    onClick,
+    barWidth,
     stack = false,
     borderRadius = 4,
     horizontal = false,
@@ -38,7 +41,7 @@ const BarChart = (props: BarChartProps) => {
         theme,
         data,
         xAxisData,
-        barWidth,
+        barWidth: barWidth ?? (horizontal ? '36%' : '40%'),
         stack,
         borderRadius,
         horizontal,
@@ -62,7 +65,9 @@ const BarChart = (props: BarChartProps) => {
     ]
   );
 
-  return <ChartFrame option={option} height={height} empty={isBarLikeEmpty(data)} />;
+  return (
+    <ChartFrame loading={loading} onClick={onClick} option={option} height={height} empty={isEmpty || isSeriesEmpty(data)} />
+  );
 };
 
 export default BarChart;

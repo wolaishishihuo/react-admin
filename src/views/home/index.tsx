@@ -1,74 +1,35 @@
 import './index.less';
 
-import { Col, Row, Statistic, Table, Tabs } from 'antd';
-import CountUpImport from 'react-countup';
+import { Col, Row, Table, Tabs } from 'antd';
 
-import ECharts from '@/components/Echarts';
-import { Icon } from '@/components/Icon';
-import { useGlobalStore } from '@/stores';
+import MetricChartCard from '@/components/Echarts/cards/MetricChartCard';
+import { LineChart, RingChart } from '@/components/Echarts/charts';
 
-import { overviewOptionsFn, overviewTabs } from './config/overview';
-import { pieOptionsFn } from './config/proportion';
+import { overviewData, overviewMonths, overviewTabs } from './config/overview';
+import { proportionData } from './config/proportion';
 import { columns, data } from './config/table';
-import { trendOptionsFn } from './config/trend';
+import { metricCards } from './config/trend';
 
-// Vite 8 ESM interop: CJS default export may land as { default: Component }
-const CountUp = (CountUpImport as { default?: typeof CountUpImport }).default ?? CountUpImport;
-
-const formatter = (value: number | string) => <CountUp end={Number(value)} duration={2} separator=',' />;
-
-const Analysis: React.FC = () => {
-  const isDark = useGlobalStore(state => state.isDark);
-
+const Analysis = () => {
   return (
     <Row gutter={[15, 15]} className='analysis'>
       {/* analysis-count */}
       <Col span={24}>
-        <Row gutter={[20, 20]} className='analysis-count'>
-          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
-            <div className='count-item'>
-              <Statistic className='count-number' title='New Customers' value={132893} formatter={formatter} />
-              <div className='count-trend'>
-                <div className='count-echarts'>
-                  <ECharts option={trendOptionsFn([50, 40, 60, 20, 40, 30, 80, 70, 120, 60, 80, 50])} />
-                </div>
-                <Statistic className='count-percentage' value={14.52} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
-              </div>
-            </div>
-          </Col>
-          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
-            <div className='count-item'>
-              <Statistic className='count-number' title='Active Users' value={219456} formatter={formatter} />
-              <div className='count-trend'>
-                <div className='count-echarts'>
-                  <ECharts option={trendOptionsFn([10, 50, 40, 100, 50, 120, 35, 40, 15, 80, 10, 20])} />
-                </div>
-                <Statistic className='count-percentage' value={58.36} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
-              </div>
-            </div>
-          </Col>
-          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
-            <div className='count-item'>
-              <Statistic className='count-number' title='Total Profit' value={854972} formatter={formatter} />
-              <div className='count-trend'>
-                <div className='count-echarts'>
-                  <ECharts option={trendOptionsFn([30, 10, 40, 70, 40, 60, 20, 110, 40, 80, 40, 10])} />
-                </div>
-                <Statistic className='count-percentage' value={36.28} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
-              </div>
-            </div>
-          </Col>
-          <Col xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
-            <div className='count-item'>
-              <Statistic className='count-number' title='Sales Volume' value={654932} formatter={formatter} />
-              <div className='count-trend'>
-                <div className='count-echarts'>
-                  <ECharts option={trendOptionsFn([25, 70, 50, 80, 120, 60, 90, 30, 45, 20, 90, 40])} />
-                </div>
-                <Statistic className='count-percentage' value={24.35} prefix={<Icon icon='ri:arrow-up-line' />} suffix='%' />
-              </div>
-            </div>
-          </Col>
+        <Row gutter={[20, 20]}>
+          {metricCards.map(item => (
+            <Col key={item.id} xxl={6} xl={12} lg={12} md={24} sm={24} xs={24}>
+              <MetricChartCard
+                mini
+                chart='line'
+                showArea
+                height={9.5}
+                value={item.value}
+                label={item.label}
+                percentage={item.percentage}
+                data={item.data}
+              />
+            </Col>
+          ))}
         </Row>
       </Col>
 
@@ -84,7 +45,7 @@ const Analysis: React.FC = () => {
                 </div>
               </div>
               <div className='overview-echarts'>
-                <ECharts option={overviewOptionsFn(isDark)} />
+                <LineChart data={overviewData} xAxisData={overviewMonths} height='100%' showAreaColor />
               </div>
             </div>
           </Col>
@@ -101,7 +62,14 @@ const Analysis: React.FC = () => {
           </Col>
           <Col xl={8} lg={24} md={24} sm={24} xs={24}>
             <div className='record-proportion card'>
-              <ECharts option={pieOptionsFn(isDark)} />
+              <RingChart
+                data={proportionData}
+                height='100%'
+                centerText='Active Users'
+                showLegend
+                legendPosition='bottom'
+                radius={['42%', '72%']}
+              />
             </div>
           </Col>
         </Row>

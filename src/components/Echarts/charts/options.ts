@@ -51,20 +51,16 @@ function categoryAxes(theme: ChartTheme, labels: string[], flags: CartesianFlags
   return valueOnX ? { xAxis: value, yAxis: category } : { xAxis: { ...category, boundaryGap: true }, yAxis: value };
 }
 
-function seriesColor(theme: ChartTheme) {
-  return theme.colors[0];
-}
-
 function verticalGradient(theme: ChartTheme) {
   return new echarts.graphic.LinearGradient(0, 0, 0, 1, [
     { offset: 0, color: theme.primaryLight },
-    { offset: 1, color: seriesColor(theme) }
+    { offset: 1, color: theme.primary }
   ]);
 }
 
 function horizontalGradient(theme: ChartTheme) {
   return new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-    { offset: 0, color: seriesColor(theme) },
+    { offset: 0, color: theme.primary },
     { offset: 1, color: theme.primaryLight }
   ]);
 }
@@ -75,7 +71,7 @@ export function buildBarOption(input: {
   xAxisData: string[];
   barWidth: string | number;
   stack: boolean;
-  borderRadius: number;
+  borderRadius: number | number[];
   horizontal?: boolean;
   flags: CartesianFlags;
   colors?: string[];
@@ -101,15 +97,15 @@ export function buildBarOption(input: {
           barWidth,
           itemStyle: {
             borderRadius,
-            color: colors?.[0] ?? (horizontal ? horizontalGradient(theme) : verticalGradient(theme))
+            color: colors?.length ? colorAt(theme, colors, 0) : horizontal ? horizontalGradient(theme) : verticalGradient(theme)
           },
           ...seriesAnimation()
         }
       ];
 
   return {
-    grid: gridWithLegend(showLegend, flags.legendPosition, { top: 15, right: horizontal ? 15 : 0, left: 0 }),
-    tooltip: flags.showTooltip ? tooltipStyle(theme) : undefined,
+    grid: gridWithLegend(showLegend, flags.legendPosition, { top: 15, right: 0, left: 0 }),
+    tooltip: flags.showTooltip ? tooltipStyle(theme) : { show: false },
     legend: showLegend ? legendStyle(theme, flags.legendPosition) : undefined,
     ...categoryAxes(theme, xAxisData, flags, horizontal),
     series
@@ -140,23 +136,32 @@ export function buildLineOption(input: {
   const { theme, data, xAxisData, smooth, lineWidth, symbol, symbolSize, showAreaColor, flags, colors } = input;
   const multiple = isNamedSeries(data);
   const showLegend = flags.showLegend && multiple;
-  const max = multiple ? data.reduce((peak, item) => Math.max(peak, ...item.data, 0), 0) : Math.max(0, ...(data as number[]));
+  let min = 0;
+  let max = 0;
+  for (const values of multiple ? data.map(item => item.data) : [data as number[]]) {
+    for (const value of values) {
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+  }
 
   const series = multiple
     ? data.map((item, index) => {
         const color = colorAt(theme, colors, index);
-        const showArea = (item.showAreaColor ?? showAreaColor) || Boolean(item.areaStyle);
+        const showArea = item.showAreaColor ?? (showAreaColor || Boolean(item.areaStyle));
         return {
           name: item.name,
           type: 'line' as const,
           data: item.data,
           smooth: item.smooth ?? smooth,
           symbol: item.symbol ?? symbol,
-          symbolSize,
+          symbolSize: item.symbolSize ?? symbolSize,
           lineStyle: { width: item.lineWidth ?? lineWidth, color },
           itemStyle: { color },
-          areaStyle: showArea ? areaFill(color, item.areaStyle?.startOpacity, item.areaStyle?.endOpacity) : undefined,
-          emphasis: { focus: 'series' as const }
+          areaStyle: showArea
+            ? (item.areaStyle?.custom ?? areaFill(color, item.areaStyle?.startOpacity ?? 0.2, item.areaStyle?.endOpacity ?? 0.02))
+            : undefined,
+          emphasis: { focus: 'series' as const, lineStyle: { width: (item.lineWidth ?? lineWidth) + 1 } }
         };
       })
     : [
@@ -168,7 +173,8 @@ export function buildLineOption(input: {
           symbolSize,
           lineStyle: { width: lineWidth, color: colorAt(theme, colors, 0) },
           itemStyle: { color: colorAt(theme, colors, 0) },
-          areaStyle: showAreaColor ? areaFill(colorAt(theme, colors, 0)) : undefined
+          areaStyle: showAreaColor ? areaFill(colorAt(theme, colors, 0)) : undefined,
+          emphasis: { focus: 'series' as const, lineStyle: { width: lineWidth + 1 } }
         }
       ];
 
@@ -176,7 +182,7 @@ export function buildLineOption(input: {
     animationDuration: 1300,
     animationDurationUpdate: 1300,
     grid: gridWithLegend(showLegend, flags.legendPosition, { top: 15, right: 15, left: 0 }),
-    tooltip: flags.showTooltip ? tooltipStyle(theme) : undefined,
+    tooltip: flags.showTooltip ? tooltipStyle(theme) : { show: false },
     legend: showLegend ? legendStyle(theme, flags.legendPosition) : undefined,
     xAxis: {
       type: 'category',
@@ -188,7 +194,7 @@ export function buildLineOption(input: {
     },
     yAxis: {
       type: 'value',
-      min: 0,
+      min,
       max,
       axisLabel: axisLabel(theme, flags.showAxisLabel),
       axisLine: axisLine(theme, flags.showAxisLine),
@@ -222,7 +228,7 @@ export function buildRingOption(input: {
           : ['50%', '40%'];
 
   return {
-    tooltip: showTooltip ? { ...tooltipStyle(theme, 'item'), formatter: '{b}: {c} ({d}%)' } : undefined,
+    tooltip: showTooltip ? { ...tooltipStyle(theme, 'item'), formatter: '{b}: {c} ({d}%)' } : { show: false },
     legend: showLegend ? legendStyle(theme, legendPosition) : undefined,
     title: centerText
       ? {
@@ -231,7 +237,7 @@ export function buildRingOption(input: {
           top: center[1],
           textAlign: 'center',
           textVerticalAlign: 'middle',
-          textStyle: { fontSize: 18, fontWeight: 500, color: theme.label }
+          textStyle: { fontSize: 18, fontWeight: 500, color: theme.centerText }
         }
       : undefined,
     series: [
@@ -242,8 +248,9 @@ export function buildRingOption(input: {
         center,
         avoidLabelOverlap: false,
         itemStyle: { borderRadius, borderColor: theme.surface, borderWidth: 0 },
-        label: { show: showLabel, formatter: '{b}\n{d}%', color: theme.label, fontSize: 12 },
+        label: { show: showLabel, formatter: '{b}\n{d}%', color: theme.pieLabel, fontSize: 12 },
         labelLine: { show: showLabel, length: 15, length2: 25, smooth: true },
+        emphasis: { label: { show: false } },
         color: colors?.length ? colors : theme.colors,
         data,
         ...seriesAnimation(),
@@ -272,7 +279,7 @@ export function buildScatterOption(input: {
             return `X: ${value[0] ?? '-'}<br/>Y: ${value[1] ?? '-'}`;
           }
         }
-      : undefined,
+      : { show: false },
     xAxis: {
       type: 'value',
       axisLabel: axisLabel(theme, flags.showAxisLabel),
@@ -292,7 +299,8 @@ export function buildScatterOption(input: {
         type: 'scatter',
         data,
         symbolSize,
-        itemStyle: { color, shadowBlur: 6, shadowColor: withAlpha(theme.text, 0.12), shadowOffsetY: 2 },
+        itemStyle: { color, shadowBlur: 6, shadowColor: withAlpha(theme.contrast, 0.1), shadowOffsetY: 2 },
+        emphasis: { itemStyle: { shadowBlur: 12, shadowColor: withAlpha(theme.contrast, 0.2) }, scale: true },
         ...seriesAnimation()
       }
     ]
@@ -310,18 +318,18 @@ export function buildRadarOption(input: {
 }): ECOption {
   const { theme, indicator, data, showTooltip, showLegend, legendPosition, colors } = input;
   return {
-    tooltip: showTooltip ? tooltipStyle(theme, 'item') : undefined,
+    tooltip: showTooltip ? tooltipStyle(theme, 'item') : { show: false },
     legend: showLegend ? legendStyle(theme, legendPosition) : undefined,
     radar: {
       indicator,
       center: ['50%', '50%'],
-      radius: '68%',
-      axisName: { color: theme.label, fontSize: 12 },
-      splitLine: { lineStyle: { color: theme.axis } },
-      axisLine: { lineStyle: { color: theme.axis } },
+      radius: '70%',
+      axisName: { color: theme.radarLabel, fontSize: 12 },
+      splitLine: { lineStyle: { color: theme.radarGrid } },
+      axisLine: { lineStyle: { color: theme.radarGrid } },
       splitArea: {
         show: true,
-        areaStyle: { color: [withAlpha(theme.text, 0.02), withAlpha(theme.text, 0.05)] }
+        areaStyle: { color: [withAlpha(theme.contrast, 0.02), withAlpha(theme.contrast, 0.05)] }
       }
     },
     series: [
@@ -335,7 +343,8 @@ export function buildRadarOption(input: {
             symbolSize: 4,
             lineStyle: { width: 2, color },
             itemStyle: { color },
-            areaStyle: { color, opacity: 0.1 }
+            areaStyle: { color, opacity: 0.1 },
+            emphasis: { areaStyle: { opacity: 0.25 }, lineStyle: { width: 3 } }
           };
         }),
         ...seriesAnimation(200, 1800)
@@ -344,7 +353,7 @@ export function buildRadarOption(input: {
   } as ECOption;
 }
 
-export function buildSparkLineOption(theme: ChartTheme, data: number[], showArea: boolean, color = theme.colors[0]): ECOption {
+export function buildSparkLineOption(theme: ChartTheme, data: number[], showArea: boolean, color?: string): ECOption {
   return {
     grid: { top: 0, right: 0, bottom: 0, left: 0 },
     xAxis: { type: 'category', show: false, boundaryGap: false },
@@ -355,8 +364,8 @@ export function buildSparkLineOption(theme: ChartTheme, data: number[], showArea
         data,
         smooth: true,
         showSymbol: false,
-        lineStyle: { width: 3, color },
-        areaStyle: showArea ? areaFill(color) : undefined
+        lineStyle: { width: 3, color: color || theme.colors[0] },
+        areaStyle: showArea ? areaFill(color || theme.primary, 0.2, 0.01) : undefined
       }
     ]
   };
@@ -382,17 +391,19 @@ export function buildMiniDonutOption(
   theme: ChartTheme,
   data: [number, number],
   radius: [string, string],
-  color = theme.colors[0]
+  color = theme.colors[0],
+  names: [string?, string?] = []
 ): ECOption {
   return {
     series: [
       {
         type: 'pie',
         radius,
+        avoidLabelOverlap: false,
         label: { show: false },
         data: [
-          { value: data[0], itemStyle: { color } },
-          { value: data[1], itemStyle: { color: theme.track } }
+          { name: names[0], value: data[0], itemStyle: { color } },
+          { name: names[1], value: data[1], itemStyle: { color: theme.track } }
         ]
       }
     ]
