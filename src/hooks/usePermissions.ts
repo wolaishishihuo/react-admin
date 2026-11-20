@@ -15,12 +15,8 @@ function initPermissions(token: string) {
   const promise = (async () => {
     try {
       const [currentUser, menuList] = await Promise.all([fetchGetCurrentUser(), fetchGetAuthMenuList()]);
-      setUserInfo({ name: currentUser.name ?? '' });
-      setAuthButtons(currentUser.buttons ?? []);
-
-      setAuthMenuList(
-        menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system' || item.meta?.key === 'template')
-      );
+      // 请求在途期间若已退出或切换账号，丢弃过期结果，不污染新会话
+      if (useUserStore.getState().token !== token) return;
 
       if (!menuList.length) {
         notification.warning({
@@ -29,15 +25,26 @@ function initPermissions(token: string) {
         });
         setUserInfo({ name: '' });
         setAuthButtons([]);
+        setAuthMenuList([]);
         setToken('');
         setRefreshToken('');
-        return Promise.reject('No permission');
+        return Promise.reject(new Error('No permission'));
       }
+
+      setUserInfo({ name: currentUser.name ?? '' });
+      setAuthButtons(currentUser.buttons ?? []);
+      setAuthMenuList(
+        menuList.filter(item => item.meta?.key === 'home' || item.meta?.key === 'system' || item.meta?.key === 'template')
+      );
     } catch (error) {
-      setUserInfo({ name: '' });
-      setAuthButtons([]);
-      setToken('');
-      setRefreshToken('');
+      // 仅在仍属于同一会话时清理，避免旧会话失败把新账号 token 清空
+      if (useUserStore.getState().token === token) {
+        setUserInfo({ name: '' });
+        setAuthButtons([]);
+        setAuthMenuList([]);
+        setToken('');
+        setRefreshToken('');
+      }
       return Promise.reject(error);
     } finally {
       if (inFlight?.token === token) inFlight = null;

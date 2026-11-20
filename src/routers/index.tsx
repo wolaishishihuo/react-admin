@@ -57,7 +57,7 @@ const RouterProvider = () => {
 
   useEffect(() => {
     if (token && !authMenuList.length) {
-      initPermissions(token);
+      initPermissions(token).catch(() => {});
     }
   }, [authMenuList.length, initPermissions, token]);
 

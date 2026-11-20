@@ -51,32 +51,28 @@ export function getFirstLevelMenuList(menuList: RouteObjectType[]) {
 }
 
 /**
- * @description Use recursion to find all breadcrumbs.
+ * 在菜单树中查找目标路径的完整祖先链（从顶层目录到匹配节点）；
+ * 优先精确匹配节点 path，找不到时回退到首段路径前缀匹配，兼容未录入菜单的动态子路径。
  */
-export function getAllBreadcrumbList(
-  menuList: RouteObjectType[],
-  parent: RouteObjectType[] = [],
-  result: Record<string, RouteObjectType[]> = {}
-) {
-  for (const item of menuList) {
-    result[item.meta!.key!] = [...parent, item];
-    if (item.children) getAllBreadcrumbList(item.children, result[item.meta!.key!], result);
+export function findMenuBranch(menuList: RouteObjectType[], targetPath: string): RouteObjectType[] {
+  function dfs(list: RouteObjectType[], trail: RouteObjectType[]): RouteObjectType[] | null {
+    for (const item of list) {
+      const nextTrail = [...trail, item];
+      if (item.path === targetPath) return nextTrail;
+      if (item.children?.length) {
+        const found = dfs(item.children, nextTrail);
+        if (found) return found;
+      }
+    }
+    return null;
   }
-  return result;
-}
 
-/**
- * @description Get the subMenu keys that need to be expanded.
- */
-export function getOpenKeys(path: string): string[] {
-  let currentKey = '';
-  const openKeys: string[] = [];
-  const pathSegments = path.split('/').map(segment => '/' + segment);
-  for (let i = 1; i < pathSegments.length - 1; i++) {
-    currentKey += pathSegments[i];
-    openKeys.push(currentKey);
-  }
-  return openKeys;
+  const exact = dfs(menuList, []);
+  if (exact) return exact;
+
+  const firstSegment = `/${targetPath.split('/')[1] ?? ''}`;
+  const prefixRoot = menuList.find(item => item.path === firstSegment);
+  return prefixRoot ? [prefixRoot] : [];
 }
 
 /**

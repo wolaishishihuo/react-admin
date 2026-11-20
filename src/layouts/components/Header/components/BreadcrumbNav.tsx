@@ -1,11 +1,11 @@
 import { Breadcrumb } from 'antd';
 import type { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
-import { Link, useMatches } from 'react-router-dom';
+import { Link, useLocation, useMatches } from 'react-router-dom';
 
 import { HOME_URL } from '@/config';
 import type { MetaProps, RouteObjectType } from '@/routers/interface';
 import { useAuthStore, useGlobalStore } from '@/stores';
-import { getAllBreadcrumbList } from '@/utils';
+import { findMenuBranch } from '@/utils';
 
 function renderTitle(item: RouteObjectType, isLink: boolean) {
   const title = item.meta?.title;
@@ -48,14 +48,17 @@ function buildBreadcrumbItems(source: RouteObjectType[]): ItemType[] {
 
 const BreadcrumbNav = () => {
   const matches = useMatches();
+  const { pathname } = useLocation();
   const authMenuList = useAuthStore(state => state.authMenuList);
   const breadcrumb = useGlobalStore(state => state.breadcrumb);
 
   if (!breadcrumb) return null;
 
   const meta = matches[matches.length - 1]?.data as MetaProps | undefined;
-  const breadcrumbAllList = getAllBreadcrumbList(authMenuList);
-  const items = meta?.key ? buildBreadcrumbItems(breadcrumbAllList[meta.key] ?? []) : [];
+  const pathBranch = findMenuBranch(authMenuList, pathname);
+  const isExactMatch = pathBranch.at(-1)?.path === pathname;
+  const branch = isExactMatch ? pathBranch : meta?.activeMenu ? findMenuBranch(authMenuList, meta.activeMenu) : pathBranch;
+  const items = branch.length ? buildBreadcrumbItems(branch) : [];
 
   return <Breadcrumb items={items} />;
 };

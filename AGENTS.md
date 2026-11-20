@@ -69,7 +69,7 @@ pnpm build:pro      # 生产构建
 
 **同一视图的同一数据源由一套机制管理请求和刷新；跨页面使用 ≠ 放 Zustand。**
 
-1. **UI 状态**：单组件用 `useState`，同页共享提升到父组件，仅跨页持续 UI 进 Zustand（瞬态字段如抽屉开关通过 `partialize` 排除持久化）；需分享或刷新恢复的筛选/分页优先放 URL。
+1. **UI 状态**：单组件用 `useState`，同页共享提升到父组件，仅跨页持续 UI 进 Zustand（瞬态字段如抽屉开关通过 `partialize` 排除持久化）。`Tabs` 与 `KeepAlive` 默认按完整 `pathname + search` 隔离页签与缓存，普通列表筛选/分页依托组件状态与 KeepAlive 保留即可，仅在确需多开独立页签或链接分享时使用 URL 参数。
 2. **启动期权限与凭证**：保持 `usePermissions` → `authStore` / `userStore`（供路由同步使用）。
 3. **ProTable 列表**：默认 `request` 调 `fetchXxx` + `formatDataForProTable`，用 `actionRef.reload()` 刷新，**不再套 Query**。
 4. **普通服务端展示数据**：默认 TanStack Query（细则见 `src/apis/README.md`），禁用 `useEffect + fetch + setState`；一次性命令（登录/登出/导出）直接 `await fetchXxx`。

@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Icon } from '@/components/Icon';
 import type { MetaProps, RouteObjectType } from '@/routers/interface';
 import { useAuthStore, useGlobalStore } from '@/stores';
-import { getOpenKeys } from '@/utils';
+import { findMenuBranch } from '@/utils';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -63,8 +63,13 @@ const LayoutMenu = (props: LayoutMenuProps) => {
       headerInverted: state.headerInverted
     }))
   );
-  const showMenuList = useAuthStore(state => state.showMenuList);
-  const flatMenuList = useAuthStore(state => state.flatMenuList);
+  const { authMenuList, showMenuList, flatMenuList } = useAuthStore(
+    useShallow(state => ({
+      authMenuList: state.authMenuList,
+      showMenuList: state.showMenuList,
+      flatMenuList: state.flatMenuList
+    }))
+  );
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
@@ -73,8 +78,7 @@ const LayoutMenu = (props: LayoutMenuProps) => {
 
   const meta = matches[matches.length - 1]?.data as MetaProps | undefined;
   const activePath = meta?.activeMenu ?? pathname;
-  const splitPath = `/${activePath.split('/')[1]}`;
-  const splitKey = showMenuList.some(item => item.path === splitPath) ? splitPath : activePath;
+  const splitKey = findMenuBranch(authMenuList, activePath)[0]?.path ?? activePath;
   const selectedKeys = [menuSplit ? splitKey : activePath];
 
   const isClassicLayout = layout === 'classic';
@@ -86,10 +90,12 @@ const LayoutMenu = (props: LayoutMenuProps) => {
     (siderInverted && !isTransverseLayout && !menuSplit);
 
   function onOpenChange(nextOpenKeys: string[]) {
-    if (nextOpenKeys.length === 0 || nextOpenKeys.length === 1) return setOpenKeys(nextOpenKeys);
+    if (nextOpenKeys.length <= 1) return setOpenKeys(nextOpenKeys);
     const latestOpenKey = nextOpenKeys[nextOpenKeys.length - 1];
-    if (latestOpenKey.includes(nextOpenKeys[0])) return setOpenKeys(nextOpenKeys);
-    setOpenKeys([latestOpenKey]);
+    const branchKeys = findMenuBranch(menuList ?? showMenuList, latestOpenKey)
+      .map(item => item.path)
+      .filter((key): key is string => Boolean(key));
+    setOpenKeys(branchKeys.length ? branchKeys : [latestOpenKey]);
   }
 
   function handleMenuNavigation(path: string) {
@@ -111,10 +117,17 @@ const LayoutMenu = (props: LayoutMenuProps) => {
 
   useEffect(() => {
     // Use setTimeout to prevent style exceptions from menu expansion
-    if (!accordion || isCollapse) return;
-    const timer = window.setTimeout(() => setOpenKeys(getOpenKeys(pathname)));
+    if (!accordion || isCollapse || mode === 'horizontal') return;
+    const source = menuList ?? showMenuList;
+    const branch = findMenuBranch(source, activePath);
+    const resolvedBranch = branch.length || menuList ? branch : findMenuBranch(authMenuList, activePath);
+    const nextOpenKeys = resolvedBranch
+      .slice(0, -1)
+      .map(item => item.path)
+      .filter((key): key is string => Boolean(key));
+    const timer = window.setTimeout(() => setOpenKeys(nextOpenKeys));
     return () => window.clearTimeout(timer);
-  }, [accordion, isCollapse, pathname]);
+  }, [accordion, isCollapse, mode, activePath, menuList, showMenuList, authMenuList]);
 
   return (
     <Menu

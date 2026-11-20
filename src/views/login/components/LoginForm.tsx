@@ -48,6 +48,9 @@ const LoginForm = () => {
       });
 
       navigate(HOME_URL);
+    } catch (error) {
+      // HTTP 层与 initPermissions 已提示业务错误；开发期保留日志便于排查代码异常
+      if (import.meta.env.DEV) console.error(error);
     } finally {
       setLoading(false);
       message.destroy(LOGIN_LOADING_KEY);

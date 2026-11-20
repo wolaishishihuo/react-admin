@@ -1,6 +1,6 @@
 import './index.css';
 import { Layout } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useMatches } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 
 import logo from '@/assets/images/logo.png';
@@ -10,14 +10,16 @@ import ToolBarRight from '@/layouts/components/Header/ToolBarRight';
 import LayoutMain from '@/layouts/components/Main';
 import LayoutMenu from '@/layouts/components/Menu';
 import { LAYOUT_SIDER_COLLAPSED_WIDTH, LAYOUT_SIDER_WIDTH } from '@/layouts/constants';
+import type { MetaProps } from '@/routers/interface';
 import { useAuthStore, useGlobalStore } from '@/stores';
-import { getFirstLevelMenuList } from '@/utils';
+import { findMenuBranch, getFirstLevelMenuList } from '@/utils';
 
 const { Header, Sider } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
 const LayoutClassic = () => {
+  const matches = useMatches();
   const { pathname } = useLocation();
 
   const { isCollapse, menuSplit } = useGlobalStore(
@@ -26,11 +28,17 @@ const LayoutClassic = () => {
       menuSplit: state.menuSplit
     }))
   );
-  const showMenuList = useAuthStore(state => state.showMenuList);
+  const { authMenuList, showMenuList } = useAuthStore(
+    useShallow(state => ({
+      authMenuList: state.authMenuList,
+      showMenuList: state.showMenuList
+    }))
+  );
   const firstLevelMenuList = getFirstLevelMenuList(showMenuList);
-  const activeMenu = menuSplit
-    ? showMenuList.find(item => pathname === item.path || `/${pathname.split('/')[1]}` === item.path)
-    : undefined;
+  const meta = matches[matches.length - 1]?.data as MetaProps | undefined;
+  const activePath = meta?.activeMenu ?? pathname;
+  const activeTopPath = menuSplit ? findMenuBranch(authMenuList, activePath)[0]?.path : undefined;
+  const activeMenu = activeTopPath ? showMenuList.find(item => item.path === activeTopPath) : undefined;
   const subMenuList = activeMenu?.children ?? [];
 
   return (

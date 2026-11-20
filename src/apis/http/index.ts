@@ -11,6 +11,18 @@ import { useAuthStore, useTabsStore, useUserStore } from '@/stores';
 
 import { checkStatus } from './helper/checkStatus';
 
+class ApiError extends Error {
+  code: string | number;
+  data: unknown;
+
+  constructor(msg: string, code: string | number, data?: unknown) {
+    super(msg);
+    this.name = 'ApiError';
+    this.code = code;
+    this.data = data;
+  }
+}
+
 declare module 'axios' {
   interface AxiosRequestConfig {
     /** 续签后的重放标记：带此标记的 401 不再二次刷新 */
@@ -37,6 +49,39 @@ const config = {
 
 function formatToken(token: null | string) {
   return token ? `Bearer ${token}` : null;
+}
+
+/** 解析下载接口返回 JSON 业务错误 Blob（仅当含非成功 code 时判错，不误伤普通 .json 文件下载） */
+async function extractBlobApiError(blob: Blob): Promise<ApiError | null> {
+  if (!blob.type.toLowerCase().includes('application/json')) return null;
+  try {
+    const parsed = JSON.parse(await blob.text()) as Record<string, unknown>;
+    if (parsed && typeof parsed === 'object' && 'code' in parsed && parsed.code !== ResultEnum.SUCCESS) {
+      const msg = typeof parsed.msg === 'string' && parsed.msg.trim() ? parsed.msg.trim() : '请求失败';
+      return new ApiError(msg, parsed.code as string | number, parsed);
+    }
+  } catch {
+    // 非合法 JSON，按正常文件流放行
+  }
+  return null;
+}
+
+/** 仅 4xx 响应优先展示后端短 msg；5xx 统一走友好文案避免暴露内部堆栈 */
+async function extractClientErrorMessage(response?: AxiosResponse): Promise<string | undefined> {
+  if (!response || response.status < 400 || response.status >= 500) return undefined;
+  let payload: unknown = response.data;
+  if (payload instanceof Blob && payload.type.toLowerCase().includes('application/json')) {
+    try {
+      payload = JSON.parse(await payload.text());
+    } catch {
+      return undefined;
+    }
+  }
+  if (payload && typeof payload === 'object' && 'msg' in payload) {
+    const msg = (payload as { msg?: unknown }).msg;
+    if (typeof msg === 'string' && msg.trim()) return msg.trim();
+  }
+  return undefined;
 }
 
 function mergeAbortSignals(primary: AbortSignal, external?: AxiosRequestConfig['signal']): AxiosRequestConfig['signal'] {
@@ -85,12 +130,21 @@ class RequestHttp {
     );
 
     this.service.interceptors.response.use(
-      (response: AxiosResponse) => {
+      async (response: AxiosResponse) => {
         const { config: reqConfig, data } = response;
         if (reqConfig.loading) tryHideFullScreenLoading();
-        if (data.code && data.code !== ResultEnum.SUCCESS) {
-          if (!reqConfig.silent) message.error(data.msg);
-          return Promise.reject(data);
+        if (data instanceof Blob) {
+          const blobError = await extractBlobApiError(data);
+          if (blobError) {
+            if (!reqConfig.silent) message.error(blobError.message);
+            return Promise.reject(blobError);
+          }
+          return data;
+        }
+        if (data?.code && data.code !== ResultEnum.SUCCESS) {
+          const msg = typeof data.msg === 'string' && data.msg ? data.msg : '请求失败';
+          if (!reqConfig.silent) message.error(msg);
+          return Promise.reject(new ApiError(msg, data.code, data));
         }
         return data;
       },
@@ -108,10 +162,13 @@ class RequestHttp {
 
         if (!reqConfig?.silent) {
           if (error.message.includes('timeout')) message.error('请求超时！请您稍后重试');
-          if (error.message.includes('Network Error')) message.error('网络错误！请您稍后重试');
-          if (response) checkStatus(response.status);
+          else if (error.message.includes('Network Error')) message.error('网络错误！请您稍后重试');
+          else if (response) {
+            const clientMsg = await extractClientErrorMessage(response);
+            if (clientMsg) message.error(clientMsg);
+            else checkStatus(response.status);
+          }
         }
-        if (!window.navigator.onLine) window.$navigate?.('/500');
         return Promise.reject(error);
       }
     );
@@ -193,7 +250,7 @@ class RequestHttp {
   }
 
   get<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
-    return this.service.get(url, { params, ...axiosConfig });
+    return this.service.get(url, params !== undefined ? { ...axiosConfig, params } : axiosConfig);
   }
   post<T>(url: string, params?: object | string, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
     return this.service.post(url, params, axiosConfig);
@@ -202,7 +259,7 @@ class RequestHttp {
     return this.service.put(url, params, axiosConfig);
   }
   delete<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
-    return this.service.delete(url, { params, ...axiosConfig });
+    return this.service.delete(url, params !== undefined ? { ...axiosConfig, params } : axiosConfig);
   }
   download(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<BlobPart> {
     return this.service.post(url, params, { ...axiosConfig, responseType: 'blob' });

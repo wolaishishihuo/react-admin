@@ -117,7 +117,7 @@ const ThemeDrawer = () => {
           </div>
         </Tooltip>
       </div>
-      <div className='theme-item mt-30px'>
+      <div className='theme-item'>
         <span>
           菜单分割
           <Tooltip title='经典模式下生效'>
@@ -135,7 +135,7 @@ const ThemeDrawer = () => {
         </span>
         <Switch checked={siderInverted} onChange={value => setGlobalState('siderInverted', value)} />
       </div>
-      <div className='theme-item mb-35px'>
+      <div className='theme-item'>
         <span>
           头部反转色
           <Tooltip title='头部颜色变为深色模式'>
@@ -193,7 +193,7 @@ const ThemeDrawer = () => {
         <span>紧凑主题</span>
         <Switch checked={compactAlgorithm} onChange={value => setGlobalState('compactAlgorithm', value)} />
       </div>
-      <div className='theme-item mb-35px'>
+      <div className='theme-item'>
         <span>圆角大小</span>
         <InputNumber
           min={1}

@@ -46,7 +46,6 @@ const MenuFormModal = (props: MenuFormModalProps) => {
       open={open}
       confirmLoading={saving}
       width={formModalWidth.menu}
-      centered
       className={formModalClassName}
       destroyOnHidden
       styles={formModalStyles}

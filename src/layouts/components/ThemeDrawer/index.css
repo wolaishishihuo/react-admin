@@ -3,7 +3,7 @@
     padding: 25px 24px 10px 26px;
   }
   .divider {
-    margin: 10px 0 0 !important;
+    margin: 35px 0 0 !important;
     font-size: 15px !important;
     &:first-child {
       margin-top: 0 !important;
@@ -15,6 +15,9 @@
   .ant-divider-with-text::before,
   .ant-divider-with-text::after {
     border-top: 1px solid var(--hooks-colorFill) !important;
+  }
+  .layout-box + .theme-item {
+    margin-top: 30px;
   }
   .theme-item {
     display: flex;

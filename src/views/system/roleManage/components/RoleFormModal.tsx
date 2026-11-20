@@ -73,7 +73,6 @@ const RoleFormModal = (props: RoleFormModalProps) => {
       open={open}
       confirmLoading={saving}
       width={formModalWidth.role}
-      centered
       className={formModalClassName}
       destroyOnHidden
       styles={formModalStyles}

@@ -36,7 +36,7 @@ description: >-
    - `config/columns.tsx`：导出 `createXxxColumns(handlers)` 工厂函数，显式传入操作回调与权限检查，不读隐式页面状态。
    - `components/<Page>FormModal.tsx`：
      - 箭头函数 + 独立 `interface XxxProps` + 首行解构；
-     - `Form.useForm()`，打开弹窗时在 `useEffect` 中重置并回填草稿（依赖含 `form`）；
+     - `Modal` 默认顶部对齐（不加 `centered`），`Form.useForm()`，打开弹窗时在 `useEffect` 中重置并回填草稿（依赖含 `form`）；
      - 表单下拉选项等服务端数据用 TanStack Query（`enabled: open`），写操作后刷新对应所有者。
    - `index.tsx`（必须 `default export`）：
      - `ProTable` 设置 `className='ant-pro-table-scroll'`、`scroll={{ x: ..., y: '100%' }}`、`bordered`、`cardBordered`、`search={{ labelWidth: 'auto' }}`、复用 `@/config/proTable` 的 `pagination`；

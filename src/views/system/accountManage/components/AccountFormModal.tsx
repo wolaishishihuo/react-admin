@@ -51,7 +51,6 @@ const AccountFormModal = (props: AccountFormModalProps) => {
       open={open}
       confirmLoading={saving}
       width={formModalWidth.account}
-      centered
       className={formModalClassName}
       destroyOnHidden
       styles={formModalStyles}
