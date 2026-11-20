@@ -1,12 +1,10 @@
-import './index.less';
-
+import './index.css';
 import { Input, Space } from 'antd';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 import { useGlobalStore } from '@/stores';
-import { convertToSixDigitHexColor } from '@/utils';
-import { isHexColor } from '@/utils/is';
+import { convertToSixDigitHexColor, isHexColor } from '@/utils/color';
 
 const presetColors = [
   '#B40006',

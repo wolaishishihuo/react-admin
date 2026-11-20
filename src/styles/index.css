@@ -1,5 +1,5 @@
-@import url('./proTable.less');
-@import url('./transition.less');
+@import url('./proTable.css');
+@import url('./transition.css');
 
 /* global */
 html,

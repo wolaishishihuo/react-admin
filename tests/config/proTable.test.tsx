@@ -1,10 +1,11 @@
 import '@/assets/icons/register';
-
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { tableExpandIcon } from '@/config/proTable';
+import { tableConfig } from '@/config/proTable';
+
+const tableExpandIcon = tableConfig.expandable.expandIcon;
 
 const baseProps = {
   prefixCls: 'ant-table',

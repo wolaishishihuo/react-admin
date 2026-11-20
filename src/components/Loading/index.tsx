@@ -1,5 +1,4 @@
-import './index.less';
-
+import './index.css';
 import { Spin } from 'antd';
 import { useEffect } from 'react';
 

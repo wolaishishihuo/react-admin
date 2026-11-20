@@ -1,5 +1,3 @@
-import React from 'react';
-
 import ThemeDrawer from '@/layouts/components/ThemeDrawer';
 import { useGlobalStore } from '@/stores';
 
@@ -9,19 +7,20 @@ import LayoutColumns from './LayoutColumns';
 import LayoutTransverse from './LayoutTransverse';
 import LayoutVertical from './LayoutVertical';
 
-const LayoutIndex: React.FC = () => {
-  const layout = useGlobalStore(state => state.layout);
+const LAYOUT_COMPONENTS = {
+  vertical: LayoutVertical,
+  classic: LayoutClassic,
+  transverse: LayoutTransverse,
+  columns: LayoutColumns
+};
 
-  const LayoutComponents = {
-    vertical: <LayoutVertical />,
-    classic: <LayoutClassic />,
-    transverse: <LayoutTransverse />,
-    columns: <LayoutColumns />
-  };
+const LayoutIndex = () => {
+  const layout = useGlobalStore(state => state.layout);
+  const ActiveLayout = LAYOUT_COMPONENTS[layout];
 
   return (
     <LayoutWatermark>
-      {LayoutComponents[layout]}
+      <ActiveLayout />
       <ThemeDrawer />
     </LayoutWatermark>
   );

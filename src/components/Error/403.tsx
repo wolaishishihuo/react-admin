@@ -1,5 +1,4 @@
-import './index.less';
-
+import './index.css';
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
 

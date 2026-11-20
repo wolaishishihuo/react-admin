@@ -7,7 +7,7 @@ import { Icon } from '@/components/Icon';
 
 import { MENU_PERMS, STATUS_ENUM } from '../../constants';
 
-export interface MenuColumnHandlers {
+interface MenuColumnHandlers {
   canUpdate: boolean;
   onAddChild: (record: MenuItem) => void;
   onEdit: (record: MenuItem) => void;

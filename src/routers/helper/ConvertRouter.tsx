@@ -22,7 +22,7 @@ export const convertToDynamicRouterFormat = (authMenuList: RouteObjectType[]) =>
 
   // Convert Routing
   const handleMenuList = flatMenuList.map(item => {
-    item.children && delete item.children;
+    if (item.children) delete item.children;
 
     // Set redirection component
     if (item.redirect) item.element = <Navigate to={item.redirect} />;

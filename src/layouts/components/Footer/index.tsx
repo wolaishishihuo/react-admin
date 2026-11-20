@@ -1,7 +1,5 @@
-import './index.less';
-
+import './index.css';
 import { Layout } from 'antd';
-import React from 'react';
 
 import { useGlobalStore } from '@/stores';
 
@@ -9,19 +7,16 @@ const { Footer } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
-const LayoutFooter: React.FC = () => {
+const LayoutFooter = () => {
   const footer = useGlobalStore(state => state.footer);
+  if (!footer) return null;
 
   return (
-    <React.Fragment>
-      {footer && (
-        <Footer className='ant-footer flex-center'>
-          <a href='#' target='_blank' rel='noreferrer'>
-            2026 © {APP_TITLE}
-          </a>
-        </Footer>
-      )}
-    </React.Fragment>
+    <Footer className='ant-footer flex-center'>
+      <a href='#' target='_blank' rel='noreferrer'>
+        2026 © {APP_TITLE}
+      </a>
+    </Footer>
   );
 };
 

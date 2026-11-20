@@ -1,22 +1,13 @@
 import { Avatar, Dropdown, type MenuProps } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
+import { cancelActiveRequests, clearAuthSession } from '@/apis/http';
 import { fetchLogout } from '@/apis/modules/login';
-import { queryClient } from '@/apis/query';
 import avatar from '@/assets/images/avatar.png';
 import { Icon } from '@/components/Icon';
-import { LOGIN_URL } from '@/config';
 import { message, modal } from '@/hooks/useMessage';
-import { useAuthStore, useUserStore } from '@/stores';
 
 const AvatarIcon = () => {
-  const navigate = useNavigate();
-  const setToken = useUserStore(state => state.setToken);
-  const setRefreshToken = useUserStore(state => state.setRefreshToken);
-  const setAuthMenuList = useAuthStore(state => state.setAuthMenuList);
-  const setAuthButtons = useAuthStore(state => state.setAuthButtons);
-
-  const logout = () => {
+  function logout() {
     modal.confirm({
       title: '温馨提示 🧡',
       icon: <Icon icon='ri:error-warning-line' className='anticon text-22px text-warning' />,
@@ -25,17 +16,18 @@ const AvatarIcon = () => {
       cancelText: '取消',
       mask: { closable: true },
       onOk: async () => {
-        await fetchLogout();
-        queryClient.clear();
-        setToken('');
-        setRefreshToken('');
-        setAuthMenuList([]);
-        setAuthButtons([]);
-        navigate(LOGIN_URL, { replace: true });
+        cancelActiveRequests();
+        try {
+          await fetchLogout();
+        } catch {
+          // 服务端登出失败不阻塞本地会话清理
+        } finally {
+          clearAuthSession();
+        }
         message.success('退出登录成功！');
       }
     });
-  };
+  }
 
   const items: MenuProps['items'] = [
     {

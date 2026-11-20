@@ -1,15 +1,8 @@
 import { defineConfig, presetWind4, transformerDirectives, transformerVariantGroup } from 'unocss';
 
-const spacingDir: Record<string, string> = {
-  t: 'top',
-  r: 'right',
-  b: 'bottom',
-  l: 'left'
-};
-
 /**
- * Wind4 + Ant Design: reset off so antd/dist/reset.css and Less stay in charge.
- * Theme colors point at runtime `--hooks-*` tokens from useTheme.
+ * Wind4 + Ant Design: reset off so antd/dist/reset.css and native CSS stay in charge.
+ * Theme colors point at runtime `--hooks-*` tokens from useTheme (aligned with art-design-pro).
  */
 export default defineConfig({
   presets: [
@@ -33,9 +26,21 @@ export default defineConfig({
       icon: 'var(--hooks-colorTextSecondaryHeader)',
       'content-pale': 'var(--hooks-colorTextPale)',
       hover: 'var(--hooks-colorTextHoverHeader, var(--hooks-colorLayoutHover))',
+      active: 'var(--hooks-colorActive)',
       'line-box': 'var(--hooks-colorBorderBox)',
+      'border-subtle': 'var(--hooks-colorBorderSubtle)',
+      'card-border': 'var(--hooks-colorCardBorder)',
       warning: 'var(--hooks-colorWarning)',
-      success: 'var(--hooks-colorSuccess)'
+      success: 'var(--hooks-colorSuccess)',
+      'g-100': 'var(--hooks-gray-100)',
+      'g-200': 'var(--hooks-gray-200)',
+      'g-300': 'var(--hooks-gray-300)',
+      'g-400': 'var(--hooks-gray-400)',
+      'g-500': 'var(--hooks-gray-500)',
+      'g-600': 'var(--hooks-gray-600)',
+      'g-700': 'var(--hooks-gray-700)',
+      'g-800': 'var(--hooks-gray-800)',
+      'g-900': 'var(--hooks-gray-900)'
     },
     shadow: {
       analysis: 'var(--hooks-boxShadowAnalysis)',
@@ -46,13 +51,9 @@ export default defineConfig({
     'flex-center': 'flex items-center justify-center',
     'flex-y-center': 'flex items-center',
     'flex-x-center': 'flex justify-center',
-    'flx-center': 'flex-center',
-    'flx-align-center': 'flex items-center',
-    'flx-justify-between': 'flex items-center justify-between',
     sle: 'truncate',
     mle: 'line-clamp-2',
-    'content-box': 'flex flex-col items-center h-full',
-    card: 'box-border p-24px text-14px bg-surface border-solid border-1 border-[var(--hooks-colorCardBorder)] rounded-[calc(var(--hooks-borderRadius)*1px_+_4px)]',
+    card: 'box-border p-24px text-14px bg-surface border-solid border-1 border-card-border rounded-[calc(var(--hooks-borderRadius)*1px_+_4px)]',
     'icon-btn':
       'text-icon relative flex-center h-34px w-34px shrink-0 cursor-pointer rounded-[8px] text-20px leading-none transition-colors hover:bg-hover'
   },
@@ -63,13 +64,6 @@ export default defineConfig({
         'padding-right': '50px',
         'mask-image': 'linear-gradient(90deg, #000 0%, #000 calc(100% - 50px), transparent)'
       }
-    ],
-    // Former common.less loop: mb20 / pt60 → 20px / 60px
-    [
-      /^([mp])([trbl])(\d+)$/,
-      ([, kind, dir, n]) => ({
-        [`${kind === 'm' ? 'margin' : 'padding'}-${spacingDir[dir]}`]: `${n}px !important`
-      })
     ]
   ]
 });

@@ -1,59 +1,49 @@
-import { message } from '@/hooks/useMessage';
+const HEX_COLOR_REG = /^#?(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+const SIX_HEX_COLOR_REG = /^#?[0-9a-fA-F]{6}$/;
 
-/**
- * @description hex color to rgb color
- * @param {String} str color value string
- * @returns {String} Returns the processed color value
- */
-export function hexToRgb(str: string) {
-  let hexs: any = '';
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(str)) return message.warning('Enter wrong hex color value');
-  str = str.replace('#', '');
-  hexs = str.match(/../g);
-  for (let i = 0; i < 3; i++) hexs[i] = parseInt(hexs[i], 16);
-  return hexs;
+/** 校验是否为合法的 3 位或 6 位十六进制颜色值（可省略前导 `#`） */
+export function isHexColor(value: string): boolean {
+  return HEX_COLOR_REG.test(value);
 }
 
-/**
- * @description RGB color to Hex color
- * @param {*} r red
- * @param {*} g green
- * @param {*} b blue
- * @returns {String} Returns the processed color value
- */
-export function rgbToHex(r: any, g: any, b: any) {
-  let reg = /^\d{1,3}$/;
-  if (!reg.test(r) || !reg.test(g) || !reg.test(b)) return message.warning('Enter wrong rgb color value');
-  let hexs = [r.toString(16), g.toString(16), b.toString(16)];
-  for (let i = 0; i < 3; i++) if (hexs[i].length == 1) hexs[i] = `0${hexs[i]}`;
-  return `#${hexs.join('')}`;
+/** 将 3 位或 6 位十六进制颜色规范为带前导 `#` 的大写 6 位格式 */
+export function convertToSixDigitHexColor(value: string): string {
+  const clean = value.startsWith('#') ? value.slice(1) : value;
+  if (clean.length === 3) {
+    return `#${clean[0]}${clean[0]}${clean[1]}${clean[1]}${clean[2]}${clean[2]}`.toUpperCase();
+  }
+  return `#${clean}`.toUpperCase();
 }
 
-/**
- * @description Darken the color value
- * @param {String} color color value string
- * @param {Number} level The degree of deepening, limited between 0-1
- * @returns {String} Returns the processed color value
- */
-export function getDarkColor(color: string, level: number) {
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(color)) return message.warning('Enter wrong hex color value');
-  let rgb = hexToRgb(color);
-  for (let i = 0; i < 3; i++) rgb[i] = Math.round(20.5 * level + rgb[i] * (1 - level));
-  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+function hexToRgb(color: string): [number, number, number] | null {
+  const normalized = SIX_HEX_COLOR_REG.test(color)
+    ? color.replace('#', '')
+    : isHexColor(color)
+      ? convertToSixDigitHexColor(color).slice(1)
+      : '';
+  if (!normalized) return null;
+
+  return [parseInt(normalized.slice(0, 2), 16), parseInt(normalized.slice(2, 4), 16), parseInt(normalized.slice(4, 6), 16)];
 }
 
-/**
- * @description Lighten the color value
- * @param {String} color color value string
- * @param {Number} level The degree of deepening, limited between 0-1
- * @returns {String} Returns the processed color value
- */
-export function getLightColor(color: string, level: number) {
-  let reg = /^#?[0-9A-Fa-f]{6}$/;
-  if (!reg.test(color)) message.warning('Enter wrong hex color value');
-  let rgb = hexToRgb(color);
-  for (let i = 0; i < 3; i++) rgb[i] = Math.round(255 * level + rgb[i] * (1 - level));
-  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+function rgbToHex(r: number, g: number, b: number): string {
+  const toByteHex = (channel: number) =>
+    Math.min(255, Math.max(0, Math.round(channel)))
+      .toString(16)
+      .padStart(2, '0');
+  return `#${toByteHex(r)}${toByteHex(g)}${toByteHex(b)}`;
+}
+
+/** 加深十六进制颜色（level 取值 0–1）；非法颜色原样返回 */
+export function getDarkColor(color: string, level: number): string {
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  return rgbToHex(20.5 * level + rgb[0] * (1 - level), 20.5 * level + rgb[1] * (1 - level), 20.5 * level + rgb[2] * (1 - level));
+}
+
+/** 变浅十六进制颜色（level 取值 0–1）；非法颜色原样返回 */
+export function getLightColor(color: string, level: number): string {
+  const rgb = hexToRgb(color);
+  if (!rgb) return color;
+  return rgbToHex(255 * level + rgb[0] * (1 - level), 255 * level + rgb[1] * (1 - level), 255 * level + rgb[2] * (1 - level));
 }

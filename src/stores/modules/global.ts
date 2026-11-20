@@ -1,14 +1,13 @@
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { shallow } from 'zustand/shallow';
-import { createWithEqualityFn } from 'zustand/traditional';
 
 import { DEFAULT_PRIMARY } from '@/config';
 import { GlobalAction, GlobalState } from '@/stores/interface';
 
-export type GlobalStoreState = GlobalState & GlobalAction;
+type GlobalStoreState = GlobalState & GlobalAction;
 
-export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
+export const useGlobalStore = create<GlobalStoreState>()(
   immer(
     persist(
       set => ({
@@ -50,8 +49,6 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
         tabs: true,
         // tabs icon
         tabsIcon: true,
-        // tabs drag
-        tabsDrag: true,
         // footer
         footer: true,
         // theme box display status
@@ -63,19 +60,8 @@ export const useGlobalStore = createWithEqualityFn<GlobalStoreState>()(
       }),
       {
         name: 'hooks-global',
-        version: 2,
-        migrate: (persisted, version) => {
-          const state = persisted as GlobalState;
-          if (version < 2) {
-            const old = String(state.primary ?? '').toLowerCase();
-            if (old === '#1677ff' || old === '#1890ff') {
-              return { ...state, primary: DEFAULT_PRIMARY };
-            }
-          }
-          return state;
-        }
+        version: 1
       }
     )
-  ),
-  shallow
+  )
 );

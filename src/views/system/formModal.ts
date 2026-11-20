@@ -1,5 +1,4 @@
-import './form-modal.less';
-
+import './form-modal.css';
 import type { CSSProperties } from 'react';
 
 import type { EnableStatus } from '@/apis/interface';

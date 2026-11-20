@@ -2,9 +2,9 @@ import type { ConfigProviderProps } from 'antd';
 
 import { RouteObjectType } from '@/routers/interface';
 
-export type SizeType = NonNullable<ConfigProviderProps['componentSize']>;
+type SizeType = NonNullable<ConfigProviderProps['componentSize']>;
 
-export type LayoutType = 'vertical' | 'classic' | 'transverse' | 'columns';
+type LayoutType = 'vertical' | 'classic' | 'transverse' | 'columns';
 
 /* GlobalState */
 export interface GlobalState {
@@ -27,7 +27,6 @@ export interface GlobalState {
   breadcrumb: boolean;
   tabs: boolean;
   tabsIcon: boolean;
-  tabsDrag: boolean;
   footer: boolean;
   themeDrawerVisible: boolean;
 }
@@ -37,7 +36,7 @@ export interface GlobalAction {
 }
 
 /* tabsMenuProps */
-export interface TabsListProp {
+interface TabsListProp {
   icon: string;
   title: string;
   path: string;
@@ -52,7 +51,7 @@ export interface TabsState {
 export interface TabsAction {
   setTabsList: (tabsList: TabsState['tabsList']) => void;
   addTab: (tabs: TabsListProp) => void;
-  removeTab: (path: string, isCurrent: boolean) => void;
+  removeTab: (path: string, isCurrent: boolean) => string | null;
   closeTabsOnSide: (path: string, type: 'left' | 'right') => void;
   closeMultipleTab: (path?: string) => void;
   setTabTitle: (title: string) => void;

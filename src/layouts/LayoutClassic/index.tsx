@@ -1,8 +1,7 @@
-import './index.less';
-
+import './index.css';
 import { Layout } from 'antd';
-import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 
 import logo from '@/assets/images/logo.png';
 import CollapseIcon from '@/layouts/components/Header/components/CollapseIcon';
@@ -11,7 +10,6 @@ import ToolBarRight from '@/layouts/components/Header/ToolBarRight';
 import LayoutMain from '@/layouts/components/Main';
 import LayoutMenu from '@/layouts/components/Menu';
 import { LAYOUT_SIDER_COLLAPSED_WIDTH, LAYOUT_SIDER_WIDTH } from '@/layouts/constants';
-import { RouteObjectType } from '@/routers/interface';
 import { useAuthStore, useGlobalStore } from '@/stores';
 import { getFirstLevelMenuList } from '@/utils';
 
@@ -19,28 +17,21 @@ const { Header, Sider } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
-const LayoutClassic: React.FC = () => {
+const LayoutClassic = () => {
   const { pathname } = useLocation();
 
-  const { isCollapse, menuSplit } = useGlobalStore(state => ({
-    isCollapse: state.isCollapse,
-    menuSplit: state.menuSplit
-  }));
+  const { isCollapse, menuSplit } = useGlobalStore(
+    useShallow(state => ({
+      isCollapse: state.isCollapse,
+      menuSplit: state.menuSplit
+    }))
+  );
   const showMenuList = useAuthStore(state => state.showMenuList);
   const firstLevelMenuList = getFirstLevelMenuList(showMenuList);
-
-  const [subMenuList, setSubMenuList] = useState<RouteObjectType[]>([]);
-
-  useEffect(() => {
-    if (menuSplit) changeSubMenu();
-  }, [pathname, menuSplit]);
-
-  const changeSubMenu = () => {
-    const menuItem = showMenuList.find(item => {
-      return pathname === item.path || `/${pathname.split('/')[1]}` === item.path;
-    });
-    setSubMenuList(menuItem?.children || []);
-  };
+  const activeMenu = menuSplit
+    ? showMenuList.find(item => pathname === item.path || `/${pathname.split('/')[1]}` === item.path)
+    : undefined;
+  const subMenuList = activeMenu?.children ?? [];
 
   return (
     <section className='layout-classic'>
@@ -64,16 +55,16 @@ const LayoutClassic: React.FC = () => {
           className={`${!subMenuList.length && menuSplit ? 'not-sider' : ''}`}
         >
           {menuSplit ? (
-            <React.Fragment>
+            <>
               {subMenuList.length ? (
-                <React.Fragment>
+                <>
                   <LayoutMenu mode='inline' menuList={subMenuList} />
                   <div className='collapse-box'>
                     <CollapseIcon />
                   </div>
-                </React.Fragment>
+                </>
               ) : null}
-            </React.Fragment>
+            </>
           ) : (
             <LayoutMenu mode='inline' />
           )}

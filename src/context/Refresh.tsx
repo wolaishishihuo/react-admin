@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useMemo, useState } from 'react';
 
 import { queryClient } from '@/apis/query';
 
@@ -8,13 +8,19 @@ interface RefreshContextType {
   refresh: () => void;
 }
 
+interface RefreshProviderProps {
+  /** 需要订阅页面刷新上下文的子树 */
+  children: ReactNode;
+}
+
 export const RefreshContext = createContext<RefreshContextType>({
   outletShow: true,
   refreshNonce: 0,
   refresh: () => {}
 });
 
-export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const RefreshProvider = (props: RefreshProviderProps) => {
+  const { children } = props;
   const [outletShow, setOutletShow] = useState(true);
   const [refreshNonce, setRefreshNonce] = useState(0);
 

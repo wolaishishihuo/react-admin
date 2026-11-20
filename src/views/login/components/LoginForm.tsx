@@ -1,7 +1,7 @@
 import { Button, Form, Input } from 'antd';
 import type { FormInstance, FormProps } from 'antd/es/form';
 import md5 from 'md5';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ReqLogin } from '@/apis/interface';
@@ -13,7 +13,7 @@ import usePermissions from '@/hooks/usePermissions';
 import { useTabsStore, useUserStore } from '@/stores';
 import { getTimeState } from '@/utils';
 
-const LoginForm: React.FC = () => {
+const LoginForm = () => {
   const navigate = useNavigate();
   const setToken = useUserStore(state => state.setToken);
   const setRefreshToken = useUserStore(state => state.setRefreshToken);
@@ -21,7 +21,7 @@ const LoginForm: React.FC = () => {
 
   const { initPermissions } = usePermissions();
 
-  const formRef = React.useRef<FormInstance>(null);
+  const formRef = useRef<FormInstance>(null);
   const [loading, setLoading] = useState(false);
 
   const key = 'loading';
@@ -34,14 +34,15 @@ const LoginForm: React.FC = () => {
 
       // user login
       const data = await fetchLogin({ ...values, password: md5(values.password) });
-      setToken(data.access_token || data.accessToken || '');
+      const accessToken = data.access_token || data.accessToken || '';
+      setToken(accessToken);
       setRefreshToken(data.refreshToken || '');
 
       // clear last account tabs
       setTabsList([]);
 
       // init permissions
-      await initPermissions(data.access_token);
+      await initPermissions(accessToken);
 
       // prompt for successful login and redirect
       notification.success({

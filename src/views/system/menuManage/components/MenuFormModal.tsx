@@ -38,7 +38,7 @@ const MenuFormModal = (props: MenuFormModalProps) => {
     if (!open) return;
     form.resetFields();
     form.setFieldsValue(initialValues);
-  }, [open, initialValues]);
+  }, [open, initialValues, form]);
 
   return (
     <Modal

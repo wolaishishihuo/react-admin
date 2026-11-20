@@ -5,7 +5,7 @@ export interface Result {
 }
 
 // Request response parameters (including data)
-export interface ResultData<T = any> extends Result {
+export interface ResultData<T = unknown> extends Result {
   data: T;
 }
 
@@ -39,22 +39,9 @@ export interface ResCurrentUser {
   buttons: string[];
 }
 
-export interface UserList {
-  id: string;
-  username: string;
-  gender: 1 | 2;
-  age: number;
-  idCard: string;
-  email: string;
-  address: string;
-  createTime: string;
-  status: boolean;
-  avatar: string;
-}
-
 export type EnableStatus = 0 | 1;
 
-export type MenuType = 'directory' | 'menu';
+type MenuType = 'directory' | 'menu';
 
 export interface MenuItem {
   id: string;

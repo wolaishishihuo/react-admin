@@ -13,17 +13,17 @@
 
 ## 项目基线与环境
 
-- 模板基线：Vite 8 + React 19 + TS strict + antd 6 / ProComponents + react-router v7 + TanStack Query v5 + Zustand 5 + UnoCSS / Less；实际依赖与命令以 `package.json` 为准。
+- 模板基线：Vite 8（Lightning CSS） + React 19 + TS strict + antd 6 / ProComponents + react-router v7 + TanStack Query v5 + Zustand 5 + UnoCSS / 原生现代 CSS + Oxc（`oxlint` + `oxfmt`）；实际依赖与命令以 `package.json` 为准。
 - 当前模板未启用 React Compiler；子项目是否启用，以构建配置为准，不要仅根据 React 版本推断。
 - 路由模式由 `VITE_ROUTER_MODE` 决定（hash | history）；后端地址、代理和接口前缀查 `.env.*` 的 `VITE_API_URL` / `VITE_PROXY` 及 HTTP、代理配置，不在业务代码中另写一套。
-- JS / TS / JSX 用**单引号**，由 Prettier 的 `singleQuote` / `jsxSingleQuote` 管理；不要另开 ESLint `quotes` / `jsx-quotes`。
-- UnoCSS 类名顺序由 ESLint `unocss/order` 管理；不要装 `prettier-plugin-tailwindcss`。
+- JS / TS / JSX 用**单引号**，由 `.oxfmtrc.json` 的 `singleQuote` / `jsxSingleQuote` 管理；import 顺序由 `oxfmt` 的 `sortImports` 管理。
+- UnoCSS 类名顺序由 `.oxlintrc.json` 的 `unocss/order`（`@unocss/eslint-plugin`）管理；不再使用 ESLint / Prettier / Less / Stylelint。
 - 通用交互 hooks（debounce、fullscreen 等）优先复用项目已有 hooks 或 ahooks；已有能力不能满足时再自行实现。
 
 ## 工作流程与验证
 
 1. **开发**：先确认组件职责、状态归属、数据流和已有能力，再实现。
-2. **重构**：先定义目标行为与边界，增量修改，保持任务范围内的行为可验证。
+2. **重构**：先定义目标行为与边界，增量修改，保持任务范围内的行为可验证；**拆分或移动代码时同步更新所有调用方与单测，严禁保留兼容重导出或仅为测试暴露的生产 `export`**。
 3. **修复**：先区分事实与假设、症状与根因，取得代码或复现证据后再修复。
 
 先查代码和配置补齐信息；仅当缺失信息会改变业务行为、接口契约或架构选择时请求澄清，常规实现细节沿用约定。
@@ -33,17 +33,20 @@
 ```bash
 pnpm dev            # 开发
 pnpm type:check     # TypeScript 检查
+pnpm lint           # Oxlint 静态检查（含 unocss/order）
+pnpm lint:fix       # Oxlint 自动修复
+pnpm format         # Oxfmt 格式化（JS/TS/JSX/CSS/JSON/MD）
+pnpm format:check   # Oxfmt 格式校验
 pnpm test           # Vitest watch
 pnpm test:run       # Vitest 单次运行
-pnpm lint:eslint    # 全仓 ESLint，带 --fix，会修改文件
 pnpm build:pro      # 生产构建
 ```
 
-- 修改 TS / TSX 或相关配置后必须跑 `pnpm type:check`；修改代码须对受影响文件跑 ESLint（`pnpm exec eslint <文件...>`），避免为局部任务自动格式化全仓。
+- 修改 TS / TSX 或相关配置后必须跑 `pnpm type:check`；修改代码须跑 `pnpm exec oxlint <文件...>`（或 `pnpm lint`）与 `pnpm exec oxfmt --check <文件...>`。
 - 业务逻辑、交互或缺陷修复应运行相关测试；新增测试验证可观察行为和关键边界，不为简单样式、文案或文件拆分机械补测试。
 - 改动构建、依赖、路由加载或资源集成时运行 `pnpm build:pro`。仅修改文档无需运行代码检查；交付时说明实际检查结果和未完成的检查。
 - 测试用独立的 `vitest.config.ts`（jsdom + Testing Library），不要合并 `vite.config.ts`，避免拖入 PWA、checker 等构建插件。
-- 测试放根目录 `tests/`，按 `src/` 相对路径镜像（如 `src/utils/is.ts` → `tests/utils/is.test.ts`）；组件测试用 `@testing-library/react`，setup 在 `tests/setup.ts`；从 `vitest` 显式 import 测试 API，不开 `globals`。HTTP 测试 mock 请求，不依赖真实后端。
+- 测试放根目录 `tests/`，按 `src/` 相对路径镜像（如 `src/utils/color.ts` → `tests/utils/color.test.ts`）；组件测试用 `@testing-library/react`，setup 在 `tests/setup.ts`；从 `vitest` 显式 import 测试 API，不开 `globals`。HTTP 测试 mock 请求，不依赖真实后端。
 
 ## 目录与文件放置
 
@@ -88,7 +91,7 @@ src/apis/modules/<module>/
 - ProTable 确需共享 Query 缓存时，整体改为 Query 驱动的 `dataSource` / `loading`，显式接管分页、筛选、排序；不要同时让 `request` 和 Query 请求同一列表。
 - Query 数据直接消费或派生，禁止为了展示再复制到 `useState` / Zustand；可计算的状态在渲染时计算，不用 effect 同步副本。
 - **编辑草稿是合理例外**：打开或切换记录时初始化独立草稿，不修改原始查询数据；后台重取不得覆盖用户未保存的输入，保存成功后刷新原数据。antd Form 的命令式初始化属于允许的集成方式。
-- Zustand 必须 selector 订阅（`useUserStore(s => s.token)`），不要整店订阅。新建 store 前先排除服务端缓存、URL 状态和可局部管理的状态；store 类型放 `src/stores/interface/`。
+- Zustand 统一使用 `create`（不用 `zustand/traditional`），必须 selector 订阅（`useUserStore(s => s.token)`），多字段对象 selector 配合 `useShallow`（`zustand/react/shallow`），不要整店订阅。新建 store 前先排除服务端缓存、URL 状态和可局部管理的状态；store 中不埋路由跳转等 UI 副作用；store 类型放 `src/stores/interface/`。
 
 ## HTTP 层与错误处理
 
@@ -97,20 +100,20 @@ src/apis/modules/<module>/
 ```
 
 - 组件禁止直接 import axios、调用 `http.get/post` 或自行发业务请求；业务 URL 来自对应模块的 `MODULE_URLS`。
-- HTTP 层已处理 token 注入、401 续签与并发重放、业务码错误、超时及断网提示。调用侧不要重复 toast 同一错误；catch 用于恢复状态或业务流程控制，需向上报告的失败继续抛出，不伪装为成功或空数据。
+- HTTP 层已处理 token 注入、请求取消、401 续签与并发重放、业务码错误、超时及断网提示。被取消请求（`axios.isCancel`）静默不提示；后台静默查询或登出等接口按需传 `{ silent: true }` / `{ skipAuthRefresh: true }`。调用侧不要重复 toast 同一错误；catch 用于恢复状态或业务流程控制，需向上报告的失败继续抛出，不伪装为成功或空数据。
 - 业务校验提示、操作成功提示由调用侧负责。`message` / `notification` / `modal` 从 `@/hooks/useMessage` 导入，不用 antd 的静态调用，避免脱离 ConfigProvider。
 - 全屏 loading 传 `{ loading: true }`；下载在 API 模块中走 `http.download`；组件外跳转沿用 `window.$navigate`。
-- 调整认证、退出或切换账号流程时，检查 Query 缓存、权限和用户状态的清理，避免复用上一身份的数据。
+- 调整认证、退出或切换账号流程时，统一经 `cancelActiveRequests` / `clearAuthSession`（`@/apis/http`）中止在途请求并清空凭证、权限与标签页；Query 缓存在受保护路由随 `token` 清空完成卸载后由 `RouterProvider` 统一 `clear()`，避免卸载前清空缓存触发活跃 `useQuery` 重发导致 401。
 
 ## TanStack Query 约定
 
 - 应用运行时共享 `@/apis/query` 的 `queryClient`；React hooks 内优先用 `useQueryClient()` 获取当前 Provider 的 client，便于隔离测试，组件外使用导出的单例。`createQueryClient` 仅供基础设施和隔离测试构造实例，业务代码不得另建 client。
 - queryKey 出自 `MODULE_QUERY_KEYS` 工厂，包含影响结果的全部业务参数（如 id、分页、筛选，以及存在时的租户范围），不要在组件里手写 key 数组，也不要简单把 URL 当作唯一缓存标识。
 - 按实际失效需求设计模块 / 列表 / 详情的 key 层级，查询和失效共用工厂；不为未实现的查询预建 key。
-- 查询在模块 `hooks.ts` 导出 `queryXxxOptions`，集中定义 `queryKey`、`queryFn` 与共用策略，供组件和预取复用；`useXxxQuery` 按实际消费封装，组件也可直接 `useQuery(queryXxxOptions(params))`。现有示例在 `src/apis/modules/user/hooks.ts`，不要因此复制其中未使用的接口。
+- 查询在模块 `hooks.ts` 导出 `queryXxxOptions`，集中定义 `queryKey`、`queryFn` 与共用策略，供组件和预取复用；`queryFn` 应透传 `({ signal })` 给 `api.ts`，保证卸载或退出取消能中止底层请求。`useXxxQuery` 按实际消费封装，组件也可直接 `useQuery(queryXxxOptions(params))`。现有与 `ProTable` 共存的真实示例见 `src/apis/modules/system/hooks.ts`（角色下拉选项查询 + 变更失效）。
 - mutation 的通用缓存失效放模块 hook 的 `onSuccess`，页面关闭弹窗、成功提示及 ProTable reload 放页面回调；封装允许传入回调时须合并执行，不能覆盖模块的失效逻辑。需要等待刷新的流程应返回或 await 失效 Promise。
 - 只失效受影响的查询；ProTable 刷新用 `actionRef.reload()`，业务操作不靠整页重挂载刷新。布局的整页“刷新”入口沿用 `src/context/Refresh.tsx`。
-- 缓存时间、重取及重试策略默认继承 `src/apis/query/defaults.ts`，仅按明确业务需求覆盖。新增 mutation 必须检查重试策略：当前模板默认会重试，创建、支付、发送等未保证幂等的操作显式设 `retry: false`；只有后端保证可安全重放时才允许自动重试。
+- 缓存时间、重取及重试策略默认继承 `src/apis/query/defaults.ts`，仅按明确业务需求覆盖：查询默认通过 `shouldRetryQuery` 仅重试网络错误与 5xx / 408 / 429（跳过取消请求、业务码错误及 4xx）；mutation 默认 `retry: false`，仅在后端明确保证幂等且业务需要时才按需开启重试。
 - `enabled` 可表达“等待必要参数 / 前置数据就绪”；复杂依赖封装进模块 hooks，不在页面堆编排 effect。无依赖的请求并行，有依赖的按实际顺序请求。
 
 ## 新增页面
@@ -125,8 +128,8 @@ src/apis/modules/<module>/
 ## 表格与 ProTable
 
 - **业务数据表格优先使用 `@ant-design/pro-components` 的 `ProTable`**，复用列配置、搜索、工具栏和分页能力；详情 / 弹窗内的简单展示表格可用 antd `Table`，有明确特殊需求时再选择其他实现。请求与刷新遵守「数据与状态归属」，不因使用 ProTable 再封装一套请求管理。
-- **独立管理列表页默认使用自适应高度、表体内部滚动**：给 ProTable 设置 `className='ant-pro-table-scroll'` 和 `scroll={{ x: ..., y: '100%' }}`。`src/styles/proTable.less` 已全局引入，配合 `src/layouts/components/Main/index.less` 分配剩余高度，搜索区、工具栏、表头和分页保留在滚动区外；`scroll.x` 按实际列宽选择数值或 `'max-content'`，不要照搬其他页面的宽度。
-- 表格外增加容器或统计卡时，保持父级可用高度与 flex 收缩链路：页面用纵向 flex，统计区不收缩，表格所在区域用 `flex: 1; min-height: 0`。高度异常先检查容器层级；CSS 方案能满足时，不重复测量 DOM、计算 `window.innerHeight`、硬编码 `calc(100vh - 固定偏移)` 或新增高度 hook。现有 `src/hooks/useTableScroll.ts` 未被页面采用，不作为默认方案。
+- **独立管理列表页默认使用自适应高度、表体内部滚动**：给 ProTable 设置 `className='ant-pro-table-scroll'` 和 `scroll={{ x: ..., y: '100%' }}`。`src/styles/proTable.css` 已全局引入，配合 `src/layouts/components/Main/index.css` 分配剩余高度，搜索区、工具栏、表头和分页保留在滚动区外；`scroll.x` 按实际列宽选择数值或 `'max-content'`，不要照搬其他页面的宽度。
+- 表格外增加容器或统计卡时，保持父级可用高度与 flex 收缩链路：页面用纵向 flex，统计区不收缩，表格所在区域用 `flex: 1; min-height: 0`。高度异常先检查容器层级；CSS 方案能满足时，不重复测量 DOM、计算 `window.innerHeight`、硬编码 `calc(100vh - 固定偏移)` 或新增高度 hook。
 - `ant-pro-table-scroll` **也是页面滚动模式的开关**：主布局检测到活动页含该类名后会关闭外层滚动。仅在需要填满受约束区域、由表体滚动时使用；长内容页、详情 / 弹窗内嵌表格和多表格页面先确定滚动容器，不机械套用该类名或 `scroll.y: '100%'`，避免内容被裁切。
 - 标准管理列表沿用 `bordered` / `cardBordered`、`search={{ labelWidth: 'auto' }}`；分页复用 `@/config/proTable` 的 `pagination`，业务差异按需覆盖，无分页时显式设 `pagination={false}`。`rowKey` 使用稳定业务标识，搜索表单的 `form.name` 在同页保持唯一。
 - 操作按钮使用 `toolBarRender`，公共样式已统一操作按钮与设置图标的布局；树形展开图标由 `src/config/proTable.tsx` 和全局 ConfigProvider 统一提供。不要在页面复制整套 `.ant-table-*` / `.ant-pro-*` 覆盖或为默认外观额外包一层 Card；共性调整改公共配置 / 样式，局部差异限制在页面作用域。
@@ -183,11 +186,11 @@ const UserPanel = (props: UserPanelProps) => {
 
 - 按实际依赖选择 memo 工具，**不要求成套使用**；简单计算、普通事件函数和 ProTable `request` 不因“保持引用稳定”统一包 memo。
 - memo 不是状态或资源的生命周期保证；必须持续存活的状态放 state / ref，资源按相应生命周期创建和清理。
-- effect 等 hooks 的依赖必须反映实际使用值；ESLint 关闭 `exhaustive-deps` 不代表可以任意省略，有意省略必须有可验证的理由和注释。
+- effect 等 hooks 的依赖必须反映实际使用值；`oxlint` 已开启 `react/exhaustive-deps` 校验，有意省略必须有可验证的理由和注释。
 
 ## 样式
 
-- UnoCSS 优先，先查 `uno.config.ts` 的 shortcuts 与规则（如 `flx-center`、`card`、`sle`、`mt20`）；utility 顺序交给 `unocss/order`，不要手排。
-- 深嵌套和动画写同目录 `index.less`，样式作用域限制在所属组件或页面，避免无意覆盖全局 antd。
-- 业务界面的颜色用 UnoCSS theme 色名（`primary`、`surface` 等）或 `--hooks-*` CSS 变量，不硬编码明暗主题颜色；需要新增语义色时在主题层统一定义。
+- UnoCSS 优先，先查 `uno.config.ts` 的 shortcuts 与语义色（如 `flex-center`、`card`、`sle`、`g-100`~`g-900`、`border-subtle`、`surface`）；utility 顺序交给 `oxlint` 的 `unocss/order`，不要手排。
+- 深嵌套、覆盖 antd 和动画写同目录原生 `index.css`（支持标准 CSS Nesting，禁止 Less 独有的 `&-suffix` 类名拼接），样式作用域限制在所属组件或页面，避免无意覆盖全局 antd。
+- 业务界面的颜色用 UnoCSS theme 色名（`primary`、`surface`、`canvas`、`g-100`~`g-900` 等，明暗主题自动翻转）或 `--hooks-*` CSS 变量，不硬编码明暗主题颜色；需要新增语义色时在 `src/styles/theme/global.ts` 与 `uno.config.ts` 统一定义。
 - 图表颜色跟随 `useChartTheme`，不要在业务页面另订阅 `isDark` 拼色；修改样式或图表后检查明暗主题下的可读性。

@@ -1,17 +1,16 @@
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { shallow } from 'zustand/shallow';
-import { createWithEqualityFn } from 'zustand/traditional';
 
 import { TabsAction, TabsState } from '@/stores/interface';
 import { getUrlWithParams } from '@/utils';
 
-export type TabsStoreState = TabsState & TabsAction;
+type TabsStoreState = TabsState & TabsAction;
 
-export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
+export const useTabsStore = create<TabsStoreState>()(
   immer(
     persist(
-      set => ({
+      (set, get) => ({
         tabsList: [],
         setTabsList: tabsList =>
           set((draft: TabsState) => {
@@ -31,19 +30,19 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
               closable: tabs.closable
             };
           }),
-        removeTab: (path, isCurrent) =>
+        removeTab: (path, isCurrent) => {
+          const currentTabs = get().tabsList;
+          const targetIndex = currentTabs.findIndex(item => item.path === path);
+          if (targetIndex === -1 || !currentTabs[targetIndex].closable) return null;
+
+          const nextPath = isCurrent ? (currentTabs[targetIndex + 1]?.path ?? currentTabs[targetIndex - 1]?.path ?? null) : null;
+
           set((draft: TabsState) => {
-            if (!draft.tabsList.find(item => item.path === path)?.closable) return;
-            if (isCurrent) {
-              draft.tabsList.forEach((item, index) => {
-                if (item.path !== path) return;
-                const nextTab = draft.tabsList[index + 1] || draft.tabsList[index - 1];
-                if (!nextTab) return;
-                window.$navigate(nextTab.path);
-              });
-            }
             draft.tabsList = draft.tabsList.filter(item => item.path !== path);
-          }),
+          });
+
+          return nextPath;
+        },
         closeTabsOnSide: (path, type) =>
           set((draft: TabsState) => {
             const currentIndex = draft.tabsList.findIndex(item => item.path === path);
@@ -63,8 +62,8 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
         setTabTitle: title =>
           set((draft: TabsState) => {
             draft.tabsList = draft.tabsList.map(item => {
-              if (item.path == getUrlWithParams()) {
-                return { ...item, title: title };
+              if (item.path === getUrlWithParams()) {
+                return { ...item, title };
               }
               return item;
             });
@@ -75,6 +74,5 @@ export const useTabsStore = createWithEqualityFn<TabsStoreState>()(
         version: 2.0
       }
     )
-  ),
-  shallow
+  )
 );

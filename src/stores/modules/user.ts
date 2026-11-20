@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 
 import { UserAction, UserState } from '@/stores/interface';
 
-export type UserStoreState = UserState & UserAction;
+type UserStoreState = UserState & UserAction;
 
 export const useUserStore = create<UserStoreState>()(
   immer(

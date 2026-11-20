@@ -80,6 +80,12 @@ export async function fetchResetAccountPassword() {
   await delay();
 }
 
+export async function fetchGetRoleOptions(signal?: AbortSignal) {
+  await delay();
+  if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+  return getRoles().map(item => ({ label: item.roleName, value: item.id }));
+}
+
 export async function fetchGetRoleList(params: ReqRoleList) {
   await delay();
   const { current = 1, pageSize = 10, roleName, roleCode, status } = params;

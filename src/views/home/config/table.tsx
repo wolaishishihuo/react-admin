@@ -1,6 +1,5 @@
 import { Button, Space, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import React from 'react';
 
 interface DataType {
   key: string;
@@ -28,13 +27,13 @@ export const columns: ColumnsType<DataType> = [
     dataIndex: 'tags',
     ellipsis: true,
     render: (_, { tags }) => (
-      <React.Fragment>
+      <>
         {tags.map(tag => (
           <Tag color='processing' key={tag}>
             {tag}
           </Tag>
         ))}
-      </React.Fragment>
+      </>
     )
   },
   {

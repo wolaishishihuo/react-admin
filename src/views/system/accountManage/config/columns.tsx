@@ -8,7 +8,7 @@ import { Icon } from '@/components/Icon';
 
 import { ACCOUNT_PERMS, STATUS_ENUM } from '../../constants';
 
-export interface AccountColumnHandlers {
+interface AccountColumnHandlers {
   canUpdate: boolean;
   onEdit: (record: AccountItem) => void;
   onResetPassword: (record: AccountItem) => void;

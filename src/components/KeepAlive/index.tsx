@@ -1,4 +1,5 @@
-import React, { Activity, useContext, useLayoutEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { Activity, useContext, useLayoutEffect, useRef } from 'react';
 import { useLocation, useMatches, useOutlet } from 'react-router-dom';
 
 import { RefreshContext } from '@/context/Refresh';
@@ -7,8 +8,17 @@ import { useGlobalStore, useTabsStore } from '@/stores';
 
 type CachePage = {
   id: string;
-  node: React.ReactNode;
+  node: ReactNode;
 };
+
+interface KeepAlivePageProps {
+  /** 路由缓存唯一标识 */
+  cacheKey: string;
+  /** 当前页面是否处于展示态 */
+  active: boolean;
+  /** 缓存的路由节点 */
+  children: ReactNode;
+}
 
 const replayEnter = (el: HTMLElement) => {
   el.classList.remove('keep-alive-enter');
@@ -16,11 +26,8 @@ const replayEnter = (el: HTMLElement) => {
   el.classList.add('keep-alive-enter');
 };
 
-const KeepAlivePage: React.FC<{
-  cacheKey: string;
-  active: boolean;
-  children: React.ReactNode;
-}> = ({ cacheKey, active, children }) => {
+const KeepAlivePage = (props: KeepAlivePageProps) => {
+  const { cacheKey, active, children } = props;
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -42,7 +49,7 @@ const KeepAlivePage: React.FC<{
   );
 };
 
-const KeepAliveOutlet: React.FC = () => {
+const KeepAliveOutlet = () => {
   const outlet = useOutlet();
   const matches = useMatches();
   const liveRef = useRef<HTMLDivElement>(null);

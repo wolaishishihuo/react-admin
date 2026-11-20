@@ -1,16 +1,29 @@
 import { CHART_TOKENS } from '@/components/Echarts/theme';
 
 /**
- * @description Global theme config
+ * @description Global theme tokens (aligned with art-design-pro adaptive light/dark scale)
  */
 const globalTheme = {
   light: {
     ...CHART_TOKENS.light,
-    // Customize global CSS variables
+    // Adaptive neutral gray scale (auto-flips in dark mode)
+    '--hooks-gray-100': '#f9fafb',
+    '--hooks-gray-200': '#f2f4f5',
+    '--hooks-gray-300': '#e6eaeb',
+    '--hooks-gray-400': '#dbdfe1',
+    '--hooks-gray-500': '#949eb7',
+    '--hooks-gray-600': '#7987a1',
+    '--hooks-gray-700': '#4d5875',
+    '--hooks-gray-800': '#383853',
+    '--hooks-gray-900': '#323251',
+
+    // Surface, border & interaction tokens
     '--hooks-colorBgContent': '#fafbfc',
     '--hooks-colorBgBox': '#ffffff',
     '--hooks-colorCardBorder': 'rgba(0, 0, 0, 0.08)',
+    '--hooks-colorBorderSubtle': '#e2e8ee',
     '--hooks-colorLayoutHover': '#edeff0',
+    '--hooks-colorActive': '#f2f4f5',
     '--hooks-colorTabText': '#7987a1',
     '--hooks-colorTextPale': '#949eb7',
     '--hooks-colorBorderBox': '#dbdfe1',
@@ -19,18 +32,31 @@ const globalTheme = {
     '--hooks-boxShadowAnalysis': '0 5px 20px 0 rgb(50 50 50 / 54%)',
     '--hooks-scrollbarThumb': 'rgba(0, 0, 0, 0.1)',
 
-    // Customize login CSS variables
+    // Login surface tokens
     '--hooks-colorBgLoginContainer': '#eeeeee',
     '--hooks-colorBgLoginMain': 'rgb(255 255 255 / 80%)',
     '--hooks-boxShadowLoginForm': '0 2px 10px 2px rgb(0 0 0 / 10%)'
   },
   dark: {
     ...CHART_TOKENS.dark,
-    // Customize global CSS variables
+    // Adaptive neutral gray scale (auto-flips in dark mode)
+    '--hooks-gray-100': '#110f0f',
+    '--hooks-gray-200': '#17171c',
+    '--hooks-gray-300': '#393946',
+    '--hooks-gray-400': '#505062',
+    '--hooks-gray-500': '#73738c',
+    '--hooks-gray-600': '#8f8fa3',
+    '--hooks-gray-700': '#ababba',
+    '--hooks-gray-800': '#c7c7d1',
+    '--hooks-gray-900': '#e3e3e8',
+
+    // Surface, border & interaction tokens
     '--hooks-colorBgContent': '#070707',
     '--hooks-colorBgBox': '#161618',
     '--hooks-colorCardBorder': 'rgba(255, 255, 255, 0.08)',
+    '--hooks-colorBorderSubtle': 'rgba(255, 255, 255, 0.1)',
     '--hooks-colorLayoutHover': '#252530',
+    '--hooks-colorActive': '#202226',
     '--hooks-colorTabText': '#8f8fa3',
     '--hooks-colorTextPale': '#73738c',
     '--hooks-colorBorderBox': '#505062',
@@ -39,7 +65,7 @@ const globalTheme = {
     '--hooks-boxShadowAnalysis': '0 3px 20px 0 rgb(255 255 255 / 35%)',
     '--hooks-scrollbarThumb': 'rgba(255, 255, 255, 0.1)',
 
-    // Customize login CSS variables
+    // Login surface tokens
     '--hooks-colorBgLoginContainer': '#191919',
     '--hooks-colorBgLoginMain': 'rgb(0 0 0 / 80%)',
     '--hooks-boxShadowLoginForm': '0 2px 10px 2px rgb(255 255 255 / 12%)'

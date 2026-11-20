@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 import { AuthAction, AuthState } from '@/stores/interface';
 import { getFlatMenuList, getShowMenuList } from '@/utils';
 
-export type AuthStoreState = AuthState & AuthAction;
+type AuthStoreState = AuthState & AuthAction;
 
 export const useAuthStore = create<AuthStoreState>()(
   immer(set => ({

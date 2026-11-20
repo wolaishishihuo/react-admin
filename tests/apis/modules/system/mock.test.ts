@@ -104,7 +104,7 @@ describe('system mock store', () => {
 
   describe('menus', () => {
     it('builds the tree from authMenuList keys', () => {
-      expect(getMenuTree().map(item => item.id)).toEqual(['home', 'system']);
+      expect(getMenuTree().map(item => item.id)).toEqual(['home', 'system', 'template']);
       expect(findMenu('accountManage')?.title).toBe('账号管理');
       expect(findMenu('system')?.type).toBe('directory');
     });
@@ -153,8 +153,8 @@ describe('system mock store', () => {
     });
 
     it('deletes a node from the tree', () => {
-      deleteMenu('menuMange');
-      expect(findMenu('menuMange')).toBeUndefined();
+      deleteMenu('menuManage');
+      expect(findMenu('menuManage')).toBeUndefined();
     });
 
     it('filters by title and keeps unmatched parents that have hits', () => {
@@ -169,7 +169,7 @@ describe('system mock store', () => {
 
     it('excludes a node so it cannot be chosen as its own parent', () => {
       const tree = excludeMenuTree(getMenuTree(), 'system');
-      expect(tree.map(item => item.id)).toEqual(['home']);
+      expect(tree.map(item => item.id)).toEqual(['home', 'template']);
       expect(findMenu('accountManage', tree)).toBeUndefined();
     });
   });

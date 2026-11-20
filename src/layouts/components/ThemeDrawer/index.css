@@ -44,10 +44,10 @@
         display: block;
         width: 11px;
         font-size: 14px;
-        &-sun {
+        &.dark-icon-sun {
           transform: translate(-6px, -0.5px);
         }
-        &-moon {
+        &.dark-icon-moon {
           transform: translate(0, -0.5px);
         }
       }

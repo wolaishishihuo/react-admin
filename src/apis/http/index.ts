@@ -7,7 +7,7 @@ import { showFullScreenLoading, tryHideFullScreenLoading } from '@/components/Lo
 import { enableRefreshToken, LOGIN_URL } from '@/config';
 import { ResultEnum } from '@/constants';
 import { message } from '@/hooks/useMessage';
-import { useUserStore } from '@/stores';
+import { useAuthStore, useTabsStore, useUserStore } from '@/stores';
 
 import { checkStatus } from './helper/checkStatus';
 
@@ -15,11 +15,18 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     /** 续签后的重放标记：带此标记的 401 不再二次刷新 */
     __isRetryRequest?: boolean;
+    /** 是否展示全屏 loading */
+    loading?: boolean;
+    /** 是否静默错误提示（适合后台刷新、登出等场景） */
+    silent?: boolean;
+    /** 401 时是否跳过自动续签与强制登出（如登出或登录接口自身） */
+    skipAuthRefresh?: boolean;
   }
 }
 
-export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  loading?: boolean;
+interface RefreshQueueItem {
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
 }
 
 const config = {
@@ -28,140 +35,211 @@ const config = {
   withCredentials: false
 };
 
-/** 刷新接口单独实例，避免 401 再次走进续签 */
-const baseRequestClient = axios.create(config);
-
 function formatToken(token: null | string) {
   return token ? `Bearer ${token}` : null;
 }
 
-async function doReAuthenticate() {
-  queryClient.clear();
-  useUserStore.getState().setToken('');
-  useUserStore.getState().setRefreshToken('');
-  window.$navigate(LOGIN_URL);
-}
+function mergeAbortSignals(primary: AbortSignal, external?: AxiosRequestConfig['signal']): AxiosRequestConfig['signal'] {
+  if (!external || external === primary) return primary;
+  if (typeof AbortSignal.any === 'function' && external instanceof AbortSignal) {
+    return AbortSignal.any([primary, external]);
+  }
 
-async function doRefreshToken() {
-  const refreshToken = useUserStore.getState().refreshToken;
-  const resp = await baseRequestClient.post(LOGIN_URLS.REFRESH, { refreshToken });
-  const payload = resp.data?.data ?? {};
-  const newToken = payload.accessToken || payload.access_token;
-  if (!newToken) {
-    throw new Error('Refresh token failed');
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+
+  if (primary.aborted || external.aborted) {
+    controller.abort();
+    return controller.signal;
   }
-  useUserStore.getState().setToken(newToken);
-  if (payload.refreshToken) {
-    useUserStore.getState().setRefreshToken(payload.refreshToken);
+
+  primary.addEventListener('abort', abort, { once: true });
+  if (external instanceof AbortSignal) {
+    external.addEventListener('abort', abort, { once: true });
   }
-  return newToken as string;
+  return controller.signal;
 }
 
 class RequestHttp {
   service: AxiosInstance;
+  /** 刷新接口单独实例，避免 401 再次走进续签 */
+  refreshService: AxiosInstance;
   public isRefreshing = false;
-  public refreshTokenQueue: ((token: string) => void)[] = [];
+  public refreshTokenQueue: RefreshQueueItem[] = [];
+  private abortController = new AbortController();
 
   public constructor(axiosConfig: AxiosRequestConfig) {
     this.service = axios.create(axiosConfig);
+    this.refreshService = axios.create(axiosConfig);
 
     this.service.interceptors.request.use(
-      (config: CustomAxiosRequestConfig) => {
-        config.loading && showFullScreenLoading();
-        if (config.headers && typeof config.headers.set === 'function') {
-          config.headers.set('Authorization', formatToken(useUserStore.getState().token));
+      (requestConfig: InternalAxiosRequestConfig) => {
+        if (requestConfig.loading) showFullScreenLoading();
+        requestConfig.signal = mergeAbortSignals(this.abortController.signal, requestConfig.signal);
+        if (requestConfig.headers && typeof requestConfig.headers.set === 'function') {
+          requestConfig.headers.set('Authorization', formatToken(useUserStore.getState().token));
         }
-        return config;
+        return requestConfig;
       },
       (error: AxiosError) => Promise.reject(error)
     );
 
     this.service.interceptors.response.use(
       (response: AxiosResponse) => {
-        const { data } = response;
-        tryHideFullScreenLoading();
+        const { config: reqConfig, data } = response;
+        if (reqConfig.loading) tryHideFullScreenLoading();
         if (data.code && data.code !== ResultEnum.SUCCESS) {
-          message.error(data.msg);
+          if (!reqConfig.silent) message.error(data.msg);
           return Promise.reject(data);
         }
         return data;
       },
       async (error: AxiosError) => {
-        tryHideFullScreenLoading();
+        const { config: reqConfig, response } = error;
+        if (reqConfig?.loading) tryHideFullScreenLoading();
 
-        const { config, response } = error;
-        if (response?.status === 401) {
-          return this.handleHttpUnauthorized(error, config);
+        if (axios.isCancel(error)) {
+          return Promise.reject(error);
         }
 
-        if (error.message.indexOf('timeout') !== -1) message.error('请求超时！请您稍后重试');
-        if (error.message.indexOf('Network Error') !== -1) message.error('网络错误！请您稍后重试');
-        if (response) checkStatus(response.status);
-        if (!window.navigator.onLine) window.$navigate('/500');
+        if (response?.status === 401 && !reqConfig?.skipAuthRefresh) {
+          return this.handleHttpUnauthorized(error, reqConfig);
+        }
+
+        if (!reqConfig?.silent) {
+          if (error.message.includes('timeout')) message.error('请求超时！请您稍后重试');
+          if (error.message.includes('Network Error')) message.error('网络错误！请您稍后重试');
+          if (response) checkStatus(response.status);
+        }
+        if (!window.navigator.onLine) window.$navigate?.('/500');
         return Promise.reject(error);
       }
     );
+  }
+
+  /** 中止所有在途请求并重建控制器，供登出或强制重置会话调用 */
+  cancelAllRequests() {
+    this.abortController.abort();
+    this.abortController = new AbortController();
+  }
+
+  private async doRefreshToken(signal?: AbortSignal) {
+    const refreshToken = useUserStore.getState().refreshToken;
+    if (!refreshToken) {
+      throw new Error('Missing refresh token');
+    }
+    const resp = await this.refreshService.post(LOGIN_URLS.REFRESH, { refreshToken }, { signal });
+    const payload = resp.data?.data ?? {};
+    const newToken = payload.accessToken || payload.access_token;
+    if (!newToken) {
+      throw new Error('Refresh token failed');
+    }
+    useUserStore.getState().setToken(newToken);
+    if (payload.refreshToken) {
+      useUserStore.getState().setRefreshToken(payload.refreshToken);
+    }
+    return newToken as string;
   }
 
   /**
    * HTTP 401：刷新 access token，并发请求排队后重放。
    * `__isRetryRequest` 只约束「这一次续签后的重放」，防止刷新死循环。
    */
-  private async handleHttpUnauthorized(error: AxiosError, config?: AxiosRequestConfig) {
-    if (!config) {
-      await doReAuthenticate();
-      throw error;
-    }
-
-    if (!enableRefreshToken || config.__isRetryRequest) {
-      await doReAuthenticate();
+  private async handleHttpUnauthorized(error: AxiosError, reqConfig?: AxiosRequestConfig) {
+    if (!reqConfig || !enableRefreshToken || reqConfig.__isRetryRequest || !useUserStore.getState().refreshToken) {
+      clearAuthSession();
       throw error;
     }
 
     if (this.isRefreshing) {
-      return new Promise(resolve => {
-        this.refreshTokenQueue.push((newToken: string) => {
-          if (config.headers) {
-            config.headers.Authorization = formatToken(newToken);
-          }
-          resolve(this.service.request(config));
+      return new Promise((resolve, reject) => {
+        this.refreshTokenQueue.push({
+          resolve: (newToken: string) => {
+            if (reqConfig.headers) {
+              reqConfig.headers.Authorization = formatToken(newToken);
+            }
+            reqConfig.__isRetryRequest = true;
+            resolve(this.service.request(reqConfig));
+          },
+          reject
         });
       });
     }
 
     this.isRefreshing = true;
-    config.__isRetryRequest = true;
+    reqConfig.__isRetryRequest = true;
+    const refreshSignal = this.abortController.signal;
 
     try {
-      const newToken = await doRefreshToken();
-      this.refreshTokenQueue.forEach(callback => callback(newToken));
+      const newToken = await this.doRefreshToken(refreshSignal);
+      const queue = this.refreshTokenQueue;
       this.refreshTokenQueue = [];
-      return this.service.request(config);
+      queue.forEach(item => item.resolve(newToken));
+      if (reqConfig.headers) {
+        reqConfig.headers.Authorization = formatToken(newToken);
+      }
+      return this.service.request(reqConfig);
     } catch (refreshError) {
-      this.refreshTokenQueue.forEach(callback => callback(''));
+      const queue = this.refreshTokenQueue;
       this.refreshTokenQueue = [];
-      await doReAuthenticate();
+      queue.forEach(item => item.reject(refreshError));
+      if (!axios.isCancel(refreshError)) {
+        clearAuthSession();
+      }
       throw refreshError;
     } finally {
       this.isRefreshing = false;
     }
   }
 
-  get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
-    return this.service.get(url, { params, ..._object });
+  get<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+    return this.service.get(url, { params, ...axiosConfig });
   }
-  post<T>(url: string, params?: object | string, _object = {}): Promise<ResultData<T>> {
-    return this.service.post(url, params, _object);
+  post<T>(url: string, params?: object | string, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+    return this.service.post(url, params, axiosConfig);
   }
-  put<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
-    return this.service.put(url, params, _object);
+  put<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+    return this.service.put(url, params, axiosConfig);
   }
-  delete<T>(url: string, params?: any, _object = {}): Promise<ResultData<T>> {
-    return this.service.delete(url, { params, ..._object });
+  delete<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
+    return this.service.delete(url, { params, ...axiosConfig });
   }
-  download(url: string, params?: object, _object = {}): Promise<BlobPart> {
-    return this.service.post(url, params, { ..._object, responseType: 'blob' });
+  download(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<BlobPart> {
+    return this.service.post(url, params, { ...axiosConfig, responseType: 'blob' });
   }
 }
 
-export default new RequestHttp(config);
+const http = new RequestHttp(config);
+
+/** 中止所有在途 HTTP 请求与进行中的 Query（不清理缓存，避免已挂载页面重发） */
+export function cancelActiveRequests() {
+  http.cancelAllRequests();
+  void queryClient.cancelQueries();
+}
+
+/**
+ * 清理本地会话状态并跳转登录页（主动登出与 401 强制登出共用）。
+ * Query 缓存在受保护路由随 token 清空完成卸载后，由 RouterProvider 统一 clear，
+ * 避免在页面卸载前清空缓存触发活跃 useQuery 立即重发导致 401。
+ */
+export function clearAuthSession() {
+  const userState = useUserStore.getState();
+  const authState = useAuthStore.getState();
+  const hasSession = Boolean(
+    userState.token || userState.refreshToken || authState.authMenuList.length || authState.authButtons.length
+  );
+
+  if (!hasSession) return;
+
+  cancelActiveRequests();
+
+  userState.setToken('');
+  userState.setRefreshToken('');
+  authState.setAuthMenuList([]);
+  authState.setAuthButtons([]);
+  useTabsStore.getState().setTabsList([]);
+
+  window.$navigate?.(LOGIN_URL, { replace: true });
+}
+
+export default http;

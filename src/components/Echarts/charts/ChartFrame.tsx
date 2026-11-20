@@ -1,5 +1,4 @@
-import './index.less';
-
+import './index.css';
 import ECharts, { type EChartProps } from '@/components/Echarts';
 
 interface ChartFrameProps extends EChartProps {

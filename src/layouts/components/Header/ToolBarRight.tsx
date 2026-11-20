@@ -1,5 +1,4 @@
-import './index.less';
-
+import './index.css';
 import AvatarIcon from './components/AvatarIcon';
 import DarkModeToggle from './components/DarkModeToggle';
 import Fullscreen from './components/Fullscreen';

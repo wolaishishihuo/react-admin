@@ -2,7 +2,7 @@ import { Col, Form, Input, Modal, Radio, Row, Select, Switch } from 'antd';
 import { useEffect } from 'react';
 
 import { AccountItem } from '@/apis/interface';
-import { BUILTIN_USERNAMES, getRoles } from '@/apis/modules/system';
+import { BUILTIN_USERNAMES, useRoleOptionsQuery } from '@/apis/modules/system';
 
 import { enableStatusSwitchProps, formModalClassName, formModalStyles, formModalWidth } from '../../formModal';
 
@@ -31,7 +31,7 @@ const emptyAccount: AccountFormValues = {
 const AccountFormModal = (props: AccountFormModalProps) => {
   const { open, saving, current, onSubmit, onCancel } = props;
   const [form] = Form.useForm<AccountFormValues>();
-  const roleOptions = getRoles().map(item => ({ label: item.roleName, value: item.id }));
+  const { data: roleOptions = [], isFetching: loadingRoles } = useRoleOptionsQuery(open);
   const isBuiltin = !!current && BUILTIN_USERNAMES.includes(current.username);
 
   async function handleOk() {
@@ -43,7 +43,7 @@ const AccountFormModal = (props: AccountFormModalProps) => {
     if (!open) return;
     form.resetFields();
     form.setFieldsValue(current ?? emptyAccount);
-  }, [open, current]);
+  }, [open, current, form]);
 
   return (
     <Modal
@@ -108,7 +108,7 @@ const AccountFormModal = (props: AccountFormModalProps) => {
           </Col>
         </Row>
         <Form.Item label='角色' name='roleIds' rules={[{ required: true, type: 'array', min: 1, message: '请选择角色' }]}>
-          <Select mode='multiple' placeholder='请选择角色' options={roleOptions} />
+          <Select mode='multiple' placeholder='请选择角色' loading={loadingRoles} options={roleOptions} />
         </Form.Item>
         <Form.Item label='备注' name='remark' className='mb-0'>
           <Input.TextArea rows={2} placeholder='请输入备注' />

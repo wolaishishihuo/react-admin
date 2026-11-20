@@ -65,7 +65,7 @@ const RoleFormModal = (props: RoleFormModalProps) => {
     if (!open) return;
     form.resetFields();
     form.setFieldsValue(current ?? emptyRole);
-  }, [open, current]);
+  }, [open, current, form]);
 
   return (
     <Modal

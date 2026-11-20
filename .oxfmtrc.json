@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 130,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "jsxSingleQuote": true,
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "sortImports": {
+    "newlinesBetween": true
+  },
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "public",
+    "coverage",
+    ".vitest",
+    ".local",
+    "stats.html",
+    "pnpm-lock.yaml",
+    "**/*.svg",
+    "**/*.sh"
+  ]
+}

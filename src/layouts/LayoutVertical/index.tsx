@@ -1,7 +1,5 @@
-import './index.less';
-
+import './index.css';
 import { Layout } from 'antd';
-import React from 'react';
 
 import logo from '@/assets/images/logo.png';
 import ToolBarLeft from '@/layouts/components/Header/ToolBarLeft';
@@ -15,7 +13,7 @@ const { Sider } = Layout;
 
 const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE;
 
-const LayoutVertical: React.FC = () => {
+const LayoutVertical = () => {
   const isCollapse = useGlobalStore(state => state.isCollapse);
 
   return (
@@ -29,10 +27,10 @@ const LayoutVertical: React.FC = () => {
       </Sider>
       <LayoutMain
         header={
-          <React.Fragment>
+          <>
             <ToolBarLeft />
             <ToolBarRight />
-          </React.Fragment>
+          </>
         }
       />
     </section>

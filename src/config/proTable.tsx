@@ -11,7 +11,7 @@ export const pagination: TablePaginationConfig = {
 type TableExpandIcon = NonNullable<NonNullable<TableProps['expandable']>['expandIcon']>;
 
 /** 树形 / 可展开表格：用箭头替代默认的加减号方框 */
-export const tableExpandIcon: TableExpandIcon = props => {
+const tableExpandIcon: TableExpandIcon = props => {
   const { prefixCls, expanded, expandable, record, onExpand } = props;
   const iconPrefix = `${prefixCls}-row-expand-icon`;
 

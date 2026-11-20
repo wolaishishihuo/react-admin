@@ -1,5 +1,4 @@
-import './index.less';
-
+import './index.css';
 import { Col, Row, Table, Tabs } from 'antd';
 
 import MetricChartCard from '@/components/Echarts/cards/MetricChartCard';

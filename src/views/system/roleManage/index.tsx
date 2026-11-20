@@ -6,11 +6,10 @@ import { type Key, useRef, useState } from 'react';
 import { ReqCreateRole, ReqRoleList, RoleItem } from '@/apis/interface';
 import {
   BUILTIN_ROLE_CODES,
-  fetchCreateRole,
-  fetchDeleteRole,
   fetchGetRoleList,
-  fetchUpdateRole,
-  getRoles
+  getRoles,
+  useDeleteRolesMutation,
+  useSaveRoleMutation
 } from '@/apis/modules/system';
 import AuthButton from '@/components/AuthButton';
 import { Icon } from '@/components/Icon';
@@ -26,10 +25,11 @@ import { getRoleColumns } from './config/columns';
 const RoleManage = () => {
   const actionRef = useRef<ActionType>(undefined);
   const [open, setOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState<RoleItem | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const { hasPerm } = useAuthButton();
+  const { mutateAsync: saveRole, isPending: saving } = useSaveRoleMutation();
+  const { mutateAsync: deleteRoles } = useDeleteRolesMutation();
 
   function reload() {
     setSelectedRowKeys([]);
@@ -43,16 +43,10 @@ const RoleManage = () => {
 
   async function handleSubmit(values: ReqCreateRole) {
     if (!hasPerm(current ? ROLE_PERMS.UPDATE : ROLE_PERMS.CREATE)) return;
-    setSaving(true);
-    try {
-      if (current) await fetchUpdateRole({ ...current, ...values });
-      else await fetchCreateRole(values);
-      setOpen(false);
-      message.success(current ? '编辑角色成功' : '新增角色成功');
-      reload();
-    } finally {
-      setSaving(false);
-    }
+    await saveRole(current ? { ...current, ...values } : values);
+    setOpen(false);
+    message.success(current ? '编辑角色成功' : '新增角色成功');
+    reload();
   }
 
   function handleDelete(ids: string[], names: string[]) {
@@ -68,7 +62,7 @@ const RoleManage = () => {
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        await Promise.all(ids.map(id => fetchDeleteRole(id)));
+        await deleteRoles(ids);
         message.success('删除成功');
         reload();
       }
@@ -77,7 +71,7 @@ const RoleManage = () => {
 
   async function handleToggleStatus(record: RoleItem, checked: boolean) {
     if (!hasPerm(ROLE_PERMS.UPDATE)) return;
-    await fetchUpdateRole({ ...record, status: checked ? 1 : 0 });
+    await saveRole({ ...record, status: checked ? 1 : 0 });
     reload();
   }
 

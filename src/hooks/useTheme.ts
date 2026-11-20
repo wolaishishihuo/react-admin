@@ -1,5 +1,6 @@
 import { theme } from 'antd';
 import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { chartPrimaryTokens } from '@/components/Echarts/theme';
 import { useGlobalStore } from '@/stores';
@@ -11,14 +12,11 @@ import { getDarkColor, getLightColor } from '@/utils/color';
 
 type ThemeType = 'light' | 'inverted' | 'dark';
 
-/**
- * @description  Use global theme settings hook
- */
 const useTheme = () => {
   const { token } = theme.useToken();
 
   const { isDark, primary, isGrey, isWeak, borderRadius, compactAlgorithm, siderInverted, headerInverted } = useGlobalStore(
-    state => ({
+    useShallow(state => ({
       isDark: state.isDark,
       primary: state.primary,
       isGrey: state.isGrey,
@@ -27,65 +25,36 @@ const useTheme = () => {
       compactAlgorithm: state.compactAlgorithm,
       siderInverted: state.siderInverted,
       headerInverted: state.headerInverted
-    })
+    }))
   );
 
-  /**
-   * @description Toggle dark mode
-   */
-  useEffect(() => switchDark(), [isDark]);
-  const switchDark = () => {
-    const html = document.documentElement;
-    html.setAttribute('class', isDark ? 'dark' : '');
-    changePrimary();
-  };
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [isDark]);
 
-  /**
-   * @description Toggle primary colors
-   */
-  useEffect(() => changePrimary(), [primary, borderRadius, compactAlgorithm]);
-  const changePrimary = () => {
+  useEffect(() => {
     const type: ThemeType = isDark ? 'dark' : 'light';
-    // custom less variable
     Object.entries(globalTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
-    // antd less variable
-    Object.entries(token).forEach(([key, val]) => setStyleProperty(`--hooks-${key}`, val));
-    // antd primaryColor less variable
+    Object.entries(token).forEach(([key, val]) => setStyleProperty(`--hooks-${key}`, String(val)));
     for (let i = 1; i <= 9; i++) {
-      setStyleProperty(
-        `--hooks-colorPrimary${i}`,
-        isDark ? `${getDarkColor(primary, i / 10)}` : `${getLightColor(primary, i / 10)}`
-      );
+      setStyleProperty(`--hooks-colorPrimary${i}`, isDark ? getDarkColor(primary, i / 10) : getLightColor(primary, i / 10));
     }
     Object.entries(chartPrimaryTokens(primary, isDark)).forEach(([key, val]) => setStyleProperty(key, val));
-  };
+  }, [isDark, primary, borderRadius, compactAlgorithm, token]);
 
-  /**
-   * @description Switch between gray and weak colors
-   */
-  useEffect(() => changeGreyOrWeak(), [isGrey, isWeak]);
-  const changeGreyOrWeak = () => {
-    const html = document.documentElement;
-    html.style.filter = isWeak ? 'invert(80%)' : isGrey ? 'grayscale(1)' : '';
-  };
+  useEffect(() => {
+    document.documentElement.style.filter = isWeak ? 'invert(80%)' : isGrey ? 'grayscale(1)' : '';
+  }, [isGrey, isWeak]);
 
-  /**
-   * @description Toggle sider theme
-   */
-  useEffect(() => changeSiderTheme(), [isDark, siderInverted]);
-  const changeSiderTheme = () => {
+  useEffect(() => {
     const type: ThemeType = isDark ? 'dark' : siderInverted ? 'inverted' : 'light';
     Object.entries(siderTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
-  };
+  }, [isDark, siderInverted]);
 
-  /**
-   * @description Toggle header theme
-   */
-  useEffect(() => changeHeaderTheme(), [isDark, headerInverted]);
-  const changeHeaderTheme = () => {
+  useEffect(() => {
     const type: ThemeType = isDark ? 'dark' : headerInverted ? 'inverted' : 'light';
     Object.entries(headerTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
-  };
+  }, [isDark, headerInverted]);
 };
 
 export default useTheme;

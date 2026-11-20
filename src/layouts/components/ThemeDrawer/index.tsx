@@ -1,13 +1,13 @@
-import './index.less';
-
+import './index.css';
 import { Divider, Drawer, InputNumber, Popover, Switch, Tooltip } from 'antd';
+import { useShallow } from 'zustand/react/shallow';
 
 import { Icon } from '@/components/Icon';
 import { useGlobalStore } from '@/stores';
 
 import ColorPicker from './components/ColorPicker';
 
-const ThemeDrawer: React.FC = () => {
+const ThemeDrawer = () => {
   const {
     layout,
     compactAlgorithm,
@@ -28,27 +28,29 @@ const ThemeDrawer: React.FC = () => {
     footer,
     themeDrawerVisible,
     setGlobalState
-  } = useGlobalStore(state => ({
-    layout: state.layout,
-    compactAlgorithm: state.compactAlgorithm,
-    borderRadius: state.borderRadius,
-    isDark: state.isDark,
-    isGrey: state.isGrey,
-    isWeak: state.isWeak,
-    isHappy: state.isHappy,
-    menuSplit: state.menuSplit,
-    siderInverted: state.siderInverted,
-    headerInverted: state.headerInverted,
-    isCollapse: state.isCollapse,
-    accordion: state.accordion,
-    watermark: state.watermark,
-    breadcrumb: state.breadcrumb,
-    tabs: state.tabs,
-    tabsIcon: state.tabsIcon,
-    footer: state.footer,
-    themeDrawerVisible: state.themeDrawerVisible,
-    setGlobalState: state.setGlobalState
-  }));
+  } = useGlobalStore(
+    useShallow(state => ({
+      layout: state.layout,
+      compactAlgorithm: state.compactAlgorithm,
+      borderRadius: state.borderRadius,
+      isDark: state.isDark,
+      isGrey: state.isGrey,
+      isWeak: state.isWeak,
+      isHappy: state.isHappy,
+      menuSplit: state.menuSplit,
+      siderInverted: state.siderInverted,
+      headerInverted: state.headerInverted,
+      isCollapse: state.isCollapse,
+      accordion: state.accordion,
+      watermark: state.watermark,
+      breadcrumb: state.breadcrumb,
+      tabs: state.tabs,
+      tabsIcon: state.tabsIcon,
+      footer: state.footer,
+      themeDrawerVisible: state.themeDrawerVisible,
+      setGlobalState: state.setGlobalState
+    }))
+  );
 
   return (
     <Drawer
@@ -69,7 +71,7 @@ const ThemeDrawer: React.FC = () => {
       <div className='layout-box'>
         <Tooltip placement='top' title='纵向' arrow={true} mouseEnterDelay={0.2}>
           <div
-            className={`layout-item layout-vertical mb22 ${layout === 'vertical' && 'layout-active'}`}
+            className={`layout-item layout-vertical mb-22px ${layout === 'vertical' && 'layout-active'}`}
             onClick={() => setGlobalState('layout', 'vertical')}
           >
             <div className='layout-dark'></div>
@@ -82,7 +84,7 @@ const ThemeDrawer: React.FC = () => {
         </Tooltip>
         <Tooltip placement='top' title='经典' arrow={true} mouseEnterDelay={0.2}>
           <div
-            className={`layout-item layout-classic mb22 ${layout === 'classic' && 'layout-active'}`}
+            className={`layout-item layout-classic mb-22px ${layout === 'classic' && 'layout-active'}`}
             onClick={() => setGlobalState('layout', 'classic')}
           >
             <div className='layout-dark'></div>
@@ -115,7 +117,7 @@ const ThemeDrawer: React.FC = () => {
           </div>
         </Tooltip>
       </div>
-      <div className='theme-item mt30'>
+      <div className='theme-item mt-30px'>
         <span>
           菜单分割
           <Tooltip title='经典模式下生效'>
@@ -133,7 +135,7 @@ const ThemeDrawer: React.FC = () => {
         </span>
         <Switch checked={siderInverted} onChange={value => setGlobalState('siderInverted', value)} />
       </div>
-      <div className='theme-item mb35'>
+      <div className='theme-item mb-35px'>
         <span>
           头部反转色
           <Tooltip title='头部颜色变为深色模式'>
@@ -191,7 +193,7 @@ const ThemeDrawer: React.FC = () => {
         <span>紧凑主题</span>
         <Switch checked={compactAlgorithm} onChange={value => setGlobalState('compactAlgorithm', value)} />
       </div>
-      <div className='theme-item mb35'>
+      <div className='theme-item mb-35px'>
         <span>圆角大小</span>
         <InputNumber
           min={1}

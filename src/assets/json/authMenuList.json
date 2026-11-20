@@ -58,10 +58,10 @@
           }
         },
         {
-          "path": "/system/menuMange",
-          "element": "/system/menuMange/index",
+          "path": "/system/menuManage",
+          "element": "/system/menuManage/index",
           "meta": {
-            "key": "menuMange",
+            "key": "menuManage",
             "icon": "ri:apps-2-line",
             "title": "菜单管理",
             "isLink": "",

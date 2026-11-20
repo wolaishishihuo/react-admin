@@ -1,7 +1,8 @@
-import './index.less';
-
+import './index.css';
 import { useDebounceFn } from 'ahooks';
-import React, { useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import KeepAliveOutlet from '@/components/KeepAlive';
 import LayoutFooter from '@/layouts/components/Footer';
@@ -11,15 +12,19 @@ import { useGlobalStore } from '@/stores';
 import Maximize from './components/Maximize';
 
 interface LayoutMainProps {
-  header?: React.ReactNode;
+  /** 顶部栏内容 */
+  header?: ReactNode;
 }
 
-const LayoutMain: React.FC<LayoutMainProps> = ({ header }) => {
-  const { maximize, isCollapse, setGlobalState } = useGlobalStore(state => ({
-    maximize: state.maximize,
-    isCollapse: state.isCollapse,
-    setGlobalState: state.setGlobalState
-  }));
+const LayoutMain = (props: LayoutMainProps) => {
+  const { header } = props;
+  const { maximize, isCollapse, setGlobalState } = useGlobalStore(
+    useShallow(state => ({
+      maximize: state.maximize,
+      isCollapse: state.isCollapse,
+      setGlobalState: state.setGlobalState
+    }))
+  );
 
   const { run } = useDebounceFn(
     () => {
@@ -32,7 +37,7 @@ const LayoutMain: React.FC<LayoutMainProps> = ({ header }) => {
   useEffect(() => {
     window.addEventListener('resize', run, false);
     return () => window.removeEventListener('resize', run);
-  }, []);
+  }, [run]);
 
   useEffect(() => {
     const root = document.getElementById('root') as HTMLElement;

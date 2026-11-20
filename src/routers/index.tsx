@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, createHashRouter, RouteObject, RouterProvider as Router } from 'react-router-dom';
 
 import NotFound from '@/components/Error/404';
@@ -39,25 +40,35 @@ const createAppRouter = (routerList: RouteObject[]) => {
 /**
  * @description Route file entry
  */
-const RouterProvider: React.FC = () => {
+const RouterProvider = () => {
   // useTheme && useMessage
   useTheme();
   useMessage();
 
+  const client = useQueryClient();
   const { initPermissions } = usePermissions();
 
   const token = useUserStore(state => state.token);
   const authMenuList = useAuthStore(state => state.authMenuList);
   const [pathname, setPathname] = useState(getLocationPath);
+  const prevTokenRef = useRef(token);
 
   useEffect(() => {
     if (token && !authMenuList.length) {
       initPermissions(token);
     }
-  }, [authMenuList, token]);
+  }, [authMenuList.length, initPermissions, token]);
+
+  // Clear Query cache only after token transitions to empty and protected pages have unmounted
+  useEffect(() => {
+    if (prevTokenRef.current && !token) {
+      client.clear();
+    }
+    prevTokenRef.current = token;
+  }, [client, token]);
 
   // Keep the static router while still on /login so hydrating menus does not remount the login page
-  const useFullRouter = authMenuList.length > 0 && pathname !== LOGIN_URL;
+  const useFullRouter = Boolean(token) && authMenuList.length > 0 && pathname !== LOGIN_URL;
 
   const routerList = useMemo(() => {
     if (!useFullRouter) return wrappedStaticRouter;

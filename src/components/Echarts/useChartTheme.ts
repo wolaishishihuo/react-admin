@@ -25,6 +25,7 @@ const useChartTheme = () => {
 /** `deps` 列出 option 真正依赖的入参。create 跟着这些值变，避免每次渲染都 setOption。 */
 export function useThemedOption(create: (theme: ChartTheme) => ECOption, deps: DependencyList) {
   const theme = useChartTheme();
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- 通用主题封装由调用方通过 deps 声明真实依赖，create 为内联工厂
   return useMemo(() => create(theme), [theme, ...deps]);
 }
 

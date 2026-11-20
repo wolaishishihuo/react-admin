@@ -1,12 +1,11 @@
-import './index.less';
-
+import './index.css';
 import loginIllustration from '@/assets/images/login_illustration.svg';
 import logo from '@/assets/images/logo.png';
 import SwitchDark from '@/components/SwitchDark';
 
 import LoginForm from './components/LoginForm';
 
-const Login: React.FC = () => {
+const Login = () => {
   return (
     <div className='login-container'>
       <div className='login-content'>

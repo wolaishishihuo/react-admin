@@ -1,25 +1,10 @@
-import { readFileSync } from 'node:fs';
-
-import dayjs from 'dayjs';
 import { resolve } from 'path';
+
 import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite';
 
 import { wrapperEnv } from './build/getEnv.ts';
 import { createVitePlugins } from './build/plugins.ts';
 import { createProxy } from './build/proxy.ts';
-
-const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, 'package.json'), 'utf-8')) as {
-  name: string;
-  version: string;
-  dependencies: Record<string, string>;
-  devDependencies: Record<string, string>;
-};
-
-const { dependencies, devDependencies, name, version } = pkg;
-const __APP_INFO__ = {
-  pkg: { dependencies, devDependencies, name, version },
-  lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-};
 
 // @see: https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -35,8 +20,8 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         '@': resolve(import.meta.dirname, './src')
       }
     },
-    define: {
-      __APP_INFO__: JSON.stringify(__APP_INFO__)
+    css: {
+      transformer: 'lightningcss'
     },
     server: {
       host: '0.0.0.0',

@@ -1,100 +1,70 @@
 {
   "editor.formatOnSave": true,
-  "prettier.prettierPath": "./node_modules/prettier",
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit"
+    "source.fixAll.oxc": "explicit",
+    "source.organizeImports": "never"
   },
-  "stylelint.enable": true,
-  "stylelint.validate": ["css", "less", "postcss", "scss", "sass", "html"],
-  "files.eol": "\n",
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
-  "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
-  "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
   "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
-  "[less]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[html]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
   },
+  "oxc.enable": true,
+  "oxc.enable.oxlint": true,
+  "oxc.enable.oxfmt": true,
+  "prettier.enable": false,
+  "files.eol": "\n",
   "cSpell.words": [
-    "acroutes",
-    "adcode",
     "ahooks",
-    "alicdn",
-    "AMAP",
     "antd",
     "anticon",
     "apifox",
-    "Appstore",
-    "Biao",
-    "breakline",
     "brotli",
     "commitlint",
-    "contentleft",
-    "contentright",
     "countup",
-    "curveness",
-    "Dingding",
-    "doclock",
-    "easymock",
     "echarts",
-    "esbuild",
-    "fangda",
-    "fastmock",
-    "geeker",
-    "Gitee",
-    "hexs",
     "hoverable",
-    "Iconfont",
-    "juejin",
-    "liquidfill",
-    "loglevel",
-    "metas",
-    "njsproj",
     "nprogress",
-    "ntvs",
-    "openapi",
-    "persistor",
+    "oxfmt",
+    "oxlint",
     "Popconfirm",
-    "Prefixs",
-    "reduxjs",
-    "screenfull",
     "Sider",
-    "sortablejs",
-    "sousuo",
-    "styl",
-    "stylelint",
-    "suoxiao",
-    "truetype",
-    "tuichu",
     "unocss",
     "UnoCSS",
     "VITE",
-    "xiala",
-    "xiao",
-    "xiaoxi",
-    "zhongyingwen",
-    "zhuti",
-    "zlevel",
     "Zustand"
   ]
 }

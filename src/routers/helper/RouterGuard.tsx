@@ -1,27 +1,27 @@
-import React, { useEffect } from 'react';
-import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+import { Navigate, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
 import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config';
 import { MetaProps } from '@/routers/interface';
 import { useAuthStore, useUserStore } from '@/stores';
 
-/**
- * @description Route guard component
- */
 interface RouterGuardProps {
-  children: React.ReactNode;
+  /** 受路由守卫保护的子节点 */
+  children: ReactNode;
 }
 
-const RouterGuard: React.FC<RouterGuardProps> = props => {
+const RouterGuard = (props: RouterGuardProps) => {
+  const { children } = props;
   const loader = useLoaderData();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Mount navigate to provide non-React function components or calls in custom React Hook functions
-  window.$navigate = navigate;
-
   const token = useUserStore(state => state.token);
   const authMenuList = useAuthStore(state => state.authMenuList);
+
+  // Mount navigate to provide non-React function components or calls in custom React Hook functions
+  window.$navigate = navigate;
 
   useEffect(() => {
     const meta = loader as MetaProps;
@@ -29,26 +29,22 @@ const RouterGuard: React.FC<RouterGuardProps> = props => {
       const title = import.meta.env.VITE_GLOB_APP_TITLE;
       document.title = meta?.title ? `${meta.title} - ${title}` : title;
     }
+  }, [loader]);
 
-    // Routing whitelist
-    if (ROUTER_WHITE_LIST.includes(pathname)) return;
+  const isWhiteListed = ROUTER_WHITE_LIST.includes(pathname);
+  const isLoginPage = pathname === LOGIN_URL;
 
-    // Whether login page
-    const isLoginPage = pathname === LOGIN_URL;
-
-    // If there is menu data, token, or login on the accessed page, redirect to the home page
-    if (authMenuList.length && token && isLoginPage) {
-      navigate(HOME_URL, { replace: true });
-      return;
+  if (!isWhiteListed) {
+    if (token && authMenuList.length > 0 && isLoginPage) {
+      return <Navigate to={HOME_URL} replace />;
     }
 
-    // If there is not menu data, no token && the accessed page is not login, redirect to the login page
-    if ((!token && !isLoginPage) || (!authMenuList.length && !token && !isLoginPage)) {
-      navigate(LOGIN_URL, { replace: true });
+    if (!token && !isLoginPage) {
+      return <Navigate to={LOGIN_URL} replace />;
     }
-  }, [loader, pathname, token, authMenuList, navigate]);
+  }
 
-  return props.children;
+  return children;
 };
 
 export default RouterGuard;

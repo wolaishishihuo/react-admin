@@ -1,0 +1,119 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "react", "import", "oxc", "vitest"],
+  "jsPlugins": ["@unocss/eslint-plugin"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "dist",
+    "coverage",
+    ".vitest",
+    "node_modules",
+    "public",
+    "stats.html",
+    "*.sh",
+    ".vscode",
+    ".husky",
+    ".local"
+  ],
+  "rules": {
+    "unocss/order": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "caughtErrors": "none",
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "typescript/no-explicit-any": "error",
+    "typescript/ban-ts-comment": "error",
+    "typescript/prefer-ts-expect-error": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/jsx-key": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/refs": "off",
+    "react/immutability": "off",
+    "react/use-memo": "off",
+    "react/set-state-in-effect": "off",
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/require-to-throw-message": "off",
+    "import/no-duplicates": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@ant-design/icons",
+            "message": "图标只用 Remix Icon：<Icon icon=\"ri:xxx\" />（@/components/Icon）"
+          },
+          {
+            "name": "axios",
+            "message": "业务代码禁止直接 import axios，请经由 src/apis/modules/<module> 发起请求"
+          },
+          {
+            "name": "antd",
+            "importNames": ["message", "notification"],
+            "message": "请从 @/hooks/useMessage 导入 message / notification，避免脱离 ConfigProvider"
+          }
+        ],
+        "patterns": [
+          {
+            "group": ["@iconify/react", "@iconify/react/*"],
+            "message": "不要直接引 Iconify，请使用 <Icon icon=\"ri:xxx\" />（@/components/Icon）"
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/components/Icon/index.tsx", "src/assets/icons/register.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["src/apis/http/**", "src/apis/query/**", "src/apis/modules/**/api.ts", "tests/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@ant-design/icons",
+                "message": "图标只用 Remix Icon：<Icon icon=\"ri:xxx\" />（@/components/Icon）"
+              },
+              {
+                "name": "antd",
+                "importNames": ["message", "notification"],
+                "message": "请从 @/hooks/useMessage 导入 message / notification，避免脱离 ConfigProvider"
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@iconify/react", "@iconify/react/*"],
+                "message": "不要直接引 Iconify，请使用 <Icon icon=\"ri:xxx\" />（@/components/Icon）"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["tests/**"],
+      "rules": {
+        "react/jsx-key": "off"
+      }
+    }
+  ]
+}

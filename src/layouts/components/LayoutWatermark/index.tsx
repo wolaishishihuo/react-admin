@@ -1,7 +1,12 @@
 import { Watermark } from 'antd';
-import React from 'react';
+import type { ReactNode } from 'react';
 
 import { useGlobalStore } from '@/stores';
+
+interface LayoutWatermarkProps {
+  /** 受水印包裹的布局内容 */
+  children: ReactNode;
+}
 
 const WATERMARK_CONTENT = ['React Admin', 'wolaishishihuo'];
 
@@ -10,7 +15,8 @@ const WATERMARK_CONTENT = ['React Admin', 'wolaishishihuo'];
  * (`drawImage` on a 0×0 canvas). Skip the component when the watermark is off,
  * and pin mark size so measureText cannot produce a zero canvas.
  */
-const LayoutWatermark: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const LayoutWatermark = (props: LayoutWatermarkProps) => {
+  const { children } = props;
   const watermark = useGlobalStore(state => state.watermark);
 
   if (!watermark) {

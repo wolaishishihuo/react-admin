@@ -1,9 +1,10 @@
-import './index.less';
-
+import './index.css';
 import { useUpdateEffect } from 'ahooks';
 import { Dropdown } from 'antd';
-import React, { useContext, useEffect, useRef } from 'react';
+import type { MouseEvent } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
+import { useShallow } from 'zustand/react/shallow';
 
 import { Icon } from '@/components/Icon';
 import { HOME_URL } from '@/config';
@@ -13,7 +14,7 @@ import { useAuthStore, useGlobalStore, useTabsStore } from '@/stores';
 
 import { buildTabMenuItems } from './tabMenu';
 
-const LayoutTabs: React.FC = () => {
+const LayoutTabs = () => {
   const matches = useMatches();
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,24 +22,26 @@ const LayoutTabs: React.FC = () => {
   const path = location.pathname + location.search;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { tabs, tabsIcon } = useGlobalStore(state => ({
-    tabs: state.tabs,
-    tabsIcon: state.tabsIcon
-  }));
+  const { tabs, tabsIcon } = useGlobalStore(
+    useShallow(state => ({
+      tabs: state.tabs,
+      tabsIcon: state.tabsIcon
+    }))
+  );
   const setGlobalState = useGlobalStore(state => state.setGlobalState);
-  const { tabsList, addTab, removeTab, closeTabsOnSide, closeMultipleTab } = useTabsStore(state => ({
-    tabsList: state.tabsList,
-    addTab: state.addTab,
-    removeTab: state.removeTab,
-    closeTabsOnSide: state.closeTabsOnSide,
-    closeMultipleTab: state.closeMultipleTab
-  }));
+  const { tabsList, addTab, removeTab, closeTabsOnSide, closeMultipleTab } = useTabsStore(
+    useShallow(state => ({
+      tabsList: state.tabsList,
+      addTab: state.addTab,
+      removeTab: state.removeTab,
+      closeTabsOnSide: state.closeTabsOnSide,
+      closeMultipleTab: state.closeMultipleTab
+    }))
+  );
   const flatMenuList = useAuthStore(state => state.flatMenuList);
   const { refresh } = useContext(RefreshContext);
 
-  useEffect(() => initTabs(), []);
-
-  const initTabs = () => {
+  useEffect(() => {
     flatMenuList.forEach(item => {
       if (item.meta?.isAffix && !item.meta.isHide && !item.meta.isFull) {
         addTab({
@@ -49,7 +52,7 @@ const LayoutTabs: React.FC = () => {
         });
       }
     });
-  };
+  }, [flatMenuList, addTab]);
 
   useUpdateEffect(() => {
     const meta = matches[matches.length - 1].data as MetaProps & { redirect: boolean };
@@ -82,11 +85,16 @@ const LayoutTabs: React.FC = () => {
     active?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
   }, [path, tabsList]);
 
+  function removeAndNavigate(tabPath: string) {
+    const nextPath = removeTab(tabPath, tabPath === path);
+    if (nextPath) navigate(nextPath);
+  }
+
   const handlers = {
     currentPath: path,
     refresh,
     maximize: () => setGlobalState('maximize', true),
-    closeCurrent: (tabPath: string) => removeTab(tabPath, tabPath === path),
+    closeCurrent: removeAndNavigate,
     closeLeft: (tabPath: string) => closeTabsOnSide(tabPath, 'left'),
     closeRight: (tabPath: string) => closeTabsOnSide(tabPath, 'right'),
     closeOther: (tabPath: string) => closeMultipleTab(tabPath),
@@ -96,11 +104,11 @@ const LayoutTabs: React.FC = () => {
     }
   };
 
-  const closeTab = (event: React.MouseEvent, tabPath: string, closable: boolean) => {
+  function closeTab(event: MouseEvent, tabPath: string, closable: boolean) {
     event.stopPropagation();
     if (!closable) return;
-    removeTab(tabPath, tabPath === path);
-  };
+    removeAndNavigate(tabPath);
+  }
 
   if (!tabs) return null;
 

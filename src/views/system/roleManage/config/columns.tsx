@@ -8,7 +8,7 @@ import { Icon } from '@/components/Icon';
 
 import { ROLE_PERMS, STATUS_ENUM } from '../../constants';
 
-export interface RoleColumnHandlers {
+interface RoleColumnHandlers {
   canUpdate: boolean;
   onEdit: (record: RoleItem) => void;
   onDelete: (ids: string[], names: string[]) => void;

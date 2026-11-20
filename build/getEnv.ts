@@ -1,48 +1,22 @@
-import path from 'path';
-
-export function isDevFn(mode: string): boolean {
-  return mode === 'development';
-}
-
-export function isProdFn(mode: string): boolean {
-  return mode === 'production';
-}
-
-export function isTestFn(mode: string): boolean {
-  return mode === 'test';
-}
-
-/**
- * Whether to generate package preview
- */
-export function isReportMode(): boolean {
-  return process.env.VITE_REPORT === 'true';
-}
-
-// Read all environment variable configuration files to process.env
-export function wrapperEnv(envConf: Recordable): ViteEnv {
-  const ret: any = {};
+/** 将 Vite loadEnv 读取的字符串映射解析为带类型的 ViteEnv */
+export function wrapperEnv(envConf: Record<string, string>): ViteEnv {
+  const ret: Record<string, unknown> = {};
 
   for (const envName of Object.keys(envConf)) {
-    let realName = envConf[envName].replace(/\\n/g, '\n');
-    realName = realName === 'true' ? true : realName === 'false' ? false : realName;
-    if (envName === 'VITE_PORT') realName = Number(realName);
-    if (envName === 'VITE_PROXY') {
+    let realValue: unknown = envConf[envName].replace(/\\n/g, '\n');
+    if (realValue === 'true') realValue = true;
+    else if (realValue === 'false') realValue = false;
+
+    if (envName === 'VITE_PORT') realValue = Number(realValue);
+    if (envName === 'VITE_PROXY' && typeof realValue === 'string') {
       try {
-        realName = JSON.parse(realName);
+        realValue = JSON.parse(realValue);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
-    ret[envName] = realName;
+    ret[envName] = realValue;
   }
-  return ret;
-}
 
-/**
- * Get user root directory
- * @param dir file path
- */
-export function getRootPath(...dir: string[]) {
-  return path.resolve(process.cwd(), ...dir);
+  return ret as unknown as ViteEnv;
 }
