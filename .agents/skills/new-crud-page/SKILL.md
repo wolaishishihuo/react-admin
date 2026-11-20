@@ -22,7 +22,7 @@ description: >-
 
 1. **确认范围与契约**
    - 明确 `<domain>`、`<page>`（camelCase，如 `system/orderManage`）、列表字段、表单字段、按钮权限码与接口来源（真实接口 vs 临时 mock）。
-   - 检查 `src/apis/modules/login/api.ts` 的 `fetchGetAuthMenuList` 与 `src/hooks/usePermissions.ts`，确认菜单来自本地 JSON 还是后端。
+   - 检查 `src/apis/modules/login/api.ts` 的 `fetchGetAuthMenuList`，确认菜单来自本地 JSON 还是后端。
 
 2. **创建类型与 API 模块**
    - 在 `src/apis/interface/` 新增 `Req*` / `Res*` 类型（按领域分文件或补入对应文件）。
@@ -45,7 +45,7 @@ description: >-
 
 4. **接入菜单与路由**
    - 菜单 `element` 必须形如 `/<domain>/<page>/index`（前导 `/`、以 `/index` 结尾）；`ConvertRouter` 只匹配 `src/views/**/index.tsx`。
-   - 仅当项目仍在用本地 `src/assets/json/authMenuList.json` 时同步更新 JSON 及 `usePermissions` 演示白名单；如已切后端菜单，不改演示 JSON，也不虚构后端配置。
+   - 仅当项目仍在用本地 `src/assets/json/authMenuList.json` 时同步更新该 JSON；如已切后端菜单，不改演示 JSON，也不虚构后端配置。
 
 5. **验证与交付**
    - 按顺序执行并报告实际结果：

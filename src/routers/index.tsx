@@ -8,11 +8,11 @@ import { Loading } from '@/components/Loading';
 import { LOGIN_URL } from '@/config';
 import { RouterModeEnum } from '@/constants';
 import useMessage from '@/hooks/useMessage';
-import usePermissions from '@/hooks/usePermissions';
 import useTheme from '@/hooks/useTheme';
 import { useAuthStore, useUserStore } from '@/stores';
 
 import { convertToDynamicRouterFormat } from './helper/ConvertRouter';
+import { initPermissions } from './helper/initPermissions';
 import RouterGuard from './helper/RouterGuard';
 import { wrappedStaticRouter } from './modules/staticRouter';
 
@@ -48,7 +48,6 @@ const RouterProvider = () => {
   useMessage();
 
   const client = useQueryClient();
-  const { initPermissions } = usePermissions();
 
   const token = useUserStore(state => state.token);
   const authMenuList = useAuthStore(state => state.authMenuList);
@@ -59,7 +58,7 @@ const RouterProvider = () => {
     if (token && !authMenuList.length) {
       initPermissions(token).catch(() => {});
     }
-  }, [authMenuList.length, initPermissions, token]);
+  }, [authMenuList.length, token]);
 
   // Clear Query cache only after token transitions to empty and protected pages have unmounted
   useEffect(() => {

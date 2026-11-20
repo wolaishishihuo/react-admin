@@ -62,7 +62,7 @@ pnpm build:pro      # 生产构建
 
 - **组件归属**：页面私有 → `src/views/<domain>/<page>/components/`；同领域复用 → `src/views/<domain>/components/`；跨领域通用 → `src/components/`。`src/views/template/` 为可删演示页，业务代码禁止引用。
 - **Hooks 与配置**：API 数据 hooks → `src/apis/modules/<module>/hooks.ts`；通用交互 hooks → `src/hooks/`；较完整的列配置等 → 页面 `config/`（依赖权限/回调时导出工厂函数显式传参）；跨领域常量才放 `src/constants/`。
-- **命名**：页面目录 camelCase（`accountManage`），通用组件目录 PascalCase（`AuthButton`），hook 文件 camelCase（`usePermissions.ts`），请求/响应类型放 `src/apis/interface/` 并带 `Req` / `Res` 前缀。
+- **命名**：页面目录 camelCase（`accountManage`），通用组件目录 PascalCase（`AuthButton`），hook 文件 camelCase（`useAuthButton.ts`），请求/响应类型放 `src/apis/interface/` 并带 `Req` / `Res` 前缀。
 - **环境变量**：新增环境变量同步 `src/typings/global.d.ts` 的 `ViteEnv` 及 `build/getEnv.ts`。
 
 ## 数据与状态归属
@@ -70,7 +70,7 @@ pnpm build:pro      # 生产构建
 **同一视图的同一数据源由一套机制管理请求和刷新；跨页面使用 ≠ 放 Zustand。**
 
 1. **UI 状态**：单组件用 `useState`，同页共享提升到父组件，仅跨页持续 UI 进 Zustand（瞬态字段如抽屉开关通过 `partialize` 排除持久化）。`Tabs` 与 `KeepAlive` 默认按完整 `pathname + search` 隔离页签与缓存，普通列表筛选/分页依托组件状态与 KeepAlive 保留即可，仅在确需多开独立页签或链接分享时使用 URL 参数。
-2. **启动期权限与凭证**：保持 `usePermissions` → `authStore` / `userStore`（供路由同步使用）。
+2. **启动期权限与凭证**：保持 `initPermissions`（`src/routers/helper/initPermissions.ts`）→ `authStore` / `userStore`（供路由同步使用）。
 3. **ProTable 列表**：默认 `request` 调 `fetchXxx` + `formatDataForProTable`，用 `actionRef.reload()` 刷新，**不再套 Query**。
 4. **普通服务端展示数据**：默认 TanStack Query（细则见 `src/apis/README.md`），禁用 `useEffect + fetch + setState`；一次性命令（登录/登出/导出）直接 `await fetchXxx`。
 5. **写操作**：简单提交直接 `await fetchXxx`；需复用生命周期或联动 Query 失效时用 `useXxxMutation`。
@@ -80,7 +80,7 @@ pnpm build:pro      # 生产构建
 
 ## 路由、权限与公共组件
 
-- **新增页面**：建 `src/views/<domain>/<page>/index.tsx`（**必须 `default export`**，已由 `ConvertRouter` 按 `**/index.tsx` 自动懒加载分包，勿手写 `React.lazy`）。菜单 `element` 形如 `/system/accountManage/index`；查 `fetchGetAuthMenuList` 与 `usePermissions` 确认实际菜单来源，已接后端时移除模板白名单过滤。固定基础页放 `src/routers/modules/staticRouter.tsx`，业务全屏页沿用菜单 `meta.isFull`，按需开启 `meta.isKeepAlive`。
+- **新增页面**：建 `src/views/<domain>/<page>/index.tsx`（**必须 `default export`**，已由 `ConvertRouter` 按 `**/index.tsx` 自动懒加载分包，勿手写 `React.lazy`）。菜单 `element` 形如 `/system/accountManage/index`；查 `fetchGetAuthMenuList` 确认菜单来自本地 JSON 还是后端。固定基础页放 `src/routers/modules/staticRouter.tsx`，业务全屏页沿用菜单 `meta.isFull`，按需开启 `meta.isKeepAlive`。
 - **按钮权限**：唯一来源 `fetchGetCurrentUser().buttons` → `authStore.authButtons`，不从菜单或角色名二次推导。显隐用 `<AuthButton authority='code'>`（只包入口按钮，不包弹窗），逻辑判断用 `useAuthButton().hasPerm(code)`。
 - **图标与图表**：业务图标统一 `<Icon icon='ri:xxx' />`（`@/components/Icon`）；标准图表用 `@/components/Echarts/charts`，自定义图表仍走公共容器与 `useChartTheme`（细则见 `src/components/Echarts/README.md`）。
 

@@ -8,7 +8,7 @@ import { fetchLogin } from '@/apis/modules/login';
 import { Icon } from '@/components/Icon';
 import { HOME_URL } from '@/config';
 import { message, notification } from '@/hooks/useMessage';
-import usePermissions from '@/hooks/usePermissions';
+import { initPermissions } from '@/routers/helper/initPermissions';
 import { useTabsStore, useUserStore } from '@/stores';
 import { getTimeState } from '@/utils';
 
@@ -20,7 +20,6 @@ const LoginForm = () => {
   const setToken = useUserStore(state => state.setToken);
   const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setTabsList = useTabsStore(state => state.setTabsList);
-  const { initPermissions } = usePermissions();
 
   const [loading, setLoading] = useState(false);
 

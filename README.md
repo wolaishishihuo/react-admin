@@ -27,4 +27,4 @@ React Admin 一款基于 React 19、React-Router v7、TanStack Query v5、Zustan
 
 1. **删除演示页 `src/views/template/`**：删除该目录后，同步从 `src/assets/json/authMenuList.json` 移除 `template` 菜单（若仍使用 `system` mock 单测，同步更新对应菜单树断言）。
 2. **删除示例管理模块 `src/views/system/`**：连同 `src/apis/modules/system/`、`tests/apis/modules/system/` 一起删除即可，无其他页面依赖。
-3. **接入真实后端菜单与权限**：替换 `src/apis/modules/login/api.ts`（`fetchGetAuthMenuList`）与 `src/apis/modules/user/api.ts`（`fetchGetCurrentUser`），并移除 `src/hooks/usePermissions.ts` 中的模板菜单白名单过滤；若更改首页路径，同步更新 `src/config/index.ts` 的 `HOME_URL`。
+3. **接入真实后端菜单与权限**：替换 `src/apis/modules/login/api.ts`（`fetchGetAuthMenuList`）与 `src/apis/modules/user/api.ts`（`fetchGetCurrentUser`）即可，路由与权限会自动同步；若更改首页路径，同步更新 `src/config/index.ts` 的 `HOME_URL`。

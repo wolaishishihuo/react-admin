@@ -20,7 +20,7 @@ vi.mock('@/hooks/useMessage', () => ({
   }
 }));
 
-import usePermissions from '@/hooks/usePermissions';
+import { initPermissions } from '@/routers/helper/initPermissions';
 import { useAuthStore, useUserStore } from '@/stores';
 
 function deferred<T>() {
@@ -33,11 +33,40 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-describe('usePermissions session race safety', () => {
+describe('initPermissions', () => {
   afterEach(() => {
     useUserStore.setState({ token: '', refreshToken: '', userInfo: { name: '' } });
     useAuthStore.setState({ authMenuList: [], showMenuList: [], flatMenuList: [], authButtons: [] });
     vi.clearAllMocks();
+  });
+
+  it('stores all returned backend menus without hardcoded template whitelist filtering', async () => {
+    mockGetCurrentUser.mockResolvedValueOnce({ name: 'alice', buttons: ['order:create'] });
+    mockGetAuthMenuList.mockResolvedValueOnce([
+      { path: '/order/list', meta: { key: 'order', title: '订单管理' } },
+      { path: '/fleet/overview', meta: { title: '车队概览' } }
+    ]);
+
+    useUserStore.setState({ token: 'token-1', refreshToken: 'refresh-1' });
+    await initPermissions('token-1');
+
+    expect(useUserStore.getState().userInfo.name).toBe('alice');
+    expect(useAuthStore.getState().authButtons).toEqual(['order:create']);
+    expect(useAuthStore.getState().authMenuList.map(item => item.path)).toEqual(['/order/list', '/fleet/overview']);
+  });
+
+  it('resets auth state and rejects when menu list is empty', async () => {
+    mockGetCurrentUser.mockResolvedValueOnce({ name: 'empty-user', buttons: ['any'] });
+    mockGetAuthMenuList.mockResolvedValueOnce([]);
+
+    useUserStore.setState({ token: 'token-empty', refreshToken: 'refresh-empty' });
+    await expect(initPermissions('token-empty')).rejects.toThrow('No permission');
+
+    expect(mockNotifyWarning).toHaveBeenCalledOnce();
+    expect(useUserStore.getState().token).toBe('');
+    expect(useUserStore.getState().userInfo.name).toBe('');
+    expect(useAuthStore.getState().authButtons).toEqual([]);
+    expect(useAuthStore.getState().authMenuList).toEqual([]);
   });
 
   it('discards stale permission responses when account switches mid-flight', async () => {
@@ -48,14 +77,11 @@ describe('usePermissions session race safety', () => {
     mockGetAuthMenuList.mockReturnValueOnce(menuReqA.promise);
 
     useUserStore.setState({ token: 'token-A', refreshToken: 'refresh-A', userInfo: { name: '' } });
-    const { initPermissions } = usePermissions();
     const pendingA = initPermissions('token-A');
 
-    // Mid-flight account switch to B
     useUserStore.setState({ token: 'token-B', refreshToken: 'refresh-B', userInfo: { name: 'user-B' } });
     useAuthStore.getState().setAuthButtons(['b:only']);
 
-    // Stale A resolves after switch
     userReqA.resolve({ name: 'user-A', buttons: ['a:stale'] });
     menuReqA.resolve([{ path: '/home/index', meta: { key: 'home', title: '首页' } }]);
     await pendingA;
@@ -73,7 +99,6 @@ describe('usePermissions session race safety', () => {
     mockGetAuthMenuList.mockReturnValueOnce(menuReqA.promise);
 
     useUserStore.setState({ token: 'token-A', refreshToken: 'refresh-A' });
-    const { initPermissions } = usePermissions();
     const pendingA = initPermissions('token-A');
 
     useUserStore.setState({ token: 'token-B', refreshToken: 'refresh-B', userInfo: { name: 'user-B' } });
