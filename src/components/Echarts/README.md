@@ -54,4 +54,4 @@ import { BarChart, KLineChart, LineChart, MapChart } from '@/components/Echarts/
 
 自动回归：`pnpm exec vitest run tests/components/Echarts`。覆盖真实 ECharts 的系列删除、面积和堆叠切换、图例选择与用户缩放保留，以及组件的零值、空态、错误、容器 resize、回调更新和 Activity / StrictMode 清理。负数范围、大数组、配色覆盖、面积开关与透明度、首次动画和地图标记也有回归用例。
 
-类型检查：`pnpm type:check`；修改代码后针对受影响文件执行 ESLint；调整引擎注册或资源集成时执行 `pnpm build:pro`。视觉与动画仍需在浏览器核查，单元测试不证明像素一致或动画全过程一致。
+类型检查：`pnpm type:check`；修改代码后针对受影响文件执行 `pnpm exec oxlint <文件...>`；调整引擎注册或资源集成时执行 `pnpm build:pro`。视觉与动画仍需在浏览器核查，单元测试不证明像素一致或动画全过程一致。
