@@ -35,6 +35,8 @@ const useTheme = () => {
   useEffect(() => {
     const type: ThemeType = isDark ? 'dark' : 'light';
     Object.entries(globalTheme[type]).forEach(([key, val]) => setStyleProperty(key, val));
+    // Clear one-shot pre-hydration dark background injected by index.html once CSS variables are active
+    document.documentElement.style.background = '';
     Object.entries(token).forEach(([key, val]) => setStyleProperty(`--hooks-${key}`, String(val)));
     for (let i = 1; i <= 9; i++) {
       setStyleProperty(`--hooks-colorPrimary${i}`, isDark ? getDarkColor(primary, i / 10) : getLightColor(primary, i / 10));

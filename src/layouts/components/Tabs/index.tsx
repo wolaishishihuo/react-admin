@@ -1,5 +1,4 @@
 import './index.css';
-import { useUpdateEffect } from 'ahooks';
 import { Dropdown } from 'antd';
 import type { MouseEvent } from 'react';
 import { useContext, useEffect, useRef } from 'react';
@@ -54,17 +53,16 @@ const LayoutTabs = () => {
     });
   }, [flatMenuList, addTab]);
 
-  useUpdateEffect(() => {
-    const meta = matches[matches.length - 1].data as MetaProps & { redirect: boolean };
-    if (!meta?.redirect) {
-      addTab({
-        icon: meta.icon!,
-        title: meta.title!,
-        path,
-        closable: !meta.isAffix
-      });
-    }
-  }, [matches]);
+  useEffect(() => {
+    const meta = matches[matches.length - 1]?.data as (MetaProps & { redirect?: boolean }) | undefined;
+    if (!meta || meta.redirect || !meta.title) return;
+    addTab({
+      icon: meta.icon ?? '',
+      title: meta.title,
+      path,
+      closable: !meta.isAffix
+    });
+  }, [matches, path, addTab]);
 
   useEffect(() => {
     const scroller = scrollRef.current;

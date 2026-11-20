@@ -261,7 +261,7 @@ class RequestHttp {
   delete<T>(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<ResultData<T>> {
     return this.service.delete(url, params !== undefined ? { ...axiosConfig, params } : axiosConfig);
   }
-  download(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<BlobPart> {
+  download(url: string, params?: object, axiosConfig: AxiosRequestConfig = {}): Promise<Blob> {
     return this.service.post(url, params, { ...axiosConfig, responseType: 'blob' });
   }
 }

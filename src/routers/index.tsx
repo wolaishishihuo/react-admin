@@ -53,6 +53,7 @@ const RouterProvider = () => {
   const authMenuList = useAuthStore(state => state.authMenuList);
   const [pathname, setPathname] = useState(getLocationPath);
   const prevTokenRef = useRef(token);
+  const prevRouterRef = useRef<ReturnType<typeof createAppRouter> | null>(null);
 
   useEffect(() => {
     if (token && !authMenuList.length) {
@@ -94,6 +95,11 @@ const RouterProvider = () => {
   const router = useMemo(() => createAppRouter(routerList as RouteObject[]), [routerList]);
 
   useEffect(() => {
+    if (prevRouterRef.current && prevRouterRef.current !== router) {
+      prevRouterRef.current.dispose();
+    }
+    prevRouterRef.current = router;
+
     return router.subscribe(() => {
       setPathname(prev => {
         const next = getLocationPath();

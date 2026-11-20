@@ -245,6 +245,7 @@ describe('RequestHttp 401 & cancellation lifecycle', () => {
 
     const okBlob = await http.download('/export-json-file');
     expect(okBlob).toBeInstanceOf(Blob);
+    expect(okBlob.type).toBe('application/json');
   });
 
   it('uses backend msg for 4xx errors but hides raw backend msg on 5xx errors', async () => {
