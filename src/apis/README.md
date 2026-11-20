@@ -38,7 +38,33 @@ src/apis/modules/<module>/
 
 ## 3. TanStack Query 约定
 
-真实样板参考 `src/apis/modules/system/{keys.ts,hooks.ts}`（角色下拉选项查询 + 角色变更失效，与 ProTable 共存）。
+标准模式（与 `ProTable` 共存——列表走 `ProTable.request`，表单选项/详情等走 Query，写操作后精确失效）：
+
+```ts
+// keys.ts
+export const ORDER_QUERY_KEYS = {
+  all: ['order'] as const,
+  options: () => [...ORDER_QUERY_KEYS.all, 'options'] as const
+};
+
+// hooks.ts
+export function queryOrderOptions() {
+  return queryOptions({
+    queryKey: ORDER_QUERY_KEYS.options(),
+    queryFn: ({ signal }) => fetchOrderOptions({ signal })
+  });
+}
+
+export function useSaveOrderMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: ReqSaveOrder) => fetchSaveOrder(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.options() })
+  });
+}
+```
+
+（如仓库仍保留模板示例，也可对照 `src/apis/modules/system/{keys.ts,hooks.ts}`。）
 
 - **Client 获取**：应用运行时共享 `@/apis/query` 的 `queryClient`；React hooks 内优先 `useQueryClient()` 以便单测隔离，组件外用单例。`createQueryClient` 仅供基础设施和隔离测试使用，业务代码不得另建 client。
 - **QueryKey 工厂**：统一出自 `MODULE_QUERY_KEYS`，包含影响结果的全部业务参数（id、分页、筛选、租户等），不在组件手写 key 数组，也不拿 URL 当唯一缓存 key；按实际失效粒度建层级，不为未实现的查询预建 key。

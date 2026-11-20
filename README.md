@@ -20,3 +20,11 @@ React Admin 一款基于 React 19、React-Router v7、TanStack Query v5、Zustan
 - 项目其它功能：菜单手风琴模式、无限级菜单、多标签页、面包屑导航、页面水印、ECharts 组件封装、Remix Icon 统一图标组件…
 - 使用 Oxc（`oxlint` + `oxfmt`）统一代码静态检查（含 `unocss/order`）与极速格式化
 - 使用 husky、lint-staged、commitlint、czg、cz-git 规范代码提交信息
+
+### 派生业务项目清理演示页 🧹
+
+模板内示例页面与核心框架完全解耦，新建业务项目时可按需直接删除：
+
+1. **删除演示页 `src/views/template/`**：删除该目录后，同步从 `src/assets/json/authMenuList.json` 移除 `template` 菜单（若仍使用 `system` mock 单测，同步更新对应菜单树断言）。
+2. **删除示例管理模块 `src/views/system/`**：连同 `src/apis/modules/system/`、`tests/apis/modules/system/` 一起删除即可，无其他页面依赖。
+3. **接入真实后端菜单与权限**：替换 `src/apis/modules/login/api.ts`（`fetchGetAuthMenuList`）与 `src/apis/modules/user/api.ts`（`fetchGetCurrentUser`），并移除 `src/hooks/usePermissions.ts` 中的模板菜单白名单过滤；若更改首页路径，同步更新 `src/config/index.ts` 的 `HOME_URL`。

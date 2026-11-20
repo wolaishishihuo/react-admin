@@ -9,7 +9,7 @@ description: >-
 
 # 新增标准 CRUD 管理页
 
-按以下顺序一次生成并接入完整的管理页，不提前创建未消费的空文件。参考样板：`src/views/system/accountManage/` 与 `src/apis/modules/system/`。
+按以下顺序一次生成并接入完整的管理页，不提前创建未消费的空文件。优先对齐当前仓库已有的业务管理页（若尚未删除模板示例，可参考 `src/views/system/accountManage/` 与 `src/apis/modules/system/`）；即使示例页已全部删除，下方步骤与专题文档中的标准骨架也完全自包含。
 
 ## 前置阅读
 
