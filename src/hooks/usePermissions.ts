@@ -9,12 +9,13 @@ function initPermissions(token: string) {
   if (!token) return Promise.resolve();
   if (inFlight?.token === token) return inFlight.promise;
 
-  const { setToken, setRefreshToken } = useUserStore.getState();
+  const { setToken, setRefreshToken, setUserInfo } = useUserStore.getState();
   const { setAuthMenuList, setAuthButtons } = useAuthStore.getState();
 
   const promise = (async () => {
     try {
       const [currentUser, menuList] = await Promise.all([fetchGetCurrentUser(), fetchGetAuthMenuList()]);
+      setUserInfo({ name: currentUser.name ?? '' });
       setAuthButtons(currentUser.buttons ?? []);
 
       setAuthMenuList(
@@ -26,12 +27,14 @@ function initPermissions(token: string) {
           title: '无权限访问',
           description: '当前账号无任何菜单权限，请联系系统管理员！'
         });
+        setUserInfo({ name: '' });
         setAuthButtons([]);
         setToken('');
         setRefreshToken('');
         return Promise.reject('No permission');
       }
     } catch (error) {
+      setUserInfo({ name: '' });
       setAuthButtons([]);
       setToken('');
       setRefreshToken('');

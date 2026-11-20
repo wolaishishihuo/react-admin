@@ -1,10 +1,9 @@
 import { Button, Form, Input } from 'antd';
-import type { FormInstance, FormProps } from 'antd/es/form';
 import md5 from 'md5';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ReqLogin } from '@/apis/interface';
+import type { ReqLogin } from '@/apis/interface';
 import { fetchLogin } from '@/apis/modules/login';
 import { Icon } from '@/components/Icon';
 import { HOME_URL } from '@/config';
@@ -13,26 +12,24 @@ import usePermissions from '@/hooks/usePermissions';
 import { useTabsStore, useUserStore } from '@/stores';
 import { getTimeState } from '@/utils';
 
+const LOGIN_LOADING_KEY = 'login-loading';
+
 const LoginForm = () => {
   const navigate = useNavigate();
+  const [form] = Form.useForm<ReqLogin>();
   const setToken = useUserStore(state => state.setToken);
   const setRefreshToken = useUserStore(state => state.setRefreshToken);
   const setTabsList = useTabsStore(state => state.setTabsList);
-
   const { initPermissions } = usePermissions();
 
-  const formRef = useRef<FormInstance>(null);
   const [loading, setLoading] = useState(false);
 
-  const key = 'loading';
-
-  const onFinish = async (values: ReqLogin) => {
+  async function onFinish(values: ReqLogin) {
+    if (loading) return;
     try {
-      // loading
       setLoading(true);
-      message.open({ key, type: 'loading', content: '登录中...' });
+      message.open({ key: LOGIN_LOADING_KEY, type: 'loading', content: '登录中...' });
 
-      // user login
       const data = await fetchLogin({ ...values, password: md5(values.password) });
       const accessToken = data.access_token || data.accessToken || '';
       setToken(accessToken);
@@ -44,43 +41,26 @@ const LoginForm = () => {
       // init permissions
       await initPermissions(accessToken);
 
-      // prompt for successful login and redirect
       notification.success({
         title: getTimeState(),
         description: `欢迎登录 ${import.meta.env.VITE_GLOB_APP_TITLE}`,
         icon: <Icon icon='ri:checkbox-circle-fill' className='text-success' />
       });
 
-      // navigate to home
       navigate(HOME_URL);
     } finally {
       setLoading(false);
-      message.destroy(key);
+      message.destroy(LOGIN_LOADING_KEY);
     }
-  };
+  }
 
-  const onFinishFailed: FormProps['onFinishFailed'] = errorInfo => {
-    console.log('Failed:', errorInfo);
-  };
+  function onReset() {
+    form.resetFields();
+  }
 
-  const onReset = () => {
-    formRef.current?.resetFields();
-  };
-
-  useEffect(() => {
-    document.onkeydown = event => {
-      if (event.code === 'Enter') {
-        event.preventDefault();
-        formRef.current?.submit();
-      }
-    };
-    return () => {
-      document.onkeydown = () => {};
-    };
-  }, []);
   return (
     <div className='login-form-content'>
-      <Form name='login' size='large' autoComplete='off' ref={formRef} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form form={form} name='login' size='large' autoComplete='off' onFinish={onFinish}>
         <Form.Item name='username' rules={[{ required: true, message: '请输入用户名' }]}>
           <Input prefix={<Icon icon='ri:user-line' />} placeholder='用户名：admin / user' />
         </Form.Item>

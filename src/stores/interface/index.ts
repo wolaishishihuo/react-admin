@@ -54,7 +54,6 @@ export interface TabsAction {
   removeTab: (path: string, isCurrent: boolean) => string | null;
   closeTabsOnSide: (path: string, type: 'left' | 'right') => void;
   closeMultipleTab: (path?: string) => void;
-  setTabTitle: (title: string) => void;
 }
 
 /* UserState */

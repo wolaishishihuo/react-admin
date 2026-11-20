@@ -17,8 +17,8 @@ export const createVitePlugins = (viteEnv: ViteEnv): (PluginOption | PluginOptio
     // Before React so attributify / JSX transforms stay available later
     UnoCSS(),
     react(),
-    // esLint error messages are displayed on the browser interface
-    checker({ typescript: true }),
+    // TypeScript error overlay in dev; build scripts already run `tsc` before `vite build`
+    checker({ typescript: true, enableBuild: false }),
     // Create a packaged compression configuration
     createCompression(viteEnv),
     // Inject variable into html file

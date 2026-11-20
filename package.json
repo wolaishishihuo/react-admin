@@ -20,21 +20,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "serve": "vite",
     "build:dev": "tsc && vite build --mode development",
     "build:test": "tsc && vite build --mode test",
     "build:pro": "tsc && vite build --mode production",
     "type:check": "tsc --noEmit --skipLibCheck",
     "test": "vitest",
     "test:run": "vitest run",
-    "preview": "npm run build:dev && vite preview",
+    "preview": "pnpm build:dev && vite preview",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint:lint-staged": "lint-staged",
     "prepare": "husky",
-    "release": "standard-version",
     "commit": "git add -A && czg && git push"
   },
   "dependencies": {
@@ -43,7 +41,6 @@
     "@iconify-json/ri": "^1.2.10",
     "@iconify/react": "^6.0.2",
     "@tanstack/react-query": "^5.104.1",
-    "@tanstack/react-query-devtools": "^5.104.1",
     "ahooks": "^3.10.0",
     "antd": "^6.6.5",
     "axios": "^1.20.0",
@@ -62,6 +59,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "@tanstack/react-query-devtools": "^5.104.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

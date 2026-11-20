@@ -51,7 +51,11 @@ const SearchMenu = () => {
 
   function selectMenuItem(menu?: RouteObjectType) {
     if (!menu) return;
-    if (menu.meta?.isLink) window.open(menu.meta.isLink, '_blank');
+    if (menu.meta?.isLink) {
+      window.open(menu.meta.isLink, '_blank', 'noopener,noreferrer');
+      closeModal();
+      return;
+    }
     navigate(menu.path!);
     closeModal();
   }
@@ -76,7 +80,11 @@ const SearchMenu = () => {
         event.preventDefault();
         const menu = searchList.find(item => item.path === activePath);
         if (!menu) return;
-        if (menu.meta?.isLink) window.open(menu.meta.isLink, '_blank');
+        if (menu.meta?.isLink) {
+          window.open(menu.meta.isLink, '_blank', 'noopener,noreferrer');
+          setIsModalOpen(false);
+          return;
+        }
         navigate(menu.path!);
         setIsModalOpen(false);
       }

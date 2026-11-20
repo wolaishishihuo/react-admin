@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { TabsAction, TabsState } from '@/stores/interface';
-import { getUrlWithParams } from '@/utils';
 
 type TabsStoreState = TabsState & TabsAction;
 
@@ -57,15 +56,6 @@ export const useTabsStore = create<TabsStoreState>()(
           set((draft: TabsState) => {
             draft.tabsList = draft.tabsList.filter(item => {
               return item.path === path || !item.closable;
-            });
-          }),
-        setTabTitle: title =>
-          set((draft: TabsState) => {
-            draft.tabsList = draft.tabsList.map(item => {
-              if (item.path === getUrlWithParams()) {
-                return { ...item, title };
-              }
-              return item;
             });
           })
       }),

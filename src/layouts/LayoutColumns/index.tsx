@@ -28,7 +28,10 @@ const LayoutColumns = () => {
 
   function changeSubMenu(item: RouteObjectType) {
     const target = item.children?.length ? item.children[0] : item;
-    if (target.meta?.isLink) window.open(target.meta.isLink, '_blank');
+    if (target.meta?.isLink) {
+      window.open(target.meta.isLink, '_blank', 'noopener,noreferrer');
+      return;
+    }
     navigate(target.path!);
   }
 

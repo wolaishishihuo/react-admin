@@ -9,7 +9,7 @@ import {
   TooltipComponent
 } from 'echarts/components';
 import * as echarts from 'echarts/core';
-import { LabelLayout } from 'echarts/features';
+import { LabelLayout, LegacyGridContainLabel } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
 export type { EChartsOption as ECOption } from 'echarts';
@@ -30,6 +30,7 @@ echarts.use([
   CandlestickChart,
   MapChart,
   LabelLayout,
+  LegacyGridContainLabel,
   CanvasRenderer
 ]);
 

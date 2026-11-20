@@ -1,14 +1,14 @@
 import { Watermark } from 'antd';
 import type { ReactNode } from 'react';
 
-import { useGlobalStore } from '@/stores';
+import { useGlobalStore, useUserStore } from '@/stores';
 
 interface LayoutWatermarkProps {
   /** 受水印包裹的布局内容 */
   children: ReactNode;
 }
 
-const WATERMARK_CONTENT = ['React Admin', 'wolaishishihuo'];
+const APP_TITLE = import.meta.env.VITE_GLOB_APP_TITLE || 'React Admin';
 
 /**
  * antd 6 Watermark crashes with InvalidStateError when `content` is empty
@@ -18,10 +18,13 @@ const WATERMARK_CONTENT = ['React Admin', 'wolaishishihuo'];
 const LayoutWatermark = (props: LayoutWatermarkProps) => {
   const { children } = props;
   const watermark = useGlobalStore(state => state.watermark);
+  const userName = useUserStore(state => state.userInfo.name);
 
   if (!watermark) {
     return <div className='watermark-content'>{children}</div>;
   }
+
+  const content = userName ? [APP_TITLE, userName] : [APP_TITLE];
 
   return (
     <Watermark
@@ -30,7 +33,7 @@ const LayoutWatermark = (props: LayoutWatermarkProps) => {
       inherit={false}
       width={120}
       height={64}
-      content={WATERMARK_CONTENT}
+      content={content}
       style={{ height: '100%', overflow: 'hidden' }}
     >
       {children}

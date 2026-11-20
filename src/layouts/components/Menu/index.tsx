@@ -94,7 +94,10 @@ const LayoutMenu = (props: LayoutMenuProps) => {
 
   function handleMenuNavigation(path: string) {
     const menuItem = flatMenuList.find(item => item.path === path);
-    if (menuItem?.meta?.isLink) window.open(menuItem.meta.isLink, '_blank');
+    if (menuItem?.meta?.isLink) {
+      window.open(menuItem.meta.isLink, '_blank', 'noopener,noreferrer');
+      return;
+    }
     navigate(path);
   }
 

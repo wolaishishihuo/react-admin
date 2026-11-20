@@ -1,8 +1,10 @@
-import ReactDOM from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 
 import { Loading } from './index';
 
 let needLoadingRequestCount = 0;
+let loadingRoot: Root | null = null;
+let loadingDom: HTMLDivElement | null = null;
 
 /**
  * @description Show Loading
@@ -12,7 +14,9 @@ export const showFullScreenLoading = () => {
     const dom = document.createElement('div');
     dom.setAttribute('id', 'loading');
     document.body.appendChild(dom);
-    ReactDOM.createRoot(dom).render(<Loading />);
+    loadingDom = dom;
+    loadingRoot = createRoot(dom);
+    loadingRoot.render(<Loading />);
   }
   needLoadingRequestCount++;
 };
@@ -24,6 +28,9 @@ export const tryHideFullScreenLoading = () => {
   if (needLoadingRequestCount <= 0) return;
   needLoadingRequestCount--;
   if (needLoadingRequestCount === 0) {
-    document.body.removeChild(document.getElementById('loading') as HTMLElement);
+    loadingRoot?.unmount();
+    loadingRoot = null;
+    loadingDom?.remove();
+    loadingDom = null;
   }
 };

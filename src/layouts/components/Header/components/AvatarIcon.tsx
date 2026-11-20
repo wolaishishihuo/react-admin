@@ -5,8 +5,10 @@ import { fetchLogout } from '@/apis/modules/login';
 import avatar from '@/assets/images/avatar.png';
 import { Icon } from '@/components/Icon';
 import { message, modal } from '@/hooks/useMessage';
+import { useUserStore } from '@/stores';
 
 const AvatarIcon = () => {
+  const userName = useUserStore(state => state.userInfo.name);
   function logout() {
     modal.confirm({
       title: '温馨提示 🧡',
@@ -30,6 +32,16 @@ const AvatarIcon = () => {
   }
 
   const items: MenuProps['items'] = [
+    ...(userName
+      ? [
+          {
+            key: 'user',
+            label: <span className='font-medium'>{userName}</span>,
+            disabled: true
+          },
+          { type: 'divider' as const }
+        ]
+      : []),
     {
       key: 'logout',
       label: <span className='dropdown-item'>退出登录</span>,
@@ -40,7 +52,7 @@ const AvatarIcon = () => {
 
   return (
     <Dropdown menu={{ items }} trigger={['click']} placement='bottom' arrow>
-      <Avatar className='avatar' size={34} src={avatar} />
+      <Avatar className='avatar' size={34} src={avatar} alt={userName || 'avatar'} />
     </Dropdown>
   );
 };

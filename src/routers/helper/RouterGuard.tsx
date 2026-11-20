@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Navigate, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
 import { HOME_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config';
@@ -21,7 +21,9 @@ const RouterGuard = (props: RouterGuardProps) => {
   const authMenuList = useAuthStore(state => state.authMenuList);
 
   // Mount navigate to provide non-React function components or calls in custom React Hook functions
-  window.$navigate = navigate;
+  useLayoutEffect(() => {
+    window.$navigate = navigate;
+  }, [navigate]);
 
   useEffect(() => {
     const meta = loader as MetaProps;

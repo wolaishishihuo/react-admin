@@ -235,6 +235,7 @@ export function clearAuthSession() {
 
   userState.setToken('');
   userState.setRefreshToken('');
+  userState.setUserInfo({ name: '' });
   authState.setAuthMenuList([]);
   authState.setAuthButtons([]);
   useTabsStore.getState().setTabsList([]);

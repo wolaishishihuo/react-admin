@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
@@ -92,12 +92,20 @@
       </div>
     </div>
     <script>
-      const globalState = JSON.parse(window.localStorage.getItem('hooks-global'));
-      if (globalState) {
-        const dot = document.querySelectorAll('.dot i');
-        const html = document.querySelector('html');
-        dot.forEach(item => (item.style.background = globalState.state.primary));
-        if (globalState.state.isDark) html.style.background = '#141414';
+      try {
+        const raw = window.localStorage.getItem('hooks-global');
+        const globalState = raw ? JSON.parse(raw) : null;
+        const state = globalState?.state;
+        if (state) {
+          if (state.primary) {
+            document.querySelectorAll('.dot i').forEach(item => (item.style.background = state.primary));
+          }
+          if (state.isDark) {
+            document.documentElement.style.background = '#141414';
+          }
+        }
+      } catch {
+        // Ignore storage read/parse errors before React mounts
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>

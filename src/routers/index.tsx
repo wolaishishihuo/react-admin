@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, createHashRouter, RouteObject, RouterProvider as Router } from 'react-router-dom';
 
 import NotFound from '@/components/Error/404';
+import RouteError from '@/components/Error/RouteError';
 import { Loading } from '@/components/Loading';
 import { LOGIN_URL } from '@/config';
 import { RouterModeEnum } from '@/constants';
@@ -30,6 +31,7 @@ const getLocationPath = () => {
 const createAppRouter = (routerList: RouteObject[]) => {
   const routes: RouteObject[] = [
     {
+      errorElement: <RouteError />,
       hydrateFallbackElement: <Loading />,
       children: routerList
     }

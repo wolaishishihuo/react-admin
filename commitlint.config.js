@@ -132,8 +132,8 @@ export default {
         emoji: '📋'
       },
       {
-        value: 'type',
-        name: 'type:     🔰  type definition file changes',
+        value: 'types',
+        name: 'types:    🔰  type definition file changes',
         emoji: '🔰'
       }
       // 中文版

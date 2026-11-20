@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { queryClient } from '@/apis/query';
 
@@ -23,12 +23,18 @@ export const RefreshProvider = (props: RefreshProviderProps) => {
   const { children } = props;
   const [outletShow, setOutletShow] = useState(true);
   const [refreshNonce, setRefreshNonce] = useState(0);
+  const timerRef = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    return () => window.clearTimeout(timerRef.current);
+  }, []);
 
   const refresh = useCallback(() => {
     queryClient.invalidateQueries();
     setRefreshNonce(n => n + 1);
     setOutletShow(false);
-    window.setTimeout(() => setOutletShow(true));
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setOutletShow(true));
   }, []);
 
   const contextValue = useMemo(

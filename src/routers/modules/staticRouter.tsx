@@ -13,7 +13,7 @@ import RouterGuard from '../helper/RouterGuard';
 /**
  * staticRouter
  */
-export const staticRouter: RouteObjectType[] = [
+const staticRouter: RouteObjectType[] = [
   {
     path: '/',
     element: <Navigate to={HOME_URL} />

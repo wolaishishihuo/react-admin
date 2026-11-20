@@ -1,6 +1,5 @@
 /* Vite */
 declare interface ViteEnv {
-  VITE_USER_NODE_ENV: 'development' | 'production' | 'test';
   VITE_GLOB_APP_TITLE: string;
   VITE_PORT: number;
   VITE_OPEN: boolean;

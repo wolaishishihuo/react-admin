@@ -1,10 +1,7 @@
 import { RequestData } from '@ant-design/pro-components';
 
 import { ResPage } from '@/apis/interface';
-import { RouterModeEnum } from '@/constants';
 import { RouteObjectType } from '@/routers/interface';
-
-const mode = import.meta.env.VITE_ROUTER_MODE;
 
 /**
  * @description Get the corresponding greeting for the current time.
@@ -66,17 +63,6 @@ export function getAllBreadcrumbList(
     if (item.children) getAllBreadcrumbList(item.children, result[item.meta!.key!], result);
   }
   return result;
-}
-
-/**
- * @description Get relative url with params
- */
-export function getUrlWithParams() {
-  const url: Record<RouterModeEnum, string> = {
-    [RouterModeEnum.HASH]: location.hash.substring(1),
-    [RouterModeEnum.HISTORY]: location.pathname + location.search
-  };
-  return url[mode];
 }
 
 /**

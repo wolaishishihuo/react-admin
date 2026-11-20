@@ -60,7 +60,11 @@ export const useGlobalStore = create<GlobalStoreState>()(
       }),
       {
         name: 'hooks-global',
-        version: 1
+        version: 1,
+        partialize: state => {
+          const { themeDrawerVisible: _drawer, maximize: _maximize, ...persisted } = state;
+          return persisted;
+        }
       }
     )
   )

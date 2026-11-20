@@ -12,7 +12,7 @@ export const useUserStore = create<UserStoreState>()(
       set => ({
         token: '',
         refreshToken: '',
-        userInfo: { name: 'wolaishishihuo' },
+        userInfo: { name: '' },
         setToken: token =>
           set((state: UserState) => {
             state.token = token;
