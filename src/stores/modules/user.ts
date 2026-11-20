@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
+import { getStorageKey } from '@/config';
 import { UserAction, UserState } from '@/stores/interface';
 
 type UserStoreState = UserState & UserAction;
@@ -27,7 +28,7 @@ export const useUserStore = create<UserStoreState>()(
           })
       }),
       {
-        name: 'hooks-user',
+        name: getStorageKey('user'),
         version: 1.0
       }
     )

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
+import { getStorageKey } from '@/config';
 import { TabsAction, TabsState } from '@/stores/interface';
 
 type TabsStoreState = TabsState & TabsAction;
@@ -60,7 +61,7 @@ export const useTabsStore = create<TabsStoreState>()(
           })
       }),
       {
-        name: 'hooks-tabs',
+        name: getStorageKey('tabs'),
         version: 2.0
       }
     )

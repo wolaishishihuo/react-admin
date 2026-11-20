@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-import { DEFAULT_PRIMARY } from '@/config';
+import { DEFAULT_PRIMARY, getStorageKey } from '@/config';
 import { GlobalAction, GlobalState } from '@/stores/interface';
 
 type GlobalStoreState = GlobalState & GlobalAction;
@@ -59,7 +59,7 @@ export const useGlobalStore = create<GlobalStoreState>()(
           })
       }),
       {
-        name: 'hooks-global',
+        name: getStorageKey('global'),
         version: 1,
         partialize: state => {
           const { themeDrawerVisible: _drawer, maximize: _maximize, ...persisted } = state;

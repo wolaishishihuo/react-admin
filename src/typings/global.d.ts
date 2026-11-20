@@ -1,6 +1,7 @@
 /* Vite */
 declare interface ViteEnv {
   VITE_GLOB_APP_TITLE: string;
+  VITE_STORAGE_PREFIX: string;
   VITE_PORT: number;
   VITE_OPEN: boolean;
   VITE_REPORT: boolean;
