@@ -122,6 +122,16 @@ src/apis/modules/<module>/
 5. 按需设置 `meta.isKeepAlive`，确认缓存页的切换、关闭和刷新行为；不要把跨页保存状态一律搬进 store。
 6. 登录、错误等固定基础页放 `src/routers/modules/staticRouter.tsx`；业务全屏页可沿用动态菜单的 `meta.isFull`，不要仅因全屏就新增静态路由。
 
+## 表格与 ProTable
+
+- **业务数据表格优先使用 `@ant-design/pro-components` 的 `ProTable`**，复用列配置、搜索、工具栏和分页能力；详情 / 弹窗内的简单展示表格可用 antd `Table`，有明确特殊需求时再选择其他实现。请求与刷新遵守「数据与状态归属」，不因使用 ProTable 再封装一套请求管理。
+- **独立管理列表页默认使用自适应高度、表体内部滚动**：给 ProTable 设置 `className='ant-pro-table-scroll'` 和 `scroll={{ x: ..., y: '100%' }}`。`src/styles/proTable.less` 已全局引入，配合 `src/layouts/components/Main/index.less` 分配剩余高度，搜索区、工具栏、表头和分页保留在滚动区外；`scroll.x` 按实际列宽选择数值或 `'max-content'`，不要照搬其他页面的宽度。
+- 表格外增加容器或统计卡时，保持父级可用高度与 flex 收缩链路：页面用纵向 flex，统计区不收缩，表格所在区域用 `flex: 1; min-height: 0`。高度异常先检查容器层级；CSS 方案能满足时，不重复测量 DOM、计算 `window.innerHeight`、硬编码 `calc(100vh - 固定偏移)` 或新增高度 hook。现有 `src/hooks/useTableScroll.ts` 未被页面采用，不作为默认方案。
+- `ant-pro-table-scroll` **也是页面滚动模式的开关**：主布局检测到活动页含该类名后会关闭外层滚动。仅在需要填满受约束区域、由表体滚动时使用；长内容页、详情 / 弹窗内嵌表格和多表格页面先确定滚动容器，不机械套用该类名或 `scroll.y: '100%'`，避免内容被裁切。
+- 标准管理列表沿用 `bordered` / `cardBordered`、`search={{ labelWidth: 'auto' }}`；分页复用 `@/config/proTable` 的 `pagination`，业务差异按需覆盖，无分页时显式设 `pagination={false}`。`rowKey` 使用稳定业务标识，搜索表单的 `form.name` 在同页保持唯一。
+- 操作按钮使用 `toolBarRender`，公共样式已统一操作按钮与设置图标的布局；树形展开图标由 `src/config/proTable.tsx` 和全局 ConfigProvider 统一提供。不要在页面复制整套 `.ant-table-*` / `.ant-pro-*` 覆盖或为默认外观额外包一层 Card；共性调整改公共配置 / 样式，局部差异限制在页面作用域。
+- 完整接入可参考 `src/views/system/accountManage/index.tsx` 的表格结构；只复用公共用法，业务请求按实际接口实现。调整表格布局后检查窗口缩放、搜索展开 / 收起、空态 / 多行、分页及缓存页切换，确认无裁切、双重纵向滚动或分页被挤出。
+
 ## 按钮权限
 
 - 按钮权限统一来自 `fetchGetCurrentUser()` 返回的 `buttons: string[]`，写入 `authStore.authButtons`；模板对应 `GET /users/me`，当前是否走 mock 以 API 实现为准。子项目改变后端字段或地址，在 API 层适配，保持组件侧契约一致。
