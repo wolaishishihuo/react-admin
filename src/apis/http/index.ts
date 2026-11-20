@@ -204,7 +204,9 @@ class RequestHttp {
    */
   private async handleHttpUnauthorized(error: AxiosError, reqConfig?: AxiosRequestConfig) {
     if (!reqConfig || !enableRefreshToken || reqConfig.__isRetryRequest || !useUserStore.getState().refreshToken) {
-      clearAuthSession();
+      if (clearAuthSession()) {
+        message.error('登录失效！请您重新登录');
+      }
       throw error;
     }
 
@@ -241,7 +243,9 @@ class RequestHttp {
       this.refreshTokenQueue = [];
       queue.forEach(item => item.reject(refreshError));
       if (!axios.isCancel(refreshError)) {
-        clearAuthSession();
+        if (clearAuthSession()) {
+          message.error('登录失效！请您重新登录');
+        }
       }
       throw refreshError;
     } finally {
@@ -279,14 +283,14 @@ export function cancelActiveRequests() {
  * Query 缓存在受保护路由随 token 清空完成卸载后，由 RouterProvider 统一 clear，
  * 避免在页面卸载前清空缓存触发活跃 useQuery 立即重发导致 401。
  */
-export function clearAuthSession() {
+export function clearAuthSession(): boolean {
   const userState = useUserStore.getState();
   const authState = useAuthStore.getState();
   const hasSession = Boolean(
     userState.token || userState.refreshToken || authState.authMenuList.length || authState.authButtons.length
   );
 
-  if (!hasSession) return;
+  if (!hasSession) return false;
 
   cancelActiveRequests();
 
@@ -298,6 +302,7 @@ export function clearAuthSession() {
   useTabsStore.getState().setTabsList([]);
 
   window.$navigate?.(LOGIN_URL, { replace: true });
+  return true;
 }
 
 export default http;

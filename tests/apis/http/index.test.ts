@@ -116,9 +116,11 @@ describe('RequestHttp 401 & cancellation lifecycle', () => {
     expect(useAuthStore.getState().authButtons).toEqual([]);
     expect(useTabsStore.getState().tabsList).toEqual([]);
     expect(navigateSpy).toHaveBeenCalledWith(LOGIN_URL, { replace: true });
+    expect(mockMessageError).toHaveBeenCalledTimes(1);
+    expect(mockMessageError).toHaveBeenCalledWith('登录失效！请您重新登录');
   });
 
-  it('does not request token refresh when refreshToken is empty', async () => {
+  it('does not request token refresh when refreshToken is empty and notifies once across concurrent 401s', async () => {
     useUserStore.setState({ token: 'old-token', refreshToken: '' });
 
     const refreshSpy = vi.fn();
@@ -127,11 +129,18 @@ describe('RequestHttp 401 & cancellation lifecycle', () => {
       throw make401(config);
     };
 
-    await expect(http.get('/home/stats')).rejects.toThrow();
+    const results = await Promise.allSettled([
+      http.get('/home/stats', undefined, { silent: true }),
+      http.get('/home/chart', undefined, { silent: true })
+    ]);
 
+    expect(results.every(item => item.status === 'rejected')).toBe(true);
     expect(refreshSpy).not.toHaveBeenCalled();
     expect(useUserStore.getState().token).toBe('');
+    expect(navigateSpy).toHaveBeenCalledTimes(1);
     expect(navigateSpy).toHaveBeenCalledWith(LOGIN_URL, { replace: true });
+    expect(mockMessageError).toHaveBeenCalledTimes(1);
+    expect(mockMessageError).toHaveBeenCalledWith('登录失效！请您重新登录');
   });
 
   it('skips auth refresh and error toast when skipAuthRefresh and silent are enabled', async () => {
@@ -197,10 +206,11 @@ describe('RequestHttp 401 & cancellation lifecycle', () => {
   });
 
   it('makes clearAuthSession idempotent when already logged out', () => {
-    clearAuthSession();
-    clearAuthSession();
+    expect(clearAuthSession()).toBe(true);
+    expect(clearAuthSession()).toBe(false);
 
     expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(mockMessageError).not.toHaveBeenCalled();
   });
 
   it('rejects business error codes with an Error instance preserving code', async () => {
